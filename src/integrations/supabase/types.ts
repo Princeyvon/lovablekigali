@@ -1,0 +1,913 @@
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[]
+
+export type Database = {
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+  __InternalSupabase: {
+    PostgrestVersion: "14.15"
+  }
+  public: {
+    Tables: {
+      admin_emails: {
+        Row: {
+          email: string
+        }
+        Insert: {
+          email: string
+        }
+        Update: {
+          email?: string
+        }
+        Relationships: []
+      }
+      client_credentials: {
+        Row: {
+          client_id: string
+          created_at: string
+          encrypted_password: string
+          id: string
+          last_rotated: string
+          notes: string | null
+          service_name: string
+          username: string | null
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          encrypted_password: string
+          id?: string
+          last_rotated?: string
+          notes?: string | null
+          service_name: string
+          username?: string | null
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          encrypted_password?: string
+          id?: string
+          last_rotated?: string
+          notes?: string | null
+          service_name?: string
+          username?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_credentials_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      client_notes: {
+        Row: {
+          client_id: string
+          content: string
+          created_at: string
+          created_by: string | null
+          id: string
+          is_draft: boolean
+          note_type: Database["public"]["Enums"]["note_type"]
+        }
+        Insert: {
+          client_id: string
+          content: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_draft?: boolean
+          note_type?: Database["public"]["Enums"]["note_type"]
+        }
+        Update: {
+          client_id?: string
+          content?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_draft?: boolean
+          note_type?: Database["public"]["Enums"]["note_type"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_notes_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_notes_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "team_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      client_system_users: {
+        Row: {
+          admin_contact: string | null
+          admin_name: string | null
+          client_id: string
+          created_at: string
+          id: string
+          last_verified_date: string | null
+          roles_breakdown: string | null
+          user_count: number
+        }
+        Insert: {
+          admin_contact?: string | null
+          admin_name?: string | null
+          client_id: string
+          created_at?: string
+          id?: string
+          last_verified_date?: string | null
+          roles_breakdown?: string | null
+          user_count?: number
+        }
+        Update: {
+          admin_contact?: string | null
+          admin_name?: string | null
+          client_id?: string
+          created_at?: string
+          id?: string
+          last_verified_date?: string | null
+          roles_breakdown?: string | null
+          user_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_system_users_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      clients: {
+        Row: {
+          business_name: string
+          contact_email: string | null
+          contact_name: string | null
+          contact_phone: string | null
+          created_at: string
+          id: string
+          industry: string | null
+          onboarded_by: string | null
+          signed_date: string
+          status: Database["public"]["Enums"]["client_status"]
+        }
+        Insert: {
+          business_name: string
+          contact_email?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          id?: string
+          industry?: string | null
+          onboarded_by?: string | null
+          signed_date?: string
+          status?: Database["public"]["Enums"]["client_status"]
+        }
+        Update: {
+          business_name?: string
+          contact_email?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          id?: string
+          industry?: string | null
+          onboarded_by?: string | null
+          signed_date?: string
+          status?: Database["public"]["Enums"]["client_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "clients_onboarded_by_fkey"
+            columns: ["onboarded_by"]
+            isOneToOne: false
+            referencedRelation: "team_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      commissions: {
+        Row: {
+          amount: number
+          client_id: string | null
+          created_at: string
+          id: string
+          payment_id: string | null
+          rep_id: string | null
+          status: Database["public"]["Enums"]["commission_status"]
+          type: Database["public"]["Enums"]["commission_type"]
+        }
+        Insert: {
+          amount?: number
+          client_id?: string | null
+          created_at?: string
+          id?: string
+          payment_id?: string | null
+          rep_id?: string | null
+          status?: Database["public"]["Enums"]["commission_status"]
+          type?: Database["public"]["Enums"]["commission_type"]
+        }
+        Update: {
+          amount?: number
+          client_id?: string | null
+          created_at?: string
+          id?: string
+          payment_id?: string | null
+          rep_id?: string | null
+          status?: Database["public"]["Enums"]["commission_status"]
+          type?: Database["public"]["Enums"]["commission_type"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "commissions_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "commissions_payment_id_fkey"
+            columns: ["payment_id"]
+            isOneToOne: false
+            referencedRelation: "payments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "commissions_rep_id_fkey"
+            columns: ["rep_id"]
+            isOneToOne: false
+            referencedRelation: "team_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      credential_access_log: {
+        Row: {
+          accessed_at: string
+          accessed_by: string | null
+          action: string
+          credential_id: string
+          id: string
+        }
+        Insert: {
+          accessed_at?: string
+          accessed_by?: string | null
+          action?: string
+          credential_id: string
+          id?: string
+        }
+        Update: {
+          accessed_at?: string
+          accessed_by?: string | null
+          action?: string
+          credential_id?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "credential_access_log_credential_id_fkey"
+            columns: ["credential_id"]
+            isOneToOne: false
+            referencedRelation: "client_credentials"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      entity_events: {
+        Row: {
+          action: string
+          actor: string | null
+          change_reason: string | null
+          created_at: string
+          entity_id: string | null
+          entity_table: string
+          id: string
+          payload: Json | null
+        }
+        Insert: {
+          action: string
+          actor?: string | null
+          change_reason?: string | null
+          created_at?: string
+          entity_id?: string | null
+          entity_table: string
+          id?: string
+          payload?: Json | null
+        }
+        Update: {
+          action?: string
+          actor?: string | null
+          change_reason?: string | null
+          created_at?: string
+          entity_id?: string | null
+          entity_table?: string
+          id?: string
+          payload?: Json | null
+        }
+        Relationships: []
+      }
+      expenses: {
+        Row: {
+          amount: number
+          category: string
+          created_at: string
+          date: string
+          id: string
+          note: string | null
+          paid_by: string | null
+          vendor: string | null
+        }
+        Insert: {
+          amount: number
+          category?: string
+          created_at?: string
+          date?: string
+          id?: string
+          note?: string | null
+          paid_by?: string | null
+          vendor?: string | null
+        }
+        Update: {
+          amount?: number
+          category?: string
+          created_at?: string
+          date?: string
+          id?: string
+          note?: string | null
+          paid_by?: string | null
+          vendor?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "expenses_paid_by_fkey"
+            columns: ["paid_by"]
+            isOneToOne: false
+            referencedRelation: "team_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payments: {
+        Row: {
+          amount: number
+          client_id: string
+          covers_period_end: string
+          covers_period_start: string
+          created_at: string
+          id: string
+          method: string | null
+          months_covered: number
+          note: string | null
+          payment_date: string
+        }
+        Insert: {
+          amount: number
+          client_id: string
+          covers_period_end?: string
+          covers_period_start?: string
+          created_at?: string
+          id?: string
+          method?: string | null
+          months_covered?: number
+          note?: string | null
+          payment_date?: string
+        }
+        Update: {
+          amount?: number
+          client_id?: string
+          covers_period_end?: string
+          covers_period_start?: string
+          created_at?: string
+          id?: string
+          method?: string | null
+          months_covered?: number
+          note?: string | null
+          payment_date?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string | null
+          full_name: string | null
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+        }
+        Relationships: []
+      }
+      prospects: {
+        Row: {
+          assigned_rep: string | null
+          business_name: string
+          contact_email: string | null
+          contact_name: string | null
+          contact_phone: string | null
+          created_at: string
+          id: string
+          industry: string | null
+          source: string | null
+          stage: Database["public"]["Enums"]["prospect_stage"]
+        }
+        Insert: {
+          assigned_rep?: string | null
+          business_name: string
+          contact_email?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          id?: string
+          industry?: string | null
+          source?: string | null
+          stage?: Database["public"]["Enums"]["prospect_stage"]
+        }
+        Update: {
+          assigned_rep?: string | null
+          business_name?: string
+          contact_email?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          id?: string
+          industry?: string | null
+          source?: string | null
+          stage?: Database["public"]["Enums"]["prospect_stage"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prospects_assigned_rep_fkey"
+            columns: ["assigned_rep"]
+            isOneToOne: false
+            referencedRelation: "team_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      referrals: {
+        Row: {
+          created_at: string
+          date: string
+          id: string
+          new_prospect_id: string | null
+          referring_client_id: string | null
+          referring_rep_id: string | null
+          reward_status: string | null
+          reward_type: string | null
+        }
+        Insert: {
+          created_at?: string
+          date?: string
+          id?: string
+          new_prospect_id?: string | null
+          referring_client_id?: string | null
+          referring_rep_id?: string | null
+          reward_status?: string | null
+          reward_type?: string | null
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          id?: string
+          new_prospect_id?: string | null
+          referring_client_id?: string | null
+          referring_rep_id?: string | null
+          reward_status?: string | null
+          reward_type?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "referrals_new_prospect_id_fkey"
+            columns: ["new_prospect_id"]
+            isOneToOne: false
+            referencedRelation: "prospects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "referrals_referring_client_id_fkey"
+            columns: ["referring_client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "referrals_referring_rep_id_fkey"
+            columns: ["referring_rep_id"]
+            isOneToOne: false
+            referencedRelation: "team_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      service_logs: {
+        Row: {
+          category: Database["public"]["Enums"]["service_category"]
+          client_id: string
+          created_at: string
+          date: string
+          description: string
+          id: string
+          logged_by: string | null
+        }
+        Insert: {
+          category?: Database["public"]["Enums"]["service_category"]
+          client_id: string
+          created_at?: string
+          date?: string
+          description: string
+          id?: string
+          logged_by?: string | null
+        }
+        Update: {
+          category?: Database["public"]["Enums"]["service_category"]
+          client_id?: string
+          created_at?: string
+          date?: string
+          description?: string
+          id?: string
+          logged_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "service_logs_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "service_logs_logged_by_fkey"
+            columns: ["logged_by"]
+            isOneToOne: false
+            referencedRelation: "team_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      subscriptions: {
+        Row: {
+          billing_cycle: string
+          client_id: string
+          created_at: string
+          id: string
+          monthly_rate: number
+          start_date: string
+          status: Database["public"]["Enums"]["sub_status"]
+        }
+        Insert: {
+          billing_cycle?: string
+          client_id: string
+          created_at?: string
+          id?: string
+          monthly_rate?: number
+          start_date?: string
+          status?: Database["public"]["Enums"]["sub_status"]
+        }
+        Update: {
+          billing_cycle?: string
+          client_id?: string
+          created_at?: string
+          id?: string
+          monthly_rate?: number
+          start_date?: string
+          status?: Database["public"]["Enums"]["sub_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscriptions_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      team_members: {
+        Row: {
+          active: boolean
+          created_at: string
+          email: string | null
+          full_name: string
+          id: string
+          phone: string | null
+          role: string
+          user_id: string | null
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          email?: string | null
+          full_name: string
+          id?: string
+          phone?: string | null
+          role?: string
+          user_id?: string | null
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          email?: string | null
+          full_name?: string
+          id?: string
+          phone?: string | null
+          role?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      team_payouts: {
+        Row: {
+          amount: number
+          created_at: string
+          date_sent: string
+          id: string
+          method: Database["public"]["Enums"]["payout_method"]
+          note: string | null
+          reference: string | null
+          team_member_id: string | null
+          type: Database["public"]["Enums"]["payout_type"]
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          date_sent?: string
+          id?: string
+          method?: Database["public"]["Enums"]["payout_method"]
+          note?: string | null
+          reference?: string | null
+          team_member_id?: string | null
+          type?: Database["public"]["Enums"]["payout_type"]
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          date_sent?: string
+          id?: string
+          method?: Database["public"]["Enums"]["payout_method"]
+          note?: string | null
+          reference?: string | null
+          team_member_id?: string | null
+          type?: Database["public"]["Enums"]["payout_type"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_payouts_team_member_id_fkey"
+            columns: ["team_member_id"]
+            isOneToOne: false
+            referencedRelation: "team_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      weekly_snapshots: {
+        Row: {
+          active_clients: number
+          churned_clients: number
+          deals_closed: number
+          id: string
+          new_leads: number
+          revenue_collected: number
+          week_start: string
+        }
+        Insert: {
+          active_clients?: number
+          churned_clients?: number
+          deals_closed?: number
+          id?: string
+          new_leads?: number
+          revenue_collected?: number
+          week_start: string
+        }
+        Update: {
+          active_clients?: number
+          churned_clients?: number
+          deals_closed?: number
+          id?: string
+          new_leads?: number
+          revenue_collected?: number
+          week_start?: string
+        }
+        Relationships: []
+      }
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      bootstrap_me: {
+        Args: never
+        Returns: Database["public"]["Enums"]["app_role"]
+      }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      is_admin: { Args: never; Returns: boolean }
+      is_staff: { Args: never; Returns: boolean }
+      my_member_id: { Args: never; Returns: string }
+      owns_client: { Args: { _client_id: string }; Returns: boolean }
+    }
+    Enums: {
+      app_role: "admin" | "sales" | "dev" | "support"
+      client_status: "Active" | "Paused" | "Churned"
+      commission_status: "Pending" | "Paid"
+      commission_type: "Signing Bonus" | "Recurring %"
+      note_type: "General" | "Prompt Draft" | "Spec"
+      payout_method: "Check" | "Mobile Money" | "Bank"
+      payout_type: "Commission" | "Salary" | "Reimbursement"
+      prospect_stage: "Contacted" | "Demo" | "Negotiating" | "Signed" | "Lost"
+      service_category: "Bug Fix" | "Feature" | "Maintenance" | "Support Call"
+      sub_status: "Active" | "Paused" | "Cancelled"
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
+}
+
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
+
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
+
+export type Tables<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+      Row: infer R
+    }
+    ? R
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+        Row: infer R
+      }
+      ? R
+      : never
+    : never
+
+export type TablesInsert<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Insert: infer I
+    }
+    ? I
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Insert: infer I
+      }
+      ? I
+      : never
+    : never
+
+export type TablesUpdate<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Update: infer U
+    }
+    ? U
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Update: infer U
+      }
+      ? U
+      : never
+    : never
+
+export type Enums<
+  DefaultSchemaEnumNameOrOptions extends
+    | keyof DefaultSchema["Enums"]
+    | { schema: keyof DatabaseWithoutInternals },
+  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    : never = never,
+> = DefaultSchemaEnumNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
+    : never
+
+export type CompositeTypes<
+  PublicCompositeTypeNameOrOptions extends
+    | keyof DefaultSchema["CompositeTypes"]
+    | { schema: keyof DatabaseWithoutInternals },
+  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    : never = never,
+> = PublicCompositeTypeNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+    : never
+
+export const Constants = {
+  public: {
+    Enums: {
+      app_role: ["admin", "sales", "dev", "support"],
+      client_status: ["Active", "Paused", "Churned"],
+      commission_status: ["Pending", "Paid"],
+      commission_type: ["Signing Bonus", "Recurring %"],
+      note_type: ["General", "Prompt Draft", "Spec"],
+      payout_method: ["Check", "Mobile Money", "Bank"],
+      payout_type: ["Commission", "Salary", "Reimbursement"],
+      prospect_stage: ["Contacted", "Demo", "Negotiating", "Signed", "Lost"],
+      service_category: ["Bug Fix", "Feature", "Maintenance", "Support Call"],
+      sub_status: ["Active", "Paused", "Cancelled"],
+    },
+  },
+} as const
