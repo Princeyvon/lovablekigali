@@ -44,3 +44,16 @@ export function startOfWeek(d: Date) {
 
 export const REMINDER_WINDOW_DAYS = 5;
 export const ROTATION_STALE_DAYS = 365;
+
+export const todayISO = () => new Date().toISOString().slice(0, 10);
+
+/** Add whole months to an ISO date (YYYY-MM-DD), clamping to end of month. */
+export function addMonths(iso: string, months: number) {
+  const d = new Date(iso + "T00:00:00");
+  const day = d.getDate();
+  d.setDate(1);
+  d.setMonth(d.getMonth() + months);
+  const last = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+  d.setDate(Math.min(day, last));
+  return d.toISOString().slice(0, 10);
+}

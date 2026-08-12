@@ -40,13 +40,13 @@ function Billing() {
     mutationFn: async () => {
       const months = Number(form.months) || 1;
       const prior = paidThrough(payments.filter((p) => p.client_id === form.client_id));
-      const start = prior ?? form.payment_date;
+      const start: string = prior ?? form.payment_date;
       const { error } = await supabase.from("payments").insert({
         client_id: form.client_id,
         amount: Number(form.amount),
         months_covered: months,
         payment_date: form.payment_date,
-        payment_method: form.method,
+        method: form.method,
         covers_period_start: start,
         covers_period_end: addMonths(start, months),
       });
@@ -170,7 +170,7 @@ function Billing() {
                 <TD>
                   {fmtDate(p.covers_period_start)} → {fmtDate(p.covers_period_end)}
                 </TD>
-                <TD>{p.payment_method}</TD>
+                <TD>{p.method}</TD>
               </tr>
             ))}
           </Table>
