@@ -118,7 +118,7 @@ function ClientDetail() {
   return (
     <AppShell
       title={client?.business_name ?? "Client"}
-      subtitle={client ? `${client.industry || "—"} · signed ${fmtDate(client.signed_date)}` : undefined}
+      subtitle={client ? `${client.industry || "—"} · signed ${fmtDate(client.signed_date)}` : "Loading client…"}
       actions={
         <Link to="/clients" className="inline-flex items-center gap-1.5 rounded-xl border border-border px-3 py-2 text-sm">
           <ArrowLeft className="size-4" /> All clients
