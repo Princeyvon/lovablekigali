@@ -122,7 +122,7 @@ export function Pill({ children, tone = "leaf" }: { children: ReactNode; tone?: 
   );
 }
 
-export function TH({ children, className }: { children: ReactNode; className?: string }) {
+export function TH({ children, className }: { children?: ReactNode; className?: string }) {
   return (
     <th className={cn("px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-muted-foreground", className)}>
       {children}
