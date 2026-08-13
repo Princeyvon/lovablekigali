@@ -8,6 +8,9 @@ import {
   Receipt,
   ScrollText,
   Send,
+  ShieldAlert,
+  ShieldCheck,
+  UserCog,
   Users,
   UserSquare2,
   Wallet,
@@ -22,12 +25,15 @@ const manage = [
   { to: "/clients", label: "Clients", icon: UserSquare2 },
   { to: "/billing", label: "Billing", icon: CreditCard },
   { to: "/referrals", label: "Referrals", icon: Handshake },
+  { to: "/apps", label: "App Status", icon: ShieldAlert },
 ] as const;
 
 const operate = [
   { to: "/team", label: "Team & Payouts", icon: Users },
   { to: "/expenses", label: "Expenses", icon: Receipt },
-  { to: "/insights", label: "Insights", icon: BarChart3 },
+  { to: "/analytics", label: "Analytics", icon: BarChart3 },
+  { to: "/profile", label: "My Profile", icon: UserCog },
+  { to: "/admin/access", label: "Access Control", icon: ShieldCheck },
   { to: "/admin/audit", label: "Audit Log", icon: ScrollText },
 ] as const;
 
