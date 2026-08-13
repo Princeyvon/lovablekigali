@@ -155,6 +155,8 @@ export type Database = {
       }
       clients: {
         Row: {
+          app_status: Database["public"]["Enums"]["app_status"]
+          app_url: string | null
           business_name: string
           contact_email: string | null
           contact_name: string | null
@@ -165,8 +167,12 @@ export type Database = {
           onboarded_by: string | null
           signed_date: string
           status: Database["public"]["Enums"]["client_status"]
+          suspended_at: string | null
+          suspension_reason: string | null
         }
         Insert: {
+          app_status?: Database["public"]["Enums"]["app_status"]
+          app_url?: string | null
           business_name: string
           contact_email?: string | null
           contact_name?: string | null
@@ -177,8 +183,12 @@ export type Database = {
           onboarded_by?: string | null
           signed_date?: string
           status?: Database["public"]["Enums"]["client_status"]
+          suspended_at?: string | null
+          suspension_reason?: string | null
         }
         Update: {
+          app_status?: Database["public"]["Enums"]["app_status"]
+          app_url?: string | null
           business_name?: string
           contact_email?: string | null
           contact_name?: string | null
@@ -189,6 +199,8 @@ export type Database = {
           onboarded_by?: string | null
           signed_date?: string
           status?: Database["public"]["Enums"]["client_status"]
+          suspended_at?: string | null
+          suspension_reason?: string | null
         }
         Relationships: [
           {
@@ -361,6 +373,54 @@ export type Database = {
           },
         ]
       }
+      payment_reminders: {
+        Row: {
+          channel: string
+          client_id: string
+          created_at: string
+          due_date: string
+          id: string
+          message: string | null
+          sent_at: string
+          sent_by: string | null
+        }
+        Insert: {
+          channel?: string
+          client_id: string
+          created_at?: string
+          due_date: string
+          id?: string
+          message?: string | null
+          sent_at?: string
+          sent_by?: string | null
+        }
+        Update: {
+          channel?: string
+          client_id?: string
+          created_at?: string
+          due_date?: string
+          id?: string
+          message?: string | null
+          sent_at?: string
+          sent_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_reminders_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_reminders_sent_by_fkey"
+            columns: ["sent_by"]
+            isOneToOne: false
+            referencedRelation: "team_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       payments: {
         Row: {
           amount: number
@@ -410,22 +470,34 @@ export type Database = {
       }
       profiles: {
         Row: {
+          avatar_url: string | null
           created_at: string
           email: string | null
           full_name: string | null
           id: string
+          job_title: string | null
+          phone: string | null
+          username: string | null
         }
         Insert: {
+          avatar_url?: string | null
           created_at?: string
           email?: string | null
           full_name?: string | null
           id: string
+          job_title?: string | null
+          phone?: string | null
+          username?: string | null
         }
         Update: {
+          avatar_url?: string | null
           created_at?: string
           email?: string | null
           full_name?: string | null
           id?: string
+          job_title?: string | null
+          phone?: string | null
+          username?: string | null
         }
         Relationships: []
       }
@@ -762,6 +834,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "sales" | "dev" | "support"
+      app_status: "Live" | "Suspended" | "Closed"
       client_status: "Active" | "Paused" | "Churned"
       commission_status: "Pending" | "Paid"
       commission_type: "Signing Bonus" | "Recurring %"
@@ -899,6 +972,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "sales", "dev", "support"],
+      app_status: ["Live", "Suspended", "Closed"],
       client_status: ["Active", "Paused", "Churned"],
       commission_status: ["Pending", "Paid"],
       commission_type: ["Signing Bonus", "Recurring %"],

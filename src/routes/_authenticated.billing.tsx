@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { Empty, Panel, Pill, TD, TH, Table } from "@/components/dash";
 import { supabase } from "@/integrations/supabase/client";
-import { addMonths, fmtDate, money, paidThrough, todayISO } from "@/lib/agency";
+import { MONTH_OPTIONS, PAYMENT_METHODS, addMonths, fmtDate, money, paidThrough, todayISO } from "@/lib/agency";
 
 export const Route = createFileRoute("/_authenticated/billing")({
   head: () => ({
@@ -21,7 +21,7 @@ export const Route = createFileRoute("/_authenticated/billing")({
 
 function Billing() {
   const qc = useQueryClient();
-  const [form, setForm] = useState({ client_id: "", amount: "", months: "1", payment_date: todayISO(), method: "Transfer" });
+  const [form, setForm] = useState({ client_id: "", amount: "", months: "1", payment_date: todayISO(), method: "MOMO" });
 
   const { data: clients = [] } = useQuery({
     queryKey: ["clients"],
@@ -91,17 +91,21 @@ function Billing() {
             <input
               value={form.amount}
               onChange={(e) => setForm({ ...form, amount: e.target.value })}
-              placeholder="Amount"
+              placeholder="Amount (RWF)"
               inputMode="decimal"
               className="rounded-xl border border-input bg-background px-3 py-2 text-sm"
             />
-            <input
+            <select
               value={form.months}
               onChange={(e) => setForm({ ...form, months: e.target.value })}
-              placeholder="Months covered"
-              inputMode="numeric"
               className="rounded-xl border border-input bg-background px-3 py-2 text-sm"
-            />
+            >
+              {MONTH_OPTIONS.map((m) => (
+                <option key={m} value={String(m)}>
+                  {m} month{m > 1 ? "s" : ""}
+                </option>
+              ))}
+            </select>
             <input
               type="date"
               value={form.payment_date}
@@ -113,7 +117,7 @@ function Billing() {
               onChange={(e) => setForm({ ...form, method: e.target.value })}
               className="rounded-xl border border-input bg-background px-3 py-2 text-sm"
             >
-              {["Transfer", "Card", "Cash", "Other"].map((m) => (
+              {PAYMENT_METHODS.map((m) => (
                 <option key={m}>{m}</option>
               ))}
             </select>

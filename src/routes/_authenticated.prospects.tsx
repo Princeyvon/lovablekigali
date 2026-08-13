@@ -6,7 +6,7 @@ import { AppShell } from "@/components/AppShell";
 import { Empty, Panel, Pill } from "@/components/dash";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { fmtDate } from "@/lib/agency";
+import { SECTORS, fmtDate } from "@/lib/agency";
 
 const STAGES = ["Contacted", "Demo", "Negotiating", "Signed", "Lost"] as const;
 
@@ -26,7 +26,15 @@ function Prospects() {
   const qc = useQueryClient();
   const { memberId, role } = useAuth();
   const [open, setOpen] = useState(false);
-  const [form, setForm] = useState({ business_name: "", industry: "", contact_name: "", source: "" });
+  const [form, setForm] = useState({
+    business_name: "",
+    industry: "",
+    contact_name: "",
+    contact_email: "",
+    contact_phone: "",
+    source: "",
+  });
+  const [customSector, setCustomSector] = useState("");
 
   const { data: members = [] } = useQuery({
     queryKey: ["members"],
@@ -46,7 +54,8 @@ function Prospects() {
     },
     onSuccess: () => {
       toast.success("Prospect added");
-      setForm({ business_name: "", industry: "", contact_name: "", source: "" });
+      setForm({ business_name: "", industry: "", contact_name: "", contact_email: "", contact_phone: "", source: "" });
+      setCustomSector("");
       setOpen(false);
       qc.invalidateQueries({ queryKey: ["prospects"] });
     },
@@ -77,17 +86,49 @@ function Prospects() {
     >
       {open && (
         <Panel title="Add prospect">
-          <div className="grid gap-3 md:grid-cols-4">
-            {(["business_name", "industry", "contact_name", "source"] as const).map((k) => (
+          <div className="grid gap-3 md:grid-cols-3">
+            {(["business_name", "contact_name", "contact_email", "contact_phone", "source"] as const).map((k) => (
               <input
                 key={k}
                 value={form[k]}
                 onChange={(e) => setForm({ ...form, [k]: e.target.value })}
-                placeholder={k.replace("_", " ")}
+                placeholder={k.replaceAll("_", " ")}
                 className="rounded-xl border border-input bg-background px-3 py-2 text-sm capitalize outline-none focus:ring-2 focus:ring-ring"
               />
             ))}
+            <select
+              value={SECTORS.includes(form.industry as (typeof SECTORS)[number]) || form.industry === "" ? form.industry : "__other"}
+              onChange={(e) => {
+                if (e.target.value === "__other") {
+                  setForm({ ...form, industry: customSector });
+                } else {
+                  setCustomSector("");
+                  setForm({ ...form, industry: e.target.value });
+                }
+              }}
+              className="rounded-xl border border-input bg-background px-3 py-2 text-sm"
+            >
+              <option value="">Select sector…</option>
+              {SECTORS.map((s) => (
+                <option key={s} value={s}>
+                  {s}
+                </option>
+              ))}
+              <option value="__other">Other (not listed)</option>
+            </select>
+            {!SECTORS.includes(form.industry as (typeof SECTORS)[number]) && form.industry !== "" ? null : null}
           </div>
+          {(customSector !== "" || (form.industry !== "" && !SECTORS.includes(form.industry as (typeof SECTORS)[number]))) && (
+            <input
+              value={form.industry}
+              onChange={(e) => {
+                setCustomSector(e.target.value);
+                setForm({ ...form, industry: e.target.value });
+              }}
+              placeholder="Name the sector"
+              className="mt-3 w-full rounded-xl border border-input bg-background px-3 py-2 text-sm md:w-1/3"
+            />
+          )}
           <button
             onClick={() => create.mutate()}
             disabled={!form.business_name}
@@ -114,6 +155,8 @@ function Prospects() {
                   <div key={p.id} className="gradient-mist rounded-xl border border-border p-3">
                     <p className="text-sm font-medium">{p.business_name}</p>
                     <p className="mt-0.5 text-xs text-muted-foreground">{p.industry || "—"}</p>
+                    <p className="text-[11px] text-muted-foreground">{p.contact_email || "no email"}</p>
+                    <p className="text-[11px] text-muted-foreground">{p.contact_phone || "no phone"}</p>
                     <p className="mt-1 text-[11px] text-muted-foreground">
                       {members.find((m) => m.id === p.assigned_rep)?.full_name ?? "Unassigned"} · {fmtDate(p.created_at)}
                     </p>
