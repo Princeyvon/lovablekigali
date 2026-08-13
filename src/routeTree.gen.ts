@@ -15,9 +15,12 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthenticatedBillingRouteImport } from './routes/_authenticated.billing'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated.dashboard'
+import { Route as AuthenticatedExpensesRouteImport } from './routes/_authenticated.expenses'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated.profile'
 import { Route as AuthenticatedProspectsRouteImport } from './routes/_authenticated.prospects'
+import { Route as AuthenticatedTeamRouteImport } from './routes/_authenticated.team'
 import { Route as AuthenticatedAdminAccessRouteImport } from './routes/_authenticated.admin.access'
+import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authenticated.admin.audit'
 import { Route as AuthenticatedClientsIndexRouteImport } from './routes/_authenticated.clients.index'
 import { Route as AuthenticatedClientsIdRouteImport } from './routes/_authenticated.clients.$id'
 
@@ -50,6 +53,11 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedExpensesRoute = AuthenticatedExpensesRouteImport.update({
+  id: '/expenses',
+  path: '/expenses',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
@@ -60,12 +68,22 @@ const AuthenticatedProspectsRoute = AuthenticatedProspectsRouteImport.update({
   path: '/prospects',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedTeamRoute = AuthenticatedTeamRouteImport.update({
+  id: '/team',
+  path: '/team',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedAdminAccessRoute =
   AuthenticatedAdminAccessRouteImport.update({
     id: '/admin/access',
     path: '/admin/access',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedAdminAuditRoute = AuthenticatedAdminAuditRouteImport.update({
+  id: '/admin/audit',
+  path: '/admin/audit',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedClientsIndexRoute =
   AuthenticatedClientsIndexRouteImport.update({
     id: '/clients/',
@@ -84,9 +102,12 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/billing': typeof AuthenticatedBillingRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/expenses': typeof AuthenticatedExpensesRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/prospects': typeof AuthenticatedProspectsRoute
+  '/team': typeof AuthenticatedTeamRoute
   '/admin/access': typeof AuthenticatedAdminAccessRoute
+  '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/clients/$id': typeof AuthenticatedClientsIdRoute
   '/clients/': typeof AuthenticatedClientsIndexRoute
 }
@@ -96,9 +117,12 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/billing': typeof AuthenticatedBillingRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/expenses': typeof AuthenticatedExpensesRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/prospects': typeof AuthenticatedProspectsRoute
+  '/team': typeof AuthenticatedTeamRoute
   '/admin/access': typeof AuthenticatedAdminAccessRoute
+  '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/clients/$id': typeof AuthenticatedClientsIdRoute
   '/clients': typeof AuthenticatedClientsIndexRoute
 }
@@ -110,9 +134,12 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/billing': typeof AuthenticatedBillingRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/expenses': typeof AuthenticatedExpensesRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/prospects': typeof AuthenticatedProspectsRoute
+  '/_authenticated/team': typeof AuthenticatedTeamRoute
   '/_authenticated/admin/access': typeof AuthenticatedAdminAccessRoute
+  '/_authenticated/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/_authenticated/clients/$id': typeof AuthenticatedClientsIdRoute
   '/_authenticated/clients/': typeof AuthenticatedClientsIndexRoute
 }
@@ -124,9 +151,12 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/billing'
     | '/dashboard'
+    | '/expenses'
     | '/profile'
     | '/prospects'
+    | '/team'
     | '/admin/access'
+    | '/admin/audit'
     | '/clients/$id'
     | '/clients/'
   fileRoutesByTo: FileRoutesByTo
@@ -136,9 +166,12 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/billing'
     | '/dashboard'
+    | '/expenses'
     | '/profile'
     | '/prospects'
+    | '/team'
     | '/admin/access'
+    | '/admin/audit'
     | '/clients/$id'
     | '/clients'
   id:
@@ -149,9 +182,12 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/_authenticated/billing'
     | '/_authenticated/dashboard'
+    | '/_authenticated/expenses'
     | '/_authenticated/profile'
     | '/_authenticated/prospects'
+    | '/_authenticated/team'
     | '/_authenticated/admin/access'
+    | '/_authenticated/admin/audit'
     | '/_authenticated/clients/$id'
     | '/_authenticated/clients/'
   fileRoutesById: FileRoutesById
@@ -207,6 +243,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/expenses': {
+      id: '/_authenticated/expenses'
+      path: '/expenses'
+      fullPath: '/expenses'
+      preLoaderRoute: typeof AuthenticatedExpensesRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/profile': {
       id: '/_authenticated/profile'
       path: '/profile'
@@ -221,11 +264,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProspectsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/team': {
+      id: '/_authenticated/team'
+      path: '/team'
+      fullPath: '/team'
+      preLoaderRoute: typeof AuthenticatedTeamRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/admin/access': {
       id: '/_authenticated/admin/access'
       path: '/admin/access'
       fullPath: '/admin/access'
       preLoaderRoute: typeof AuthenticatedAdminAccessRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/admin/audit': {
+      id: '/_authenticated/admin/audit'
+      path: '/admin/audit'
+      fullPath: '/admin/audit'
+      preLoaderRoute: typeof AuthenticatedAdminAuditRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/clients/': {
@@ -248,9 +305,12 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteChildren {
   AuthenticatedBillingRoute: typeof AuthenticatedBillingRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedExpensesRoute: typeof AuthenticatedExpensesRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedProspectsRoute: typeof AuthenticatedProspectsRoute
+  AuthenticatedTeamRoute: typeof AuthenticatedTeamRoute
   AuthenticatedAdminAccessRoute: typeof AuthenticatedAdminAccessRoute
+  AuthenticatedAdminAuditRoute: typeof AuthenticatedAdminAuditRoute
   AuthenticatedClientsIdRoute: typeof AuthenticatedClientsIdRoute
   AuthenticatedClientsIndexRoute: typeof AuthenticatedClientsIndexRoute
 }
@@ -258,9 +318,12 @@ interface AuthenticatedRouteChildren {
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedBillingRoute: AuthenticatedBillingRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedExpensesRoute: AuthenticatedExpensesRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedProspectsRoute: AuthenticatedProspectsRoute,
+  AuthenticatedTeamRoute: AuthenticatedTeamRoute,
   AuthenticatedAdminAccessRoute: AuthenticatedAdminAccessRoute,
+  AuthenticatedAdminAuditRoute: AuthenticatedAdminAuditRoute,
   AuthenticatedClientsIdRoute: AuthenticatedClientsIdRoute,
   AuthenticatedClientsIndexRoute: AuthenticatedClientsIndexRoute,
 }
