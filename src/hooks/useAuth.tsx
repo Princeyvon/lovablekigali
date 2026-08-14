@@ -48,7 +48,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!session?.user) return;
     let cancelled = false;
     (async () => {
+      const meta = session.user.user_metadata ?? {};
+      if (meta['username'] || meta['full_name']) {
+        await supabase
+          .from("profiles")
+          .update({ username: meta['username'] ?? null, full_name: meta['full_name'] ?? null })
+          .eq("id", session.user.id)
+          .is("username", null);
+      }
       const { data: bootstrapped } = await supabase.rpc("bootstrap_me");
+
       const { data: memberRow } = await supabase
         .from("team_members")
         .select("id")

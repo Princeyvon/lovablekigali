@@ -3,7 +3,6 @@ import {
   BarChart3,
   CreditCard,
   Gauge,
-  Handshake,
   LogOut,
   Receipt,
   ScrollText,
@@ -24,7 +23,6 @@ const manage = [
   { to: "/prospects", label: "Prospects", icon: Send },
   { to: "/clients", label: "Clients", icon: UserSquare2 },
   { to: "/billing", label: "Billing", icon: CreditCard },
-  { to: "/referrals", label: "Referrals", icon: Handshake },
   { to: "/apps", label: "App Status", icon: ShieldAlert },
 ] as const;
 
@@ -33,6 +31,9 @@ const operate = [
   { to: "/expenses", label: "Expenses", icon: Receipt },
   { to: "/analytics", label: "Analytics", icon: BarChart3 },
   { to: "/profile", label: "My Profile", icon: UserCog },
+] as const;
+
+const adminOnly = [
   { to: "/admin/access", label: "Access Control", icon: ShieldCheck },
   { to: "/admin/audit", label: "Audit Log", icon: ScrollText },
 ] as const;
@@ -102,6 +103,7 @@ export function AppShell({
           <div className="flex-1 overflow-y-auto">
             <NavGroup label="Manage" items={manage} pathname={pathname} />
             <NavGroup label="Operate" items={operate} pathname={pathname} />
+            {role === "admin" ? <NavGroup label="Admin" items={adminOnly} pathname={pathname} /> : null}
           </div>
           <div className="mx-3 mt-4 overflow-hidden rounded-2xl bg-white/5 p-4">
             <p className="text-sm font-semibold text-sidebar-foreground">
