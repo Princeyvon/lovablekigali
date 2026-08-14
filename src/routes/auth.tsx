@@ -77,10 +77,21 @@ function AuthPage() {
         return;
       }
 
-      const { email: resolved } = await resolveLoginEmail({ data: { identifier } });
-      const { error } = await supabase.auth.signInWithPassword({ email: resolved, password });
-      if (error) throw new Error("Invalid username/email or password");
+      const { email: resolved } = await resolveLoginEmail({ data: { identifier: identifier.trim() } });
+      const { error } = await supabase.auth.signInWithPassword({
+        email: resolved.trim().toLowerCase(),
+        password,
+      });
+      if (error) {
+        throw new Error(
+          error.message.toLowerCase().includes("confirm")
+            ? "Confirm your email first, then sign in"
+            : "Invalid username/email or password",
+        );
+      }
       toast.success("Welcome back");
+      void navigate({ to: "/dashboard" });
+
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Something went wrong");
     } finally {
