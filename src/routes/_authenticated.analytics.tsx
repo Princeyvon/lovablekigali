@@ -18,8 +18,8 @@ export const Route = createFileRoute("/_authenticated/analytics")({
   component: Analytics,
 });
 
-function monthKey(d: string) {
-  return d.slice(0, 7);
+function monthKey(d: string | null | undefined) {
+  return typeof d === "string" ? d.slice(0, 7) : null;
 }
 
 function Analytics() {
@@ -61,8 +61,14 @@ function Analytics() {
   const trend = useMemo(() => {
     const rev = new Map<string, number>();
     const exp = new Map<string, number>();
-    for (const p of payments) rev.set(monthKey(p.payment_date), (rev.get(monthKey(p.payment_date)) ?? 0) + Number(p.amount));
-    for (const e of expenses) exp.set(monthKey(e.date), (exp.get(monthKey(e.date)) ?? 0) + Number(e.amount));
+    for (const p of payments) {
+      const k = monthKey(p.payment_date);
+      if (k) rev.set(k, (rev.get(k) ?? 0) + Number(p.amount ?? 0));
+    }
+    for (const e of expenses) {
+      const k = monthKey(e.date);
+      if (k) exp.set(k, (exp.get(k) ?? 0) + Number(e.amount ?? 0));
+    }
     return months.map((m) => ({
       label: m.slice(5),
       a: rev.get(m) ?? 0,
