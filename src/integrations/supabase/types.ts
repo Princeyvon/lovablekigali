@@ -695,6 +695,7 @@ export type Database = {
           id: string
           phone: string | null
           role: string
+          salary: number
           user_id: string | null
         }
         Insert: {
@@ -705,6 +706,7 @@ export type Database = {
           id?: string
           phone?: string | null
           role?: string
+          salary?: number
           user_id?: string | null
         }
         Update: {
@@ -715,6 +717,7 @@ export type Database = {
           id?: string
           phone?: string | null
           role?: string
+          salary?: number
           user_id?: string | null
         }
         Relationships: []
@@ -762,6 +765,54 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      transactions: {
+        Row: {
+          amount: number
+          category: string
+          created_at: string
+          created_by: string | null
+          direction: string
+          id: string
+          method: string
+          note: string | null
+          occurred_at: string
+          payee: string | null
+          source_id: string | null
+          source_table: string
+          updated_at: string
+        }
+        Insert: {
+          amount?: number
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          direction?: string
+          id?: string
+          method?: string
+          note?: string | null
+          occurred_at?: string
+          payee?: string | null
+          source_id?: string | null
+          source_table?: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          direction?: string
+          id?: string
+          method?: string
+          note?: string | null
+          occurred_at?: string
+          payee?: string | null
+          source_id?: string | null
+          source_table?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       user_roles: {
         Row: {
