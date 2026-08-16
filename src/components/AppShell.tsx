@@ -1,16 +1,13 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
-  BarChart3,
   CreditCard,
   Gauge,
   LogOut,
-  Receipt,
   ScrollText,
   Send,
   ShieldAlert,
   ShieldCheck,
   UserCog,
-  Users,
   UserSquare2,
   Wallet,
 } from "lucide-react";
@@ -27,9 +24,7 @@ const manage = [
 ] as const;
 
 const operate = [
-  { to: "/team", label: "Team & Payouts", icon: Users },
-  { to: "/expenses", label: "Expenses", icon: Receipt },
-  { to: "/analytics", label: "Analytics", icon: BarChart3 },
+  { to: "/finance/team", label: "Finance", icon: Wallet },
   { to: "/profile", label: "My Profile", icon: UserCog },
 ] as const;
 
@@ -46,7 +41,8 @@ function NavGroup({ label, items, pathname }: { label: string; items: readonly {
       </p>
       <nav className="mt-2 space-y-1">
         {items.map((item) => {
-          const active = pathname === item.to || pathname.startsWith(item.to + "/");
+          const section = item.to.startsWith("/finance") ? "/finance" : item.to;
+          const active = pathname === section || pathname.startsWith(section + "/");
           return (
             <Link
               key={item.to}

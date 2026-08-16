@@ -1,10 +1,38 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { AlertTriangle, KeyRound, TrendingUp, Wallet } from "lucide-react";
+import { AlertTriangle, KeyRound, TrendingDown, TrendingUp, Wallet } from "lucide-react";
+import {
+  Area,
+  AreaChart,
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Legend,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 import { AppShell } from "@/components/AppShell";
-import { Bars, Donut, Empty, Panel, Pill, Stat, TD, TH, Table } from "@/components/dash";
+import { Donut, Empty, Panel, Pill, Stat, TD, TH, Table } from "@/components/dash";
 import { supabase } from "@/integrations/supabase/client";
-import { REMINDER_WINDOW_DAYS, ROTATION_STALE_DAYS, daysUntil, fmtDate, money, paidThrough, startOfWeek } from "@/lib/agency";
+import { REMINDER_WINDOW_DAYS, ROTATION_STALE_DAYS, daysUntil, fmtDate, money, paidThrough, shortMoney, startOfWeek } from "@/lib/agency";
+
+function Trend({ current, previous, unit = "" }: { current: number; previous: number; unit?: string }) {
+  const delta = previous === 0 ? (current === 0 ? 0 : 100) : ((current - previous) / previous) * 100;
+  const up = delta >= 0;
+  return (
+    <span
+      className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold ${
+        up ? "bg-secondary text-primary" : "bg-muted text-muted-foreground"
+      }`}
+    >
+      {up ? <TrendingUp className="size-3" /> : <TrendingDown className="size-3" />}
+      {up ? "+" : ""}
+      {Math.round(delta)}% {unit}
+    </span>
+  );
+}
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
@@ -65,10 +93,13 @@ function Dashboard() {
     ).length;
     return {
       label: `${start.getDate()}/${start.getMonth() + 1}`,
-      a: revenue / 100,
-      b: leads,
+      revenue,
+      leads,
     };
   });
+
+  const thisWeek = weeks[weeks.length - 1] ?? { revenue: 0, leads: 0 };
+  const lastWeek = weeks[weeks.length - 2] ?? { revenue: 0, leads: 0 };
 
   const staleCreds = (data?.creds ?? []).filter((c) => {
     const d = daysUntil(c.last_rotated);
@@ -92,21 +123,81 @@ function Dashboard() {
       </div>
 
       <div className="grid gap-6 xl:grid-cols-[1.6fr_1fr]">
-        <Panel
-          title="Weekly velocity"
-          right={
-            <div className="flex items-center gap-4 text-xs text-muted-foreground">
-              <span className="flex items-center gap-1.5">
-                <span className="gradient-bar size-2.5 rounded-full" /> Revenue
-              </span>
-              <span className="flex items-center gap-1.5">
-                <span className="size-2.5 rounded-full bg-[var(--leaf-deep)]" /> New leads
-              </span>
+        <div className="space-y-6">
+          <Panel
+            title="Revenue collected per week"
+            right={
+              <div className="flex items-center gap-2">
+                <span className="font-display text-sm font-semibold">{money(thisWeek.revenue)} this week</span>
+                <Trend current={thisWeek.revenue} previous={lastWeek.revenue} unit="vs last week" />
+              </div>
+            }
+          >
+            <div className="h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={weeks} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="revFill" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="var(--leaf)" stopOpacity={0.55} />
+                      <stop offset="100%" stopColor="var(--leaf)" stopOpacity={0.04} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
+                  <XAxis dataKey="label" tickLine={false} axisLine={false} fontSize={12} stroke="var(--muted-foreground)" />
+                  <YAxis
+                    tickFormatter={(v: number) => shortMoney(v)}
+                    tickLine={false}
+                    axisLine={false}
+                    width={70}
+                    fontSize={12}
+                    stroke="var(--muted-foreground)"
+                  />
+                  <Tooltip
+                    formatter={(v: number) => [money(v), "Revenue"]}
+                    labelFormatter={(l: string) => `Week of ${l}`}
+                    contentStyle={{ borderRadius: 12, border: "1px solid var(--border)", background: "var(--card)" }}
+                  />
+                  <Legend verticalAlign="top" height={24} />
+                  <Area
+                    name="Revenue (RWF)"
+                    type="monotone"
+                    dataKey="revenue"
+                    stroke="var(--leaf)"
+                    strokeWidth={2.5}
+                    fill="url(#revFill)"
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
             </div>
-          }
-        >
-          <Bars data={weeks} />
-        </Panel>
+          </Panel>
+
+          <Panel
+            title="New prospects per week"
+            right={
+              <div className="flex items-center gap-2">
+                <span className="font-display text-sm font-semibold">{thisWeek.leads} this week</span>
+                <Trend current={thisWeek.leads} previous={lastWeek.leads} unit="vs last week" />
+              </div>
+            }
+          >
+            <div className="h-52">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={weeks} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
+                  <XAxis dataKey="label" tickLine={false} axisLine={false} fontSize={12} stroke="var(--muted-foreground)" />
+                  <YAxis allowDecimals={false} tickLine={false} axisLine={false} width={32} fontSize={12} stroke="var(--muted-foreground)" />
+                  <Tooltip
+                    labelFormatter={(l: string) => `Week of ${l}`}
+                    contentStyle={{ borderRadius: 12, border: "1px solid var(--border)", background: "var(--card)" }}
+                  />
+                  <Legend verticalAlign="top" height={24} />
+                  <Bar name="New prospects" dataKey="leads" fill="var(--leaf-deep)" radius={[6, 6, 0, 0]} maxBarSize={26} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </Panel>
+        </div>
+
 
         <Panel title="Collection health">
           <Donut

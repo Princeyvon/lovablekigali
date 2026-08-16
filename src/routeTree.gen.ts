@@ -27,8 +27,11 @@ import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authentic
 import { Route as AuthenticatedClientsIndexRouteImport } from './routes/_authenticated.clients.index'
 import { Route as AuthenticatedClientsIdRouteImport } from './routes/_authenticated.clients.$id'
 import { Route as AuthenticatedFinanceIndexRouteImport } from './routes/_authenticated.finance.index'
+import { Route as AuthenticatedFinanceAnalyticsRouteImport } from './routes/_authenticated.finance.analytics'
+import { Route as AuthenticatedFinanceExpensesRouteImport } from './routes/_authenticated.finance.expenses'
 import { Route as AuthenticatedFinancePayoutsRouteImport } from './routes/_authenticated.finance.payouts'
 import { Route as AuthenticatedFinanceTeamRouteImport } from './routes/_authenticated.finance.team'
+import { Route as AuthenticatedFinanceTransactionsRouteImport } from './routes/_authenticated.finance.transactions'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -122,6 +125,18 @@ const AuthenticatedFinanceIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedFinanceRoute,
   } as any)
+const AuthenticatedFinanceAnalyticsRoute =
+  AuthenticatedFinanceAnalyticsRouteImport.update({
+    id: '/analytics',
+    path: '/analytics',
+    getParentRoute: () => AuthenticatedFinanceRoute,
+  } as any)
+const AuthenticatedFinanceExpensesRoute =
+  AuthenticatedFinanceExpensesRouteImport.update({
+    id: '/expenses',
+    path: '/expenses',
+    getParentRoute: () => AuthenticatedFinanceRoute,
+  } as any)
 const AuthenticatedFinancePayoutsRoute =
   AuthenticatedFinancePayoutsRouteImport.update({
     id: '/payouts',
@@ -132,6 +147,12 @@ const AuthenticatedFinanceTeamRoute =
   AuthenticatedFinanceTeamRouteImport.update({
     id: '/team',
     path: '/team',
+    getParentRoute: () => AuthenticatedFinanceRoute,
+  } as any)
+const AuthenticatedFinanceTransactionsRoute =
+  AuthenticatedFinanceTransactionsRouteImport.update({
+    id: '/transactions',
+    path: '/transactions',
     getParentRoute: () => AuthenticatedFinanceRoute,
   } as any)
 
@@ -151,8 +172,11 @@ export interface FileRoutesByFullPath {
   '/admin/access': typeof AuthenticatedAdminAccessRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/clients/$id': typeof AuthenticatedClientsIdRoute
+  '/finance/analytics': typeof AuthenticatedFinanceAnalyticsRoute
+  '/finance/expenses': typeof AuthenticatedFinanceExpensesRoute
   '/finance/payouts': typeof AuthenticatedFinancePayoutsRoute
   '/finance/team': typeof AuthenticatedFinanceTeamRoute
+  '/finance/transactions': typeof AuthenticatedFinanceTransactionsRoute
   '/clients/': typeof AuthenticatedClientsIndexRoute
   '/finance/': typeof AuthenticatedFinanceIndexRoute
 }
@@ -171,8 +195,11 @@ export interface FileRoutesByTo {
   '/admin/access': typeof AuthenticatedAdminAccessRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/clients/$id': typeof AuthenticatedClientsIdRoute
+  '/finance/analytics': typeof AuthenticatedFinanceAnalyticsRoute
+  '/finance/expenses': typeof AuthenticatedFinanceExpensesRoute
   '/finance/payouts': typeof AuthenticatedFinancePayoutsRoute
   '/finance/team': typeof AuthenticatedFinanceTeamRoute
+  '/finance/transactions': typeof AuthenticatedFinanceTransactionsRoute
   '/clients': typeof AuthenticatedClientsIndexRoute
   '/finance': typeof AuthenticatedFinanceIndexRoute
 }
@@ -194,8 +221,11 @@ export interface FileRoutesById {
   '/_authenticated/admin/access': typeof AuthenticatedAdminAccessRoute
   '/_authenticated/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/_authenticated/clients/$id': typeof AuthenticatedClientsIdRoute
+  '/_authenticated/finance/analytics': typeof AuthenticatedFinanceAnalyticsRoute
+  '/_authenticated/finance/expenses': typeof AuthenticatedFinanceExpensesRoute
   '/_authenticated/finance/payouts': typeof AuthenticatedFinancePayoutsRoute
   '/_authenticated/finance/team': typeof AuthenticatedFinanceTeamRoute
+  '/_authenticated/finance/transactions': typeof AuthenticatedFinanceTransactionsRoute
   '/_authenticated/clients/': typeof AuthenticatedClientsIndexRoute
   '/_authenticated/finance/': typeof AuthenticatedFinanceIndexRoute
 }
@@ -217,8 +247,11 @@ export interface FileRouteTypes {
     | '/admin/access'
     | '/admin/audit'
     | '/clients/$id'
+    | '/finance/analytics'
+    | '/finance/expenses'
     | '/finance/payouts'
     | '/finance/team'
+    | '/finance/transactions'
     | '/clients/'
     | '/finance/'
   fileRoutesByTo: FileRoutesByTo
@@ -237,8 +270,11 @@ export interface FileRouteTypes {
     | '/admin/access'
     | '/admin/audit'
     | '/clients/$id'
+    | '/finance/analytics'
+    | '/finance/expenses'
     | '/finance/payouts'
     | '/finance/team'
+    | '/finance/transactions'
     | '/clients'
     | '/finance'
   id:
@@ -259,8 +295,11 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/access'
     | '/_authenticated/admin/audit'
     | '/_authenticated/clients/$id'
+    | '/_authenticated/finance/analytics'
+    | '/_authenticated/finance/expenses'
     | '/_authenticated/finance/payouts'
     | '/_authenticated/finance/team'
+    | '/_authenticated/finance/transactions'
     | '/_authenticated/clients/'
     | '/_authenticated/finance/'
   fileRoutesById: FileRoutesById
@@ -400,6 +439,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedFinanceIndexRouteImport
       parentRoute: typeof AuthenticatedFinanceRoute
     }
+    '/_authenticated/finance/analytics': {
+      id: '/_authenticated/finance/analytics'
+      path: '/analytics'
+      fullPath: '/finance/analytics'
+      preLoaderRoute: typeof AuthenticatedFinanceAnalyticsRouteImport
+      parentRoute: typeof AuthenticatedFinanceRoute
+    }
+    '/_authenticated/finance/expenses': {
+      id: '/_authenticated/finance/expenses'
+      path: '/expenses'
+      fullPath: '/finance/expenses'
+      preLoaderRoute: typeof AuthenticatedFinanceExpensesRouteImport
+      parentRoute: typeof AuthenticatedFinanceRoute
+    }
     '/_authenticated/finance/payouts': {
       id: '/_authenticated/finance/payouts'
       path: '/payouts'
@@ -414,18 +467,31 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedFinanceTeamRouteImport
       parentRoute: typeof AuthenticatedFinanceRoute
     }
+    '/_authenticated/finance/transactions': {
+      id: '/_authenticated/finance/transactions'
+      path: '/transactions'
+      fullPath: '/finance/transactions'
+      preLoaderRoute: typeof AuthenticatedFinanceTransactionsRouteImport
+      parentRoute: typeof AuthenticatedFinanceRoute
+    }
   }
 }
 
 interface AuthenticatedFinanceRouteChildren {
+  AuthenticatedFinanceAnalyticsRoute: typeof AuthenticatedFinanceAnalyticsRoute
+  AuthenticatedFinanceExpensesRoute: typeof AuthenticatedFinanceExpensesRoute
   AuthenticatedFinancePayoutsRoute: typeof AuthenticatedFinancePayoutsRoute
   AuthenticatedFinanceTeamRoute: typeof AuthenticatedFinanceTeamRoute
+  AuthenticatedFinanceTransactionsRoute: typeof AuthenticatedFinanceTransactionsRoute
   AuthenticatedFinanceIndexRoute: typeof AuthenticatedFinanceIndexRoute
 }
 
 const AuthenticatedFinanceRouteChildren: AuthenticatedFinanceRouteChildren = {
+  AuthenticatedFinanceAnalyticsRoute: AuthenticatedFinanceAnalyticsRoute,
+  AuthenticatedFinanceExpensesRoute: AuthenticatedFinanceExpensesRoute,
   AuthenticatedFinancePayoutsRoute: AuthenticatedFinancePayoutsRoute,
   AuthenticatedFinanceTeamRoute: AuthenticatedFinanceTeamRoute,
+  AuthenticatedFinanceTransactionsRoute: AuthenticatedFinanceTransactionsRoute,
   AuthenticatedFinanceIndexRoute: AuthenticatedFinanceIndexRoute,
 }
 

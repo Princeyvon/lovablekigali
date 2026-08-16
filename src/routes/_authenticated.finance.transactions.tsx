@@ -38,13 +38,13 @@ function Transactions() {
   const totals = useMemo(() => {
     let inflow = 0;
     let outflow = 0;
-    const per: Record<string, number> = { momo: 0, bank: 0, cash: 0, other: 0 };
+    const per = { momo: 0, bank: 0, cash: 0, other: 0 };
     for (const t of tx) {
       const amt = Number(t.amount ?? 0);
       const signed = t.direction === "in" ? amt : -amt;
       if (t.direction === "in") inflow += amt;
       else outflow += amt;
-      const bucket = BUCKETS.find((b) => b.test(t.method ?? ""))?.key ?? "other";
+      const bucket: keyof typeof per = BUCKETS.find((b) => b.test(t.method ?? ""))?.key ?? "other";
       per[bucket] += signed;
     }
     return { inflow, outflow, net: inflow - outflow, per };
