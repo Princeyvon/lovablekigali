@@ -157,17 +157,46 @@ function Billing() {
           </button>
         </Panel>
 
-        <Panel title="Needs attention" right={<Pill tone="warn">{overdue.length} overdue</Pill>}>
-          {overdue.length === 0 ? (
+        <Panel title="Needs attention" right={<Pill tone="warn">{attention.length} overdue</Pill>}>
+          {attention.length === 0 ? (
             <Empty>Everyone is current.</Empty>
           ) : (
-            <div className="space-y-2">
-              {overdue.map((c) => (
-                <div key={c.id} className="gradient-mist flex items-center justify-between rounded-xl border border-border p-3">
-                  <span className="text-sm font-medium">{c.business_name}</span>
-                  <span className="text-xs text-muted-foreground">
-                    {c.through ? `through ${fmtDate(c.through)}` : "never paid"}
-                  </span>
+            <div className="max-h-[26rem] space-y-2 overflow-y-auto pr-1">
+              {attention.map((c) => (
+                <div key={c.id} className="gradient-mist rounded-xl border border-border p-3">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <Link
+                        to="/clients/$id"
+                        params={{ id: c.id }}
+                        className="truncate text-sm font-semibold text-primary hover:underline"
+                      >
+                        {c.business_name}
+                      </Link>
+                      <p className="mt-0.5 text-xs text-muted-foreground">
+                        {c.through ? `paid through ${fmtDate(c.through)}` : "never paid"}
+                        {c.owed > 0 ? ` · owes ${money(c.owed)}` : ""}
+                      </p>
+                    </div>
+                    <Pill tone={c.pastGrace ? "warn" : "mist"}>
+                      {c.daysOverdue > 0 ? `${c.daysOverdue}d overdue` : "due"}
+                    </Pill>
+                  </div>
+                  <div className="mt-2 flex flex-wrap gap-3 text-xs font-semibold">
+                    <button
+                      type="button"
+                      onClick={() => setForm((f) => ({ ...f, client_id: c.id, amount: c.rate ? String(c.rate) : f.amount }))}
+                      className="text-primary hover:underline"
+                    >
+                      Log payment
+                    </button>
+                    <Link to="/clients/$id" params={{ id: c.id }} className="text-primary hover:underline">
+                      Open profile
+                    </Link>
+                    <Link to="/apps" className="text-primary hover:underline">
+                      App status
+                    </Link>
+                  </div>
                 </div>
               ))}
             </div>
@@ -175,7 +204,22 @@ function Billing() {
         </Panel>
       </div>
 
-      <Panel title="Payment history" right={<SearchInput value={q} onChange={setQ} placeholder="Search payments…" />}>
+      <Panel
+        title="Payment history"
+        right={
+          <div className="flex flex-wrap items-center gap-2">
+            <FilterSelect label="Method" value={method} onChange={setMethod} options={PAYMENT_METHODS.map((m) => ({ value: m, label: m }))} />
+            <FilterSelect
+              label="Client"
+              value={clientFilter}
+              onChange={setClientFilter}
+              options={clients.map((c) => ({ value: c.id, label: c.business_name }))}
+            />
+            <SearchInput value={q} onChange={setQ} placeholder="Search payments…" />
+          </div>
+        }
+      >
+
         {visiblePayments.length === 0 ? (
           <Empty>No payments yet.</Empty>
         ) : (
