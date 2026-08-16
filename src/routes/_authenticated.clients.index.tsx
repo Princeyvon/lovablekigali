@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
-import { SearchInput, matches } from "@/components/search";
+import { FilterSelect, SearchInput, matches, uniqueOptions } from "@/components/search";
 import { Empty, Panel, Pill, TD, TH, Table } from "@/components/dash";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -26,6 +26,10 @@ function Clients() {
   const { role, memberId } = useAuth();
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState("");
+  const [status, setStatus] = useState("all");
+  const [industry, setIndustry] = useState("all");
+  const [rep, setRep] = useState("all");
+  const [billing, setBilling] = useState("all");
   const [form, setForm] = useState({ business_name: "", industry: "", contact_name: "", contact_email: "" });
 
   const { data: clients = [], isLoading } = useQuery({
@@ -61,8 +65,19 @@ function Clients() {
   });
 
   const visible = useMemo(
-    () => clients.filter((c) => matches(q, c.business_name, c.industry, c.contact_name, c.contact_email, c.status)),
-    [clients, q],
+    () =>
+      clients.filter((c) => {
+        const through = paidThrough(payments.filter((p) => p.client_id === c.id));
+        const isOverdue = !through || through < new Date().toISOString().slice(0, 10);
+        return (
+          (status === "all" || c.status === status) &&
+          (industry === "all" || (c.industry ?? "") === industry) &&
+          (rep === "all" || c.onboarded_by === rep) &&
+          (billing === "all" || (billing === "overdue" ? isOverdue : !isOverdue)) &&
+          matches(q, c.business_name, c.industry, c.contact_name, c.contact_email, c.status)
+        );
+      }),
+    [clients, payments, q, status, industry, rep, billing],
   );
 
   return (
@@ -72,6 +87,10 @@ function Clients() {
       actions={
         <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-center">
         <SearchInput value={q} onChange={setQ} placeholder="Search clients…" />
+        <FilterSelect label="Status" value={status} onChange={setStatus} options={["Active","Paused","Churned"].map((v)=>({value:v,label:v}))} />
+        <FilterSelect label="Sector" value={industry} onChange={setIndustry} options={uniqueOptions(clients.map((c) => c.industry))} />
+        <FilterSelect label="Rep" value={rep} onChange={setRep} options={members.map((m) => ({ value: m.id, label: m.full_name }))} />
+        <FilterSelect label="Billing" value={billing} onChange={setBilling} options={[{value:"overdue",label:"Overdue"},{value:"current",label:"Current"}]} />
         {role === "admin" ? (
           <button
             onClick={() => setOpen((v) => !v)}
