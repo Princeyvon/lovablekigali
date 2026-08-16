@@ -1,8 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
+import { SearchInput, matches } from "@/components/search";
 import { Empty, Panel, Pill } from "@/components/dash";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -35,6 +36,7 @@ function Prospects() {
     source: "",
   });
   const [customSector, setCustomSector] = useState("");
+  const [q, setQ] = useState("");
 
   const { data: members = [] } = useQuery({
     queryKey: ["members"],
@@ -71,17 +73,28 @@ function Prospects() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const visible = useMemo(
+    () =>
+      prospects.filter((p) =>
+        matches(q, p.business_name, p.industry, p.contact_name, p.contact_email, p.contact_phone, p.source),
+      ),
+    [prospects, q],
+  );
+
   return (
     <AppShell
       title="Prospects"
       subtitle="Pipeline by stage — drag-free, one click to advance."
       actions={
+        <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-center">
+        <SearchInput value={q} onChange={setQ} placeholder="Search prospects…" />
         <button
           onClick={() => setOpen((v) => !v)}
           className="gradient-leaf rounded-xl px-4 py-2 text-sm font-semibold text-primary-foreground"
         >
           {open ? "Close" : "New prospect"}
         </button>
+        </div>
       }
     >
       {open && (
@@ -141,7 +154,7 @@ function Prospects() {
 
       <div className="grid gap-4 lg:grid-cols-5">
         {STAGES.map((stage) => {
-          const items = prospects.filter((p) => p.stage === stage);
+          const items = visible.filter((p) => p.stage === stage);
           return (
             <div key={stage} className="surface-card p-4">
               <div className="mb-3 flex items-center justify-between">
