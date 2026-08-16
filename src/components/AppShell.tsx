@@ -27,9 +27,7 @@ const manage = [
 ] as const;
 
 const operate = [
-  { to: "/team", label: "Team & Payouts", icon: Users },
-  { to: "/expenses", label: "Expenses", icon: Receipt },
-  { to: "/analytics", label: "Analytics", icon: BarChart3 },
+  { to: "/finance/team", label: "Finance", icon: Wallet },
   { to: "/profile", label: "My Profile", icon: UserCog },
 ] as const;
 
