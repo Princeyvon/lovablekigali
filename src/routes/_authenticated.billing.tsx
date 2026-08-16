@@ -1,10 +1,10 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { Empty, Panel, Pill, Stat, TD, TH, Table } from "@/components/dash";
-import { Combobox, SearchInput, matches } from "@/components/search";
+import { Combobox, FilterSelect, SearchInput, matches } from "@/components/search";
 import { buildStanding, summarise, type ClientRow } from "@/lib/standing";
 import { supabase } from "@/integrations/supabase/client";
 import { MONTH_OPTIONS, PAYMENT_METHODS, addMonths, fmtDate, money, paidThrough, todayISO } from "@/lib/agency";
@@ -26,6 +26,8 @@ function Billing() {
   const [form, setForm] = useState({ client_id: "", amount: "", months: "1", payment_date: todayISO(), method: "MOMO" });
 
   const [q, setQ] = useState("");
+  const [method, setMethod] = useState("all");
+  const [clientFilter, setClientFilter] = useState("all");
 
   const { data: clients = [] } = useQuery({
     queryKey: ["clients"],
@@ -87,12 +89,17 @@ function Billing() {
     [clients, payments, subs],
   );
 
+  const attention = summary.overdue;
+
   const visiblePayments = useMemo(
     () =>
-      payments.filter((p) =>
-        matches(q, clients.find((c) => c.id === p.client_id)?.business_name, p.method, String(p.amount)),
+      payments.filter(
+        (p) =>
+          (method === "all" || p.method === method) &&
+          (clientFilter === "all" || p.client_id === clientFilter) &&
+          matches(q, clients.find((c) => c.id === p.client_id)?.business_name, p.method, String(p.amount)),
       ),
-    [payments, clients, q],
+    [payments, clients, q, method, clientFilter],
   );
 
   return (
