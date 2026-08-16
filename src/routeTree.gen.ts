@@ -30,6 +30,7 @@ import { Route as AuthenticatedFinanceIndexRouteImport } from './routes/_authent
 import { Route as AuthenticatedFinanceAnalyticsRouteImport } from './routes/_authenticated.finance.analytics'
 import { Route as AuthenticatedFinanceExpensesRouteImport } from './routes/_authenticated.finance.expenses'
 import { Route as AuthenticatedFinancePayoutsRouteImport } from './routes/_authenticated.finance.payouts'
+import { Route as AuthenticatedFinanceReportsRouteImport } from './routes/_authenticated.finance.reports'
 import { Route as AuthenticatedFinanceTeamRouteImport } from './routes/_authenticated.finance.team'
 import { Route as AuthenticatedFinanceTransactionsRouteImport } from './routes/_authenticated.finance.transactions'
 
@@ -143,6 +144,12 @@ const AuthenticatedFinancePayoutsRoute =
     path: '/payouts',
     getParentRoute: () => AuthenticatedFinanceRoute,
   } as any)
+const AuthenticatedFinanceReportsRoute =
+  AuthenticatedFinanceReportsRouteImport.update({
+    id: '/reports',
+    path: '/reports',
+    getParentRoute: () => AuthenticatedFinanceRoute,
+  } as any)
 const AuthenticatedFinanceTeamRoute =
   AuthenticatedFinanceTeamRouteImport.update({
     id: '/team',
@@ -175,6 +182,7 @@ export interface FileRoutesByFullPath {
   '/finance/analytics': typeof AuthenticatedFinanceAnalyticsRoute
   '/finance/expenses': typeof AuthenticatedFinanceExpensesRoute
   '/finance/payouts': typeof AuthenticatedFinancePayoutsRoute
+  '/finance/reports': typeof AuthenticatedFinanceReportsRoute
   '/finance/team': typeof AuthenticatedFinanceTeamRoute
   '/finance/transactions': typeof AuthenticatedFinanceTransactionsRoute
   '/clients/': typeof AuthenticatedClientsIndexRoute
@@ -198,6 +206,7 @@ export interface FileRoutesByTo {
   '/finance/analytics': typeof AuthenticatedFinanceAnalyticsRoute
   '/finance/expenses': typeof AuthenticatedFinanceExpensesRoute
   '/finance/payouts': typeof AuthenticatedFinancePayoutsRoute
+  '/finance/reports': typeof AuthenticatedFinanceReportsRoute
   '/finance/team': typeof AuthenticatedFinanceTeamRoute
   '/finance/transactions': typeof AuthenticatedFinanceTransactionsRoute
   '/clients': typeof AuthenticatedClientsIndexRoute
@@ -224,6 +233,7 @@ export interface FileRoutesById {
   '/_authenticated/finance/analytics': typeof AuthenticatedFinanceAnalyticsRoute
   '/_authenticated/finance/expenses': typeof AuthenticatedFinanceExpensesRoute
   '/_authenticated/finance/payouts': typeof AuthenticatedFinancePayoutsRoute
+  '/_authenticated/finance/reports': typeof AuthenticatedFinanceReportsRoute
   '/_authenticated/finance/team': typeof AuthenticatedFinanceTeamRoute
   '/_authenticated/finance/transactions': typeof AuthenticatedFinanceTransactionsRoute
   '/_authenticated/clients/': typeof AuthenticatedClientsIndexRoute
@@ -250,6 +260,7 @@ export interface FileRouteTypes {
     | '/finance/analytics'
     | '/finance/expenses'
     | '/finance/payouts'
+    | '/finance/reports'
     | '/finance/team'
     | '/finance/transactions'
     | '/clients/'
@@ -273,6 +284,7 @@ export interface FileRouteTypes {
     | '/finance/analytics'
     | '/finance/expenses'
     | '/finance/payouts'
+    | '/finance/reports'
     | '/finance/team'
     | '/finance/transactions'
     | '/clients'
@@ -298,6 +310,7 @@ export interface FileRouteTypes {
     | '/_authenticated/finance/analytics'
     | '/_authenticated/finance/expenses'
     | '/_authenticated/finance/payouts'
+    | '/_authenticated/finance/reports'
     | '/_authenticated/finance/team'
     | '/_authenticated/finance/transactions'
     | '/_authenticated/clients/'
@@ -460,6 +473,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedFinancePayoutsRouteImport
       parentRoute: typeof AuthenticatedFinanceRoute
     }
+    '/_authenticated/finance/reports': {
+      id: '/_authenticated/finance/reports'
+      path: '/reports'
+      fullPath: '/finance/reports'
+      preLoaderRoute: typeof AuthenticatedFinanceReportsRouteImport
+      parentRoute: typeof AuthenticatedFinanceRoute
+    }
     '/_authenticated/finance/team': {
       id: '/_authenticated/finance/team'
       path: '/team'
@@ -481,6 +501,7 @@ interface AuthenticatedFinanceRouteChildren {
   AuthenticatedFinanceAnalyticsRoute: typeof AuthenticatedFinanceAnalyticsRoute
   AuthenticatedFinanceExpensesRoute: typeof AuthenticatedFinanceExpensesRoute
   AuthenticatedFinancePayoutsRoute: typeof AuthenticatedFinancePayoutsRoute
+  AuthenticatedFinanceReportsRoute: typeof AuthenticatedFinanceReportsRoute
   AuthenticatedFinanceTeamRoute: typeof AuthenticatedFinanceTeamRoute
   AuthenticatedFinanceTransactionsRoute: typeof AuthenticatedFinanceTransactionsRoute
   AuthenticatedFinanceIndexRoute: typeof AuthenticatedFinanceIndexRoute
@@ -490,6 +511,7 @@ const AuthenticatedFinanceRouteChildren: AuthenticatedFinanceRouteChildren = {
   AuthenticatedFinanceAnalyticsRoute: AuthenticatedFinanceAnalyticsRoute,
   AuthenticatedFinanceExpensesRoute: AuthenticatedFinanceExpensesRoute,
   AuthenticatedFinancePayoutsRoute: AuthenticatedFinancePayoutsRoute,
+  AuthenticatedFinanceReportsRoute: AuthenticatedFinanceReportsRoute,
   AuthenticatedFinanceTeamRoute: AuthenticatedFinanceTeamRoute,
   AuthenticatedFinanceTransactionsRoute: AuthenticatedFinanceTransactionsRoute,
   AuthenticatedFinanceIndexRoute: AuthenticatedFinanceIndexRoute,
