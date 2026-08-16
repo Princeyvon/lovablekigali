@@ -3,7 +3,9 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
-import { Empty, Panel, Pill, TD, TH, Table } from "@/components/dash";
+import { Empty, Panel, Pill, Stat, TD, TH, Table } from "@/components/dash";
+import { Combobox, SearchInput, matches } from "@/components/search";
+import { buildStanding, summarise, type ClientRow } from "@/lib/standing";
 import { supabase } from "@/integrations/supabase/client";
 import { MONTH_OPTIONS, PAYMENT_METHODS, addMonths, fmtDate, money, paidThrough, todayISO } from "@/lib/agency";
 
@@ -23,9 +25,11 @@ function Billing() {
   const qc = useQueryClient();
   const [form, setForm] = useState({ client_id: "", amount: "", months: "1", payment_date: todayISO(), method: "MOMO" });
 
+  const [q, setQ] = useState("");
+
   const { data: clients = [] } = useQuery({
     queryKey: ["clients"],
-    queryFn: async () => (await supabase.from("clients").select("id, business_name, status")).data ?? [],
+    queryFn: async () => (await supabase.from("clients").select("*").order("business_name")).data ?? [],
   });
   const { data: payments = [] } = useQuery({
     queryKey: ["payments"],
@@ -71,23 +75,45 @@ function Billing() {
 
   const overdue = standing.filter((s) => s.overdue && s.status === "Active");
 
+  const summary = useMemo(
+    () =>
+      summarise(
+        buildStanding(
+          clients as unknown as ClientRow[],
+          payments as { client_id: string; covers_period_end: string; amount: number }[],
+          subs as { client_id: string; monthly_rate: number; status: string }[],
+        ),
+      ),
+    [clients, payments, subs],
+  );
+
+  const visiblePayments = useMemo(
+    () =>
+      payments.filter((p) =>
+        matches(q, clients.find((c) => c.id === p.client_id)?.business_name, p.method, String(p.amount)),
+      ),
+    [payments, clients, q],
+  );
+
   return (
     <AppShell title="Billing" subtitle="Multi-month payments, paid-through math handled for you.">
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <Stat label="Expected revenue" value={money(summary.expectedRevenue)} hint="Owed by apps past the grace window" tone="deep" />
+        <Stat label="Total owed" value={money(summary.totalOwed)} hint={`${summary.overdue.length} overdue clients`} tone="warn" />
+        <Stat label="Collected all-time" value={money(summary.collected)} tone="leaf" />
+        <Stat label="Active MRR" value={money(summary.mrr)} hint={`${summary.activeCount} active clients`} tone="mist" />
+      </div>
+
       <div className="grid gap-6 lg:grid-cols-[1.1fr_1fr]">
         <Panel title="Record payment">
           <div className="grid gap-3 md:grid-cols-2">
-            <select
+            <Combobox
+              className="md:col-span-2"
               value={form.client_id}
-              onChange={(e) => setForm({ ...form, client_id: e.target.value })}
-              className="rounded-xl border border-input bg-background px-3 py-2 text-sm md:col-span-2"
-            >
-              <option value="">Select client…</option>
-              {clients.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.business_name}
-                </option>
-              ))}
-            </select>
+              onChange={(v) => setForm({ ...form, client_id: v })}
+              placeholder="Search and select client…"
+              options={clients.map((c) => ({ value: c.id, label: c.business_name, hint: c.status }))}
+            />
             <input
               value={form.amount}
               onChange={(e) => setForm({ ...form, amount: e.target.value })}
@@ -149,8 +175,8 @@ function Billing() {
         </Panel>
       </div>
 
-      <Panel title="Payment history">
-        {payments.length === 0 ? (
+      <Panel title="Payment history" right={<SearchInput value={q} onChange={setQ} placeholder="Search payments…" />}>
+        {visiblePayments.length === 0 ? (
           <Empty>No payments yet.</Empty>
         ) : (
           <Table
@@ -165,7 +191,7 @@ function Billing() {
               </>
             }
           >
-            {payments.map((p) => (
+            {visiblePayments.map((p) => (
               <tr key={p.id}>
                 <TD className="font-medium">{clients.find((c) => c.id === p.client_id)?.business_name ?? "—"}</TD>
                 <TD>{fmtDate(p.payment_date)}</TD>
