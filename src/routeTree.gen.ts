@@ -27,6 +27,7 @@ import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authentic
 import { Route as AuthenticatedClientsIndexRouteImport } from './routes/_authenticated.clients.index'
 import { Route as AuthenticatedClientsIdRouteImport } from './routes/_authenticated.clients.$id'
 import { Route as AuthenticatedFinanceIndexRouteImport } from './routes/_authenticated.finance.index'
+import { Route as AuthenticatedFinancePayoutsRouteImport } from './routes/_authenticated.finance.payouts'
 import { Route as AuthenticatedFinanceTeamRouteImport } from './routes/_authenticated.finance.team'
 
 const IndexRoute = IndexRouteImport.update({
@@ -121,6 +122,12 @@ const AuthenticatedFinanceIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedFinanceRoute,
   } as any)
+const AuthenticatedFinancePayoutsRoute =
+  AuthenticatedFinancePayoutsRouteImport.update({
+    id: '/payouts',
+    path: '/payouts',
+    getParentRoute: () => AuthenticatedFinanceRoute,
+  } as any)
 const AuthenticatedFinanceTeamRoute =
   AuthenticatedFinanceTeamRouteImport.update({
     id: '/team',
@@ -144,6 +151,7 @@ export interface FileRoutesByFullPath {
   '/admin/access': typeof AuthenticatedAdminAccessRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/clients/$id': typeof AuthenticatedClientsIdRoute
+  '/finance/payouts': typeof AuthenticatedFinancePayoutsRoute
   '/finance/team': typeof AuthenticatedFinanceTeamRoute
   '/clients/': typeof AuthenticatedClientsIndexRoute
   '/finance/': typeof AuthenticatedFinanceIndexRoute
@@ -163,6 +171,7 @@ export interface FileRoutesByTo {
   '/admin/access': typeof AuthenticatedAdminAccessRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/clients/$id': typeof AuthenticatedClientsIdRoute
+  '/finance/payouts': typeof AuthenticatedFinancePayoutsRoute
   '/finance/team': typeof AuthenticatedFinanceTeamRoute
   '/clients': typeof AuthenticatedClientsIndexRoute
   '/finance': typeof AuthenticatedFinanceIndexRoute
@@ -185,6 +194,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/access': typeof AuthenticatedAdminAccessRoute
   '/_authenticated/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/_authenticated/clients/$id': typeof AuthenticatedClientsIdRoute
+  '/_authenticated/finance/payouts': typeof AuthenticatedFinancePayoutsRoute
   '/_authenticated/finance/team': typeof AuthenticatedFinanceTeamRoute
   '/_authenticated/clients/': typeof AuthenticatedClientsIndexRoute
   '/_authenticated/finance/': typeof AuthenticatedFinanceIndexRoute
@@ -207,6 +217,7 @@ export interface FileRouteTypes {
     | '/admin/access'
     | '/admin/audit'
     | '/clients/$id'
+    | '/finance/payouts'
     | '/finance/team'
     | '/clients/'
     | '/finance/'
@@ -226,6 +237,7 @@ export interface FileRouteTypes {
     | '/admin/access'
     | '/admin/audit'
     | '/clients/$id'
+    | '/finance/payouts'
     | '/finance/team'
     | '/clients'
     | '/finance'
@@ -247,6 +259,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/access'
     | '/_authenticated/admin/audit'
     | '/_authenticated/clients/$id'
+    | '/_authenticated/finance/payouts'
     | '/_authenticated/finance/team'
     | '/_authenticated/clients/'
     | '/_authenticated/finance/'
@@ -387,6 +400,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedFinanceIndexRouteImport
       parentRoute: typeof AuthenticatedFinanceRoute
     }
+    '/_authenticated/finance/payouts': {
+      id: '/_authenticated/finance/payouts'
+      path: '/payouts'
+      fullPath: '/finance/payouts'
+      preLoaderRoute: typeof AuthenticatedFinancePayoutsRouteImport
+      parentRoute: typeof AuthenticatedFinanceRoute
+    }
     '/_authenticated/finance/team': {
       id: '/_authenticated/finance/team'
       path: '/team'
@@ -398,11 +418,13 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedFinanceRouteChildren {
+  AuthenticatedFinancePayoutsRoute: typeof AuthenticatedFinancePayoutsRoute
   AuthenticatedFinanceTeamRoute: typeof AuthenticatedFinanceTeamRoute
   AuthenticatedFinanceIndexRoute: typeof AuthenticatedFinanceIndexRoute
 }
 
 const AuthenticatedFinanceRouteChildren: AuthenticatedFinanceRouteChildren = {
+  AuthenticatedFinancePayoutsRoute: AuthenticatedFinancePayoutsRoute,
   AuthenticatedFinanceTeamRoute: AuthenticatedFinanceTeamRoute,
   AuthenticatedFinanceIndexRoute: AuthenticatedFinanceIndexRoute,
 }
