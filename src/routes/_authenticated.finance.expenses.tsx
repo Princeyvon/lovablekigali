@@ -133,9 +133,19 @@ function Expenses() {
         </Panel>
       </div>
 
-      <Panel title="History" right={<Pill tone="mist">{expenses.length}</Pill>}>
-        {expenses.length === 0 ? (
-          <Empty>No expenses yet.</Empty>
+      <Panel
+        title="History"
+        right={
+          <div className="flex flex-wrap items-center gap-2">
+            <FilterSelect label="Category" value={cat} onChange={setCat} options={uniqueOptions(expenses.map((e) => e.category))} />
+            <FilterSelect label="Month" value={month} onChange={setMonth} options={months} />
+            <SearchInput value={q} onChange={setQ} placeholder="Search expenses…" />
+            <Pill tone="mist">{visible.length}</Pill>
+          </div>
+        }
+      >
+        {visible.length === 0 ? (
+          <Empty>No expenses match.</Empty>
         ) : (
           <Table
             head={
@@ -148,7 +158,8 @@ function Expenses() {
               </>
             }
           >
-            {expenses.map((e) => (
+            {visible.map((e) => (
+
               <tr key={e.id}>
                 <TD>{fmtDate(e.date)}</TD>
                 <TD>
