@@ -1,10 +1,38 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { AlertTriangle, KeyRound, TrendingUp, Wallet } from "lucide-react";
+import { AlertTriangle, KeyRound, TrendingDown, TrendingUp, Wallet } from "lucide-react";
+import {
+  Area,
+  AreaChart,
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Legend,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 import { AppShell } from "@/components/AppShell";
-import { Bars, Donut, Empty, Panel, Pill, Stat, TD, TH, Table } from "@/components/dash";
+import { Donut, Empty, Panel, Pill, Stat, TD, TH, Table } from "@/components/dash";
 import { supabase } from "@/integrations/supabase/client";
-import { REMINDER_WINDOW_DAYS, ROTATION_STALE_DAYS, daysUntil, fmtDate, money, paidThrough, startOfWeek } from "@/lib/agency";
+import { REMINDER_WINDOW_DAYS, ROTATION_STALE_DAYS, daysUntil, fmtDate, money, paidThrough, shortMoney, startOfWeek } from "@/lib/agency";
+
+function Trend({ current, previous, unit = "" }: { current: number; previous: number; unit?: string }) {
+  const delta = previous === 0 ? (current === 0 ? 0 : 100) : ((current - previous) / previous) * 100;
+  const up = delta >= 0;
+  return (
+    <span
+      className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold ${
+        up ? "bg-secondary text-primary" : "bg-muted text-muted-foreground"
+      }`}
+    >
+      {up ? <TrendingUp className="size-3" /> : <TrendingDown className="size-3" />}
+      {up ? "+" : ""}
+      {Math.round(delta)}% {unit}
+    </span>
+  );
+}
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
