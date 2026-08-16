@@ -1,8 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
+import { SearchInput, matches } from "@/components/search";
 import { Empty, Panel, Pill, TD, TH, Table } from "@/components/dash";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -24,6 +25,7 @@ function Clients() {
   const qc = useQueryClient();
   const { role, memberId } = useAuth();
   const [open, setOpen] = useState(false);
+  const [q, setQ] = useState("");
   const [form, setForm] = useState({ business_name: "", industry: "", contact_name: "", contact_email: "" });
 
   const { data: clients = [], isLoading } = useQuery({
@@ -58,19 +60,27 @@ function Clients() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const visible = useMemo(
+    () => clients.filter((c) => matches(q, c.business_name, c.industry, c.contact_name, c.contact_email, c.status)),
+    [clients, q],
+  );
+
   return (
     <AppShell
       title="Clients"
       subtitle="Signed relationships, owner-credited and audited."
       actions={
-        role === "admin" ? (
+        <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-center">
+        <SearchInput value={q} onChange={setQ} placeholder="Search clients…" />
+        {role === "admin" ? (
           <button
             onClick={() => setOpen((v) => !v)}
             className="gradient-leaf rounded-xl px-4 py-2 text-sm font-semibold text-primary-foreground"
           >
             {open ? "Close" : "New client"}
           </button>
-        ) : null
+        ) : null}
+        </div>
       }
     >
       {open && (
@@ -96,10 +106,10 @@ function Clients() {
         </Panel>
       )}
 
-      <Panel title={`${clients.length} clients`}>
+      <Panel title={`${visible.length} of ${clients.length} clients`}>
         {isLoading ? (
           <Empty>Loading…</Empty>
-        ) : clients.length === 0 ? (
+        ) : visible.length === 0 ? (
           <Empty>No clients yet.</Empty>
         ) : (
           <Table
@@ -115,7 +125,7 @@ function Clients() {
               </>
             }
           >
-            {clients.map((c) => {
+            {visible.map((c) => {
               const through = paidThrough(payments.filter((p) => p.client_id === c.id));
               const rate = subs.find((s) => s.client_id === c.id)?.monthly_rate;
               return (
