@@ -13,9 +13,9 @@ const STAGES = ["Contacted", "Demo", "Negotiating", "Signed", "Lost"] as const;
 export const Route = createFileRoute("/_authenticated/prospects")({
   head: () => ({
     meta: [
-      { title: "Prospects — Agency OS" },
+      { title: "Prospects — Lovable Solutions" },
       { name: "description", content: "Pipeline of businesses approached, by stage and assigned rep." },
-      { property: "og:title", content: "Prospects — Agency OS" },
+      { property: "og:title", content: "Prospects — Lovable Solutions" },
       { property: "og:description", content: "Track the pipeline from first contact to signed." },
     ],
   }),

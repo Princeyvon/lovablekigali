@@ -10,9 +10,9 @@ import { MONTH_OPTIONS, PAYMENT_METHODS, addMonths, fmtDate, money, paidThrough,
 export const Route = createFileRoute("/_authenticated/billing")({
   head: () => ({
     meta: [
-      { title: "Billing — Agency OS" },
+      { title: "Billing — Lovable Solutions" },
       { name: "description", content: "Record multi-month payments and see who is overdue at a glance." },
-      { property: "og:title", content: "Billing — Agency OS" },
+      { property: "og:title", content: "Billing — Lovable Solutions" },
       { property: "og:description", content: "Multi-month payment entry with automatic paid-through math." },
     ],
   }),

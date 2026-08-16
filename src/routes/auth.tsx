@@ -8,9 +8,9 @@ import { resolveLoginEmail } from "@/lib/account.functions";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Sign in — Agency OS" },
-      { name: "description", content: "Sign in to the Agency OS internal operations platform." },
-      { property: "og:title", content: "Sign in — Agency OS" },
+      { title: "Sign in — Lovable Solutions" },
+      { name: "description", content: "Sign in to the Lovable Solutions internal operations platform." },
+      { property: "og:title", content: "Sign in — Lovable Solutions" },
       { property: "og:description", content: "Access clients, billing, vault and insights." },
       { name: "robots", content: "noindex" },
     ],
@@ -105,7 +105,7 @@ function AuthPage() {
         <div className="gradient-rail relative hidden flex-col justify-between p-10 md:flex">
           <div className="gradient-halo pointer-events-none absolute inset-0" />
           <div className="relative">
-            <p className="font-display text-2xl font-semibold text-sidebar-foreground">Agency OS</p>
+            <p className="font-display text-2xl font-semibold text-sidebar-foreground">Lovable Solutions</p>
             <p className="mt-3 max-w-xs text-sm text-sidebar-foreground/70">
               One source of truth for clients, credentials, billing and the people who build it all.
             </p>

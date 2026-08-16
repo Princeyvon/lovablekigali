@@ -14,9 +14,9 @@ const ROLES = ["admin", "sales", "dev", "support"] as const;
 export const Route = createFileRoute("/_authenticated/admin/access")({
   head: () => ({
     meta: [
-      { title: "Access control — Agency OS" },
+      { title: "Access control — Lovable Solutions" },
       { name: "description", content: "Manage teammate roles and issue one-time passwords." },
-      { property: "og:title", content: "Access control — Agency OS" },
+      { property: "og:title", content: "Access control — Lovable Solutions" },
       { property: "og:description", content: "Admin console for roles and account recovery." },
     ],
   }),

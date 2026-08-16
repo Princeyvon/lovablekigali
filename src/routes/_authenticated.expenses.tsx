@@ -12,9 +12,9 @@ const CATEGORIES = ["Hosting", "Internet", "Transport", "Salaries", "Marketing",
 export const Route = createFileRoute("/_authenticated/expenses")({
   head: () => ({
     meta: [
-      { title: "Expenses — Agency OS" },
+      { title: "Expenses — Lovable Solutions" },
       { name: "description", content: "Track operating costs in RWF by category and vendor." },
-      { property: "og:title", content: "Expenses — Agency OS" },
+      { property: "og:title", content: "Expenses — Lovable Solutions" },
       { property: "og:description", content: "Every franc that leaves the agency." },
     ],
   }),

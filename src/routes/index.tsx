@@ -6,12 +6,12 @@ export const Route = createFileRoute("/")({
   },
   head: () => ({
     meta: [
-      { title: "Agency OS — Run the agency that builds systems" },
+      { title: "Lovable Solutions — Run the agency that builds systems" },
       {
         name: "description",
         content: "Clients, credentials, billing, commissions and insights in one audited internal platform.",
       },
-      { property: "og:title", content: "Agency OS" },
+      { property: "og:title", content: "Lovable Solutions" },
       { property: "og:description", content: "Internal operations platform for a digital-solutions agency." },
     ],
   }),

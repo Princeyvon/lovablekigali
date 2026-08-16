@@ -77,11 +77,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Agency OS — Internal Operations Platform" },
+      { title: "Lovable Solutions — Internal Operations Platform" },
       {
         name: "description",
         content:
-          "Agency OS runs the agency: clients, credentials vault, billing, commissions, payouts and performance insights in one audited system.",
+          "Lovable Solutions runs the agency: clients, credentials vault, billing, commissions, payouts and performance insights in one audited system.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

@@ -16,9 +16,9 @@ const TABS = ["Overview", "Notes", "Service Log", "System Users", "Credentials",
 export const Route = createFileRoute("/_authenticated/clients/$id")({
   head: () => ({
     meta: [
-      { title: "Client detail — Agency OS" },
+      { title: "Client detail — Lovable Solutions" },
       { name: "description", content: "Overview, notes, service log, system users, credentials and billing for a client." },
-      { property: "og:title", content: "Client detail — Agency OS" },
+      { property: "og:title", content: "Client detail — Lovable Solutions" },
       { property: "og:description", content: "Everything known about one client relationship." },
     ],
   }),

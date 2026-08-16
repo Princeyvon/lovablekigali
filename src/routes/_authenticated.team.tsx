@@ -14,9 +14,9 @@ const PAYOUT_METHODS = ["Mobile Money", "Bank", "Check"] as const;
 export const Route = createFileRoute("/_authenticated/team")({
   head: () => ({
     meta: [
-      { title: "Team & payouts — Agency OS" },
+      { title: "Team & payouts — Lovable Solutions" },
       { name: "description", content: "Team roster, commissions earned and money sent out in RWF." },
-      { property: "og:title", content: "Team & payouts — Agency OS" },
+      { property: "og:title", content: "Team & payouts — Lovable Solutions" },
       { property: "og:description", content: "Roster, commissions and payouts in one place." },
     ],
   }),

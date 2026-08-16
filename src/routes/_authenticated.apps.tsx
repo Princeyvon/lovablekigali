@@ -19,9 +19,9 @@ import {
 export const Route = createFileRoute("/_authenticated/apps")({
   head: () => ({
     meta: [
-      { title: "App status — Agency OS" },
+      { title: "App status — Lovable Solutions" },
       { name: "description", content: "Which client web apps are live, in grace, or switched off for unpaid invoices." },
-      { property: "og:title", content: "App status — Agency OS" },
+      { property: "og:title", content: "App status — Lovable Solutions" },
       { property: "og:description", content: "Two-week grace period, reminders every two days, then shutdown." },
     ],
   }),
