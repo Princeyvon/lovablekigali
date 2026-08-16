@@ -18,6 +18,7 @@ import { Route as AuthenticatedAppsRouteImport } from './routes/_authenticated.a
 import { Route as AuthenticatedBillingRouteImport } from './routes/_authenticated.billing'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated.dashboard'
 import { Route as AuthenticatedExpensesRouteImport } from './routes/_authenticated.expenses'
+import { Route as AuthenticatedFinanceRouteImport } from './routes/_authenticated.finance'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated.profile'
 import { Route as AuthenticatedProspectsRouteImport } from './routes/_authenticated.prospects'
 import { Route as AuthenticatedTeamRouteImport } from './routes/_authenticated.team'
@@ -70,6 +71,11 @@ const AuthenticatedExpensesRoute = AuthenticatedExpensesRouteImport.update({
   path: '/expenses',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedFinanceRoute = AuthenticatedFinanceRouteImport.update({
+  id: '/finance',
+  path: '/finance',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
@@ -117,6 +123,7 @@ export interface FileRoutesByFullPath {
   '/billing': typeof AuthenticatedBillingRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/expenses': typeof AuthenticatedExpensesRoute
+  '/finance': typeof AuthenticatedFinanceRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/prospects': typeof AuthenticatedProspectsRoute
   '/team': typeof AuthenticatedTeamRoute
@@ -134,6 +141,7 @@ export interface FileRoutesByTo {
   '/billing': typeof AuthenticatedBillingRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/expenses': typeof AuthenticatedExpensesRoute
+  '/finance': typeof AuthenticatedFinanceRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/prospects': typeof AuthenticatedProspectsRoute
   '/team': typeof AuthenticatedTeamRoute
@@ -153,6 +161,7 @@ export interface FileRoutesById {
   '/_authenticated/billing': typeof AuthenticatedBillingRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/expenses': typeof AuthenticatedExpensesRoute
+  '/_authenticated/finance': typeof AuthenticatedFinanceRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/prospects': typeof AuthenticatedProspectsRoute
   '/_authenticated/team': typeof AuthenticatedTeamRoute
@@ -172,6 +181,7 @@ export interface FileRouteTypes {
     | '/billing'
     | '/dashboard'
     | '/expenses'
+    | '/finance'
     | '/profile'
     | '/prospects'
     | '/team'
@@ -189,6 +199,7 @@ export interface FileRouteTypes {
     | '/billing'
     | '/dashboard'
     | '/expenses'
+    | '/finance'
     | '/profile'
     | '/prospects'
     | '/team'
@@ -207,6 +218,7 @@ export interface FileRouteTypes {
     | '/_authenticated/billing'
     | '/_authenticated/dashboard'
     | '/_authenticated/expenses'
+    | '/_authenticated/finance'
     | '/_authenticated/profile'
     | '/_authenticated/prospects'
     | '/_authenticated/team'
@@ -288,6 +300,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedExpensesRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/finance': {
+      id: '/_authenticated/finance'
+      path: '/finance'
+      fullPath: '/finance'
+      preLoaderRoute: typeof AuthenticatedFinanceRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/profile': {
       id: '/_authenticated/profile'
       path: '/profile'
@@ -346,6 +365,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedBillingRoute: typeof AuthenticatedBillingRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedExpensesRoute: typeof AuthenticatedExpensesRoute
+  AuthenticatedFinanceRoute: typeof AuthenticatedFinanceRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedProspectsRoute: typeof AuthenticatedProspectsRoute
   AuthenticatedTeamRoute: typeof AuthenticatedTeamRoute
@@ -361,6 +381,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedBillingRoute: AuthenticatedBillingRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedExpensesRoute: AuthenticatedExpensesRoute,
+  AuthenticatedFinanceRoute: AuthenticatedFinanceRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedProspectsRoute: AuthenticatedProspectsRoute,
   AuthenticatedTeamRoute: AuthenticatedTeamRoute,
