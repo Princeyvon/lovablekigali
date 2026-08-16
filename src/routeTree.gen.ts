@@ -26,6 +26,7 @@ import { Route as AuthenticatedAdminAccessRouteImport } from './routes/_authenti
 import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authenticated.admin.audit'
 import { Route as AuthenticatedClientsIndexRouteImport } from './routes/_authenticated.clients.index'
 import { Route as AuthenticatedClientsIdRouteImport } from './routes/_authenticated.clients.$id'
+import { Route as AuthenticatedFinanceIndexRouteImport } from './routes/_authenticated.finance.index'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -113,6 +114,12 @@ const AuthenticatedClientsIdRoute = AuthenticatedClientsIdRouteImport.update({
   path: '/clients/$id',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedFinanceIndexRoute =
+  AuthenticatedFinanceIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedFinanceRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -123,7 +130,7 @@ export interface FileRoutesByFullPath {
   '/billing': typeof AuthenticatedBillingRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/expenses': typeof AuthenticatedExpensesRoute
-  '/finance': typeof AuthenticatedFinanceRoute
+  '/finance': typeof AuthenticatedFinanceRouteWithChildren
   '/profile': typeof AuthenticatedProfileRoute
   '/prospects': typeof AuthenticatedProspectsRoute
   '/team': typeof AuthenticatedTeamRoute
@@ -131,6 +138,7 @@ export interface FileRoutesByFullPath {
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/clients/$id': typeof AuthenticatedClientsIdRoute
   '/clients/': typeof AuthenticatedClientsIndexRoute
+  '/finance/': typeof AuthenticatedFinanceIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -141,7 +149,6 @@ export interface FileRoutesByTo {
   '/billing': typeof AuthenticatedBillingRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/expenses': typeof AuthenticatedExpensesRoute
-  '/finance': typeof AuthenticatedFinanceRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/prospects': typeof AuthenticatedProspectsRoute
   '/team': typeof AuthenticatedTeamRoute
@@ -149,6 +156,7 @@ export interface FileRoutesByTo {
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/clients/$id': typeof AuthenticatedClientsIdRoute
   '/clients': typeof AuthenticatedClientsIndexRoute
+  '/finance': typeof AuthenticatedFinanceIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -161,7 +169,7 @@ export interface FileRoutesById {
   '/_authenticated/billing': typeof AuthenticatedBillingRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/expenses': typeof AuthenticatedExpensesRoute
-  '/_authenticated/finance': typeof AuthenticatedFinanceRoute
+  '/_authenticated/finance': typeof AuthenticatedFinanceRouteWithChildren
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/prospects': typeof AuthenticatedProspectsRoute
   '/_authenticated/team': typeof AuthenticatedTeamRoute
@@ -169,6 +177,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/_authenticated/clients/$id': typeof AuthenticatedClientsIdRoute
   '/_authenticated/clients/': typeof AuthenticatedClientsIndexRoute
+  '/_authenticated/finance/': typeof AuthenticatedFinanceIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -189,6 +198,7 @@ export interface FileRouteTypes {
     | '/admin/audit'
     | '/clients/$id'
     | '/clients/'
+    | '/finance/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -199,7 +209,6 @@ export interface FileRouteTypes {
     | '/billing'
     | '/dashboard'
     | '/expenses'
-    | '/finance'
     | '/profile'
     | '/prospects'
     | '/team'
@@ -207,6 +216,7 @@ export interface FileRouteTypes {
     | '/admin/audit'
     | '/clients/$id'
     | '/clients'
+    | '/finance'
   id:
     | '__root__'
     | '/'
@@ -226,6 +236,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/audit'
     | '/_authenticated/clients/$id'
     | '/_authenticated/clients/'
+    | '/_authenticated/finance/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -356,8 +367,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedClientsIdRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/finance/': {
+      id: '/_authenticated/finance/'
+      path: '/'
+      fullPath: '/finance/'
+      preLoaderRoute: typeof AuthenticatedFinanceIndexRouteImport
+      parentRoute: typeof AuthenticatedFinanceRoute
+    }
   }
 }
+
+interface AuthenticatedFinanceRouteChildren {
+  AuthenticatedFinanceIndexRoute: typeof AuthenticatedFinanceIndexRoute
+}
+
+const AuthenticatedFinanceRouteChildren: AuthenticatedFinanceRouteChildren = {
+  AuthenticatedFinanceIndexRoute: AuthenticatedFinanceIndexRoute,
+}
+
+const AuthenticatedFinanceRouteWithChildren =
+  AuthenticatedFinanceRoute._addFileChildren(AuthenticatedFinanceRouteChildren)
 
 interface AuthenticatedRouteChildren {
   AuthenticatedAnalyticsRoute: typeof AuthenticatedAnalyticsRoute
@@ -365,7 +394,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedBillingRoute: typeof AuthenticatedBillingRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedExpensesRoute: typeof AuthenticatedExpensesRoute
-  AuthenticatedFinanceRoute: typeof AuthenticatedFinanceRoute
+  AuthenticatedFinanceRoute: typeof AuthenticatedFinanceRouteWithChildren
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedProspectsRoute: typeof AuthenticatedProspectsRoute
   AuthenticatedTeamRoute: typeof AuthenticatedTeamRoute
@@ -381,7 +410,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedBillingRoute: AuthenticatedBillingRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedExpensesRoute: AuthenticatedExpensesRoute,
-  AuthenticatedFinanceRoute: AuthenticatedFinanceRoute,
+  AuthenticatedFinanceRoute: AuthenticatedFinanceRouteWithChildren,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedProspectsRoute: AuthenticatedProspectsRoute,
   AuthenticatedTeamRoute: AuthenticatedTeamRoute,
