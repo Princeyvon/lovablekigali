@@ -1,8 +1,9 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { Link, createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
+import { SearchInput, matches } from "@/components/search";
 import { Empty, Panel, Pill, Stat, TD, TH, Table } from "@/components/dash";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -34,6 +35,7 @@ function Apps() {
   const qc = useQueryClient();
   const { role, memberId } = useAuth();
   const [channel, setChannel] = useState<Channel>("whatsapp");
+  const [q, setQ] = useState("");
 
   const { data: clients = [] } = useQuery({
     queryKey: ["clients"],
@@ -66,8 +68,13 @@ function Apps() {
       .sort((a, b) => b.daysOverdue - a.daysOverdue);
   }, [clients, payments, subs, reminders]);
 
-  const suspended = rows.filter((r) => r.app_status === "Suspended" || r.app_status === "Closed");
-  const inGrace = rows.filter((r) => r.overdue && r.app_status === "Live");
+  const visible = useMemo(
+    () => rows.filter((r) => matches(q, r.business_name, r.app_url, r.app_status, r.industry as string | null)),
+    [rows, q],
+  );
+
+  const suspended = visible.filter((r) => r.app_status === "Suspended" || r.app_status === "Closed");
+  const inGrace = visible.filter((r) => r.overdue && r.app_status === "Live");
   const atRisk = inGrace.filter((r) => r.suspendable);
   const lostRevenue = suspended.reduce((s, r) => s + r.rate, 0);
 
@@ -114,6 +121,8 @@ function Apps() {
       title="App status"
       subtitle={`Reminders every 2 days while overdue. Shutdown only allowed after ${GRACE_DAYS} days.`}
       actions={
+        <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-center">
+        <SearchInput value={q} onChange={setQ} placeholder="Search apps…" />
         <select
           value={channel}
           onChange={(e) => setChannel(e.target.value as Channel)}
@@ -125,6 +134,7 @@ function Apps() {
             </option>
           ))}
         </select>
+        </div>
       }
     >
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
@@ -152,7 +162,11 @@ function Apps() {
           >
             {suspended.map((r) => (
               <tr key={r.id}>
-                <TD className="font-medium">{r.business_name}</TD>
+                <TD className="font-medium">
+                  <Link to="/clients/$id" params={{ id: r.id }} className="text-primary hover:underline">
+                    {r.business_name}
+                  </Link>
+                </TD>
                 <TD className="text-muted-foreground">{r.app_url ?? "—"}</TD>
                 <TD>{fmtDate(r.suspended_at)}</TD>
                 <TD className="text-muted-foreground">{r.suspension_reason ?? "—"}</TD>
@@ -190,7 +204,11 @@ function Apps() {
           >
             {inGrace.map((r) => (
               <tr key={r.id}>
-                <TD className="font-medium">{r.business_name}</TD>
+                <TD className="font-medium">
+                  <Link to="/clients/$id" params={{ id: r.id }} className="text-primary hover:underline">
+                    {r.business_name}
+                  </Link>
+                </TD>
                 <TD>{fmtDate(r.through)}</TD>
                 <TD>
                   <Pill tone={r.suspendable ? "warn" : "mist"}>{r.daysOverdue} d</Pill>
