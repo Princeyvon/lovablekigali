@@ -29,6 +29,7 @@ import { Route as AuthenticatedClientsIdRouteImport } from './routes/_authentica
 import { Route as AuthenticatedFinanceIndexRouteImport } from './routes/_authenticated.finance.index'
 import { Route as AuthenticatedFinancePayoutsRouteImport } from './routes/_authenticated.finance.payouts'
 import { Route as AuthenticatedFinanceTeamRouteImport } from './routes/_authenticated.finance.team'
+import { Route as AuthenticatedFinanceTransactionsRouteImport } from './routes/_authenticated.finance.transactions'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -134,6 +135,12 @@ const AuthenticatedFinanceTeamRoute =
     path: '/team',
     getParentRoute: () => AuthenticatedFinanceRoute,
   } as any)
+const AuthenticatedFinanceTransactionsRoute =
+  AuthenticatedFinanceTransactionsRouteImport.update({
+    id: '/transactions',
+    path: '/transactions',
+    getParentRoute: () => AuthenticatedFinanceRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -153,6 +160,7 @@ export interface FileRoutesByFullPath {
   '/clients/$id': typeof AuthenticatedClientsIdRoute
   '/finance/payouts': typeof AuthenticatedFinancePayoutsRoute
   '/finance/team': typeof AuthenticatedFinanceTeamRoute
+  '/finance/transactions': typeof AuthenticatedFinanceTransactionsRoute
   '/clients/': typeof AuthenticatedClientsIndexRoute
   '/finance/': typeof AuthenticatedFinanceIndexRoute
 }
@@ -173,6 +181,7 @@ export interface FileRoutesByTo {
   '/clients/$id': typeof AuthenticatedClientsIdRoute
   '/finance/payouts': typeof AuthenticatedFinancePayoutsRoute
   '/finance/team': typeof AuthenticatedFinanceTeamRoute
+  '/finance/transactions': typeof AuthenticatedFinanceTransactionsRoute
   '/clients': typeof AuthenticatedClientsIndexRoute
   '/finance': typeof AuthenticatedFinanceIndexRoute
 }
@@ -196,6 +205,7 @@ export interface FileRoutesById {
   '/_authenticated/clients/$id': typeof AuthenticatedClientsIdRoute
   '/_authenticated/finance/payouts': typeof AuthenticatedFinancePayoutsRoute
   '/_authenticated/finance/team': typeof AuthenticatedFinanceTeamRoute
+  '/_authenticated/finance/transactions': typeof AuthenticatedFinanceTransactionsRoute
   '/_authenticated/clients/': typeof AuthenticatedClientsIndexRoute
   '/_authenticated/finance/': typeof AuthenticatedFinanceIndexRoute
 }
@@ -219,6 +229,7 @@ export interface FileRouteTypes {
     | '/clients/$id'
     | '/finance/payouts'
     | '/finance/team'
+    | '/finance/transactions'
     | '/clients/'
     | '/finance/'
   fileRoutesByTo: FileRoutesByTo
@@ -239,6 +250,7 @@ export interface FileRouteTypes {
     | '/clients/$id'
     | '/finance/payouts'
     | '/finance/team'
+    | '/finance/transactions'
     | '/clients'
     | '/finance'
   id:
@@ -261,6 +273,7 @@ export interface FileRouteTypes {
     | '/_authenticated/clients/$id'
     | '/_authenticated/finance/payouts'
     | '/_authenticated/finance/team'
+    | '/_authenticated/finance/transactions'
     | '/_authenticated/clients/'
     | '/_authenticated/finance/'
   fileRoutesById: FileRoutesById
@@ -414,18 +427,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedFinanceTeamRouteImport
       parentRoute: typeof AuthenticatedFinanceRoute
     }
+    '/_authenticated/finance/transactions': {
+      id: '/_authenticated/finance/transactions'
+      path: '/transactions'
+      fullPath: '/finance/transactions'
+      preLoaderRoute: typeof AuthenticatedFinanceTransactionsRouteImport
+      parentRoute: typeof AuthenticatedFinanceRoute
+    }
   }
 }
 
 interface AuthenticatedFinanceRouteChildren {
   AuthenticatedFinancePayoutsRoute: typeof AuthenticatedFinancePayoutsRoute
   AuthenticatedFinanceTeamRoute: typeof AuthenticatedFinanceTeamRoute
+  AuthenticatedFinanceTransactionsRoute: typeof AuthenticatedFinanceTransactionsRoute
   AuthenticatedFinanceIndexRoute: typeof AuthenticatedFinanceIndexRoute
 }
 
 const AuthenticatedFinanceRouteChildren: AuthenticatedFinanceRouteChildren = {
   AuthenticatedFinancePayoutsRoute: AuthenticatedFinancePayoutsRoute,
   AuthenticatedFinanceTeamRoute: AuthenticatedFinanceTeamRoute,
+  AuthenticatedFinanceTransactionsRoute: AuthenticatedFinanceTransactionsRoute,
   AuthenticatedFinanceIndexRoute: AuthenticatedFinanceIndexRoute,
 }
 
