@@ -131,3 +131,45 @@ export function Combobox({
     </div>
   );
 }
+
+export function FilterSelect({
+  value,
+  onChange,
+  options,
+  label,
+  className,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  options: { value: string; label: string }[];
+  label: string;
+  className?: string;
+}) {
+  return (
+    <label className={cn("relative inline-flex items-center", className)}>
+      <span className="sr-only">{label}</span>
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className={cn(
+          "appearance-none rounded-xl border border-input bg-background py-2 pl-3 pr-8 text-sm outline-none transition focus:ring-2 focus:ring-ring",
+          value !== "all" && "border-primary/60 text-primary",
+        )}
+      >
+        <option value="all">{label}: all</option>
+        {options.map((o) => (
+          <option key={o.value} value={o.value}>
+            {o.label}
+          </option>
+        ))}
+      </select>
+      <ChevronsUpDown className="pointer-events-none absolute right-2 size-3.5 text-muted-foreground" />
+    </label>
+  );
+}
+
+export function uniqueOptions(values: (string | null | undefined)[]) {
+  return [...new Set(values.filter((v): v is string => !!v))]
+    .sort((a, b) => a.localeCompare(b))
+    .map((v) => ({ value: v, label: v }));
+}
