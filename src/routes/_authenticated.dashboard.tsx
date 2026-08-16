@@ -93,10 +93,13 @@ function Dashboard() {
     ).length;
     return {
       label: `${start.getDate()}/${start.getMonth() + 1}`,
-      a: revenue / 100,
-      b: leads,
+      revenue,
+      leads,
     };
   });
+
+  const thisWeek = weeks[weeks.length - 1] ?? { revenue: 0, leads: 0 };
+  const lastWeek = weeks[weeks.length - 2] ?? { revenue: 0, leads: 0 };
 
   const staleCreds = (data?.creds ?? []).filter((c) => {
     const d = daysUntil(c.last_rotated);
