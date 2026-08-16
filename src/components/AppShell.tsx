@@ -97,7 +97,7 @@ export function AppShell({
             <span className="gradient-leaf flex size-9 items-center justify-center rounded-xl text-primary-foreground">
               <Wallet className="size-4" />
             </span>
-            <span className="font-display text-lg font-semibold text-sidebar-foreground">Agency OS</span>
+            <span className="font-display text-lg font-semibold text-sidebar-foreground">Lovable Solutions</span>
           </div>
           <div className="mx-5 mt-5 h-px bg-sidebar-border" />
           <div className="flex-1 overflow-y-auto">

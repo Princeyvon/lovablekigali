@@ -11,9 +11,9 @@ import { fmtDate, money, paidThrough } from "@/lib/agency";
 export const Route = createFileRoute("/_authenticated/clients/")({
   head: () => ({
     meta: [
-      { title: "Clients — Agency OS" },
+      { title: "Clients — Lovable Solutions" },
       { name: "description", content: "Signed clients, who onboarded them, and their billing standing." },
-      { property: "og:title", content: "Clients — Agency OS" },
+      { property: "og:title", content: "Clients — Lovable Solutions" },
       { property: "og:description", content: "Every signed client with owner, status and paid-through date." },
     ],
   }),

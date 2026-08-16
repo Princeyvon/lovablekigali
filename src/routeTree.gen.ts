@@ -18,6 +18,7 @@ import { Route as AuthenticatedAppsRouteImport } from './routes/_authenticated.a
 import { Route as AuthenticatedBillingRouteImport } from './routes/_authenticated.billing'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated.dashboard'
 import { Route as AuthenticatedExpensesRouteImport } from './routes/_authenticated.expenses'
+import { Route as AuthenticatedFinanceRouteImport } from './routes/_authenticated.finance'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated.profile'
 import { Route as AuthenticatedProspectsRouteImport } from './routes/_authenticated.prospects'
 import { Route as AuthenticatedTeamRouteImport } from './routes/_authenticated.team'
@@ -25,6 +26,9 @@ import { Route as AuthenticatedAdminAccessRouteImport } from './routes/_authenti
 import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authenticated.admin.audit'
 import { Route as AuthenticatedClientsIndexRouteImport } from './routes/_authenticated.clients.index'
 import { Route as AuthenticatedClientsIdRouteImport } from './routes/_authenticated.clients.$id'
+import { Route as AuthenticatedFinanceIndexRouteImport } from './routes/_authenticated.finance.index'
+import { Route as AuthenticatedFinancePayoutsRouteImport } from './routes/_authenticated.finance.payouts'
+import { Route as AuthenticatedFinanceTeamRouteImport } from './routes/_authenticated.finance.team'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -70,6 +74,11 @@ const AuthenticatedExpensesRoute = AuthenticatedExpensesRouteImport.update({
   path: '/expenses',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedFinanceRoute = AuthenticatedFinanceRouteImport.update({
+  id: '/finance',
+  path: '/finance',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
@@ -107,6 +116,24 @@ const AuthenticatedClientsIdRoute = AuthenticatedClientsIdRouteImport.update({
   path: '/clients/$id',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedFinanceIndexRoute =
+  AuthenticatedFinanceIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedFinanceRoute,
+  } as any)
+const AuthenticatedFinancePayoutsRoute =
+  AuthenticatedFinancePayoutsRouteImport.update({
+    id: '/payouts',
+    path: '/payouts',
+    getParentRoute: () => AuthenticatedFinanceRoute,
+  } as any)
+const AuthenticatedFinanceTeamRoute =
+  AuthenticatedFinanceTeamRouteImport.update({
+    id: '/team',
+    path: '/team',
+    getParentRoute: () => AuthenticatedFinanceRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -117,13 +144,17 @@ export interface FileRoutesByFullPath {
   '/billing': typeof AuthenticatedBillingRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/expenses': typeof AuthenticatedExpensesRoute
+  '/finance': typeof AuthenticatedFinanceRouteWithChildren
   '/profile': typeof AuthenticatedProfileRoute
   '/prospects': typeof AuthenticatedProspectsRoute
   '/team': typeof AuthenticatedTeamRoute
   '/admin/access': typeof AuthenticatedAdminAccessRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/clients/$id': typeof AuthenticatedClientsIdRoute
+  '/finance/payouts': typeof AuthenticatedFinancePayoutsRoute
+  '/finance/team': typeof AuthenticatedFinanceTeamRoute
   '/clients/': typeof AuthenticatedClientsIndexRoute
+  '/finance/': typeof AuthenticatedFinanceIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -140,7 +171,10 @@ export interface FileRoutesByTo {
   '/admin/access': typeof AuthenticatedAdminAccessRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/clients/$id': typeof AuthenticatedClientsIdRoute
+  '/finance/payouts': typeof AuthenticatedFinancePayoutsRoute
+  '/finance/team': typeof AuthenticatedFinanceTeamRoute
   '/clients': typeof AuthenticatedClientsIndexRoute
+  '/finance': typeof AuthenticatedFinanceIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -153,13 +187,17 @@ export interface FileRoutesById {
   '/_authenticated/billing': typeof AuthenticatedBillingRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/expenses': typeof AuthenticatedExpensesRoute
+  '/_authenticated/finance': typeof AuthenticatedFinanceRouteWithChildren
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/prospects': typeof AuthenticatedProspectsRoute
   '/_authenticated/team': typeof AuthenticatedTeamRoute
   '/_authenticated/admin/access': typeof AuthenticatedAdminAccessRoute
   '/_authenticated/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/_authenticated/clients/$id': typeof AuthenticatedClientsIdRoute
+  '/_authenticated/finance/payouts': typeof AuthenticatedFinancePayoutsRoute
+  '/_authenticated/finance/team': typeof AuthenticatedFinanceTeamRoute
   '/_authenticated/clients/': typeof AuthenticatedClientsIndexRoute
+  '/_authenticated/finance/': typeof AuthenticatedFinanceIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -172,13 +210,17 @@ export interface FileRouteTypes {
     | '/billing'
     | '/dashboard'
     | '/expenses'
+    | '/finance'
     | '/profile'
     | '/prospects'
     | '/team'
     | '/admin/access'
     | '/admin/audit'
     | '/clients/$id'
+    | '/finance/payouts'
+    | '/finance/team'
     | '/clients/'
+    | '/finance/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -195,7 +237,10 @@ export interface FileRouteTypes {
     | '/admin/access'
     | '/admin/audit'
     | '/clients/$id'
+    | '/finance/payouts'
+    | '/finance/team'
     | '/clients'
+    | '/finance'
   id:
     | '__root__'
     | '/'
@@ -207,13 +252,17 @@ export interface FileRouteTypes {
     | '/_authenticated/billing'
     | '/_authenticated/dashboard'
     | '/_authenticated/expenses'
+    | '/_authenticated/finance'
     | '/_authenticated/profile'
     | '/_authenticated/prospects'
     | '/_authenticated/team'
     | '/_authenticated/admin/access'
     | '/_authenticated/admin/audit'
     | '/_authenticated/clients/$id'
+    | '/_authenticated/finance/payouts'
+    | '/_authenticated/finance/team'
     | '/_authenticated/clients/'
+    | '/_authenticated/finance/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -288,6 +337,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedExpensesRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/finance': {
+      id: '/_authenticated/finance'
+      path: '/finance'
+      fullPath: '/finance'
+      preLoaderRoute: typeof AuthenticatedFinanceRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/profile': {
       id: '/_authenticated/profile'
       path: '/profile'
@@ -337,8 +393,44 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedClientsIdRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/finance/': {
+      id: '/_authenticated/finance/'
+      path: '/'
+      fullPath: '/finance/'
+      preLoaderRoute: typeof AuthenticatedFinanceIndexRouteImport
+      parentRoute: typeof AuthenticatedFinanceRoute
+    }
+    '/_authenticated/finance/payouts': {
+      id: '/_authenticated/finance/payouts'
+      path: '/payouts'
+      fullPath: '/finance/payouts'
+      preLoaderRoute: typeof AuthenticatedFinancePayoutsRouteImport
+      parentRoute: typeof AuthenticatedFinanceRoute
+    }
+    '/_authenticated/finance/team': {
+      id: '/_authenticated/finance/team'
+      path: '/team'
+      fullPath: '/finance/team'
+      preLoaderRoute: typeof AuthenticatedFinanceTeamRouteImport
+      parentRoute: typeof AuthenticatedFinanceRoute
+    }
   }
 }
+
+interface AuthenticatedFinanceRouteChildren {
+  AuthenticatedFinancePayoutsRoute: typeof AuthenticatedFinancePayoutsRoute
+  AuthenticatedFinanceTeamRoute: typeof AuthenticatedFinanceTeamRoute
+  AuthenticatedFinanceIndexRoute: typeof AuthenticatedFinanceIndexRoute
+}
+
+const AuthenticatedFinanceRouteChildren: AuthenticatedFinanceRouteChildren = {
+  AuthenticatedFinancePayoutsRoute: AuthenticatedFinancePayoutsRoute,
+  AuthenticatedFinanceTeamRoute: AuthenticatedFinanceTeamRoute,
+  AuthenticatedFinanceIndexRoute: AuthenticatedFinanceIndexRoute,
+}
+
+const AuthenticatedFinanceRouteWithChildren =
+  AuthenticatedFinanceRoute._addFileChildren(AuthenticatedFinanceRouteChildren)
 
 interface AuthenticatedRouteChildren {
   AuthenticatedAnalyticsRoute: typeof AuthenticatedAnalyticsRoute
@@ -346,6 +438,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedBillingRoute: typeof AuthenticatedBillingRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedExpensesRoute: typeof AuthenticatedExpensesRoute
+  AuthenticatedFinanceRoute: typeof AuthenticatedFinanceRouteWithChildren
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedProspectsRoute: typeof AuthenticatedProspectsRoute
   AuthenticatedTeamRoute: typeof AuthenticatedTeamRoute
@@ -361,6 +454,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedBillingRoute: AuthenticatedBillingRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedExpensesRoute: AuthenticatedExpensesRoute,
+  AuthenticatedFinanceRoute: AuthenticatedFinanceRouteWithChildren,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedProspectsRoute: AuthenticatedProspectsRoute,
   AuthenticatedTeamRoute: AuthenticatedTeamRoute,

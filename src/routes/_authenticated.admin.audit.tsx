@@ -9,9 +9,9 @@ import { fmtDate } from "@/lib/agency";
 export const Route = createFileRoute("/_authenticated/admin/audit")({
   head: () => ({
     meta: [
-      { title: "Audit log — Agency OS" },
+      { title: "Audit log — Lovable Solutions" },
       { name: "description", content: "Every credential reveal, role change and sensitive action, timestamped." },
-      { property: "og:title", content: "Audit log — Agency OS" },
+      { property: "og:title", content: "Audit log — Lovable Solutions" },
       { property: "og:description", content: "Immutable trail of sensitive activity." },
     ],
   }),

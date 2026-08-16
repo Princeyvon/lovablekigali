@@ -9,9 +9,9 @@ import { money, shortMoney } from "@/lib/agency";
 export const Route = createFileRoute("/_authenticated/analytics")({
   head: () => ({
     meta: [
-      { title: "Analytics — Agency OS" },
+      { title: "Analytics — Lovable Solutions" },
       { name: "description", content: "Revenue, churn, sector mix and rep performance across the agency in RWF." },
-      { property: "og:title", content: "Analytics — Agency OS" },
+      { property: "og:title", content: "Analytics — Lovable Solutions" },
       { property: "og:description", content: "Twelve-month revenue trend, sector mix and pipeline conversion." },
     ],
   }),

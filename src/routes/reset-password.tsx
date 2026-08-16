@@ -6,10 +6,10 @@ import { supabase } from "@/integrations/supabase/client";
 export const Route = createFileRoute("/reset-password")({
   head: () => ({
     meta: [
-      { title: "Set a new password — Agency OS" },
-      { name: "description", content: "Choose a new password for your Agency OS account." },
-      { property: "og:title", content: "Set a new password — Agency OS" },
-      { property: "og:description", content: "Complete your Agency OS password reset." },
+      { title: "Set a new password — Lovable Solutions" },
+      { name: "description", content: "Choose a new password for your Lovable Solutions account." },
+      { property: "og:title", content: "Set a new password — Lovable Solutions" },
+      { property: "og:description", content: "Complete your Lovable Solutions password reset." },
       { name: "robots", content: "noindex" },
     ],
   }),

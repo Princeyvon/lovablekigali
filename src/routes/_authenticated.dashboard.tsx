@@ -9,9 +9,9 @@ import { REMINDER_WINDOW_DAYS, ROTATION_STALE_DAYS, daysUntil, fmtDate, money, p
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
     meta: [
-      { title: "Dashboard — Agency OS" },
+      { title: "Dashboard — Lovable Solutions" },
       { name: "description", content: "Payments due, overdue accounts, weekly velocity and credential rotation alerts." },
-      { property: "og:title", content: "Dashboard — Agency OS" },
+      { property: "og:title", content: "Dashboard — Lovable Solutions" },
       { property: "og:description", content: "The daily operating view of the agency." },
     ],
   }),

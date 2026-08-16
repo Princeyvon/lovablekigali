@@ -11,9 +11,9 @@ import { fmtDate, money } from "@/lib/agency";
 export const Route = createFileRoute("/_authenticated/profile")({
   head: () => ({
     meta: [
-      { title: "My profile — Agency OS" },
+      { title: "My profile — Lovable Solutions" },
       { name: "description", content: "Manage your personal details, username and password." },
-      { property: "og:title", content: "My profile — Agency OS" },
+      { property: "og:title", content: "My profile — Lovable Solutions" },
       { property: "og:description", content: "Personal profile and security settings." },
     ],
   }),
