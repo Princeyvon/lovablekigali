@@ -8,6 +8,7 @@ const TABS = [
   { to: "/finance/expenses", label: "Expenses" },
   { to: "/finance/analytics", label: "Analytics" },
   { to: "/finance/transactions", label: "Transactions" },
+  { to: "/finance/reports", label: "Reports" },
 ] as const;
 
 export const Route = createFileRoute("/_authenticated/finance")({
