@@ -66,16 +66,8 @@ function Billing() {
     onError: (e: Error) => toast.error(e.message),
   });
 
-  const standing = useMemo(() => {
-    const now = todayISO();
-    return clients.map((c) => {
-      const through = paidThrough(payments.filter((p) => p.client_id === c.id));
-      const rate = subs.find((s) => s.client_id === c.id)?.monthly_rate ?? null;
-      return { ...c, through, rate, overdue: !through || through < now };
-    });
-  }, [clients, payments, subs]);
 
-  const overdue = standing.filter((s) => s.overdue && s.status === "Active");
+
 
   const summary = useMemo(
     () =>
