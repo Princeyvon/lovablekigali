@@ -3,12 +3,12 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { toast } from "sonner";
-import { ArrowLeft, Eye, KeyRound } from "lucide-react";
+import { AlertTriangle, ArrowLeft, CalendarClock, Eye, KeyRound } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { Empty, Panel, Pill, TD, TH, Table } from "@/components/dash";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { fmtDate, money, paidThrough } from "@/lib/agency";
+import { GRACE_DAYS, daysUntil, fmtDate, money, paidThrough } from "@/lib/agency";
 import { revealCredential, saveCredential } from "@/lib/vault.functions";
 
 const TABS = ["Overview", "Notes", "Service Log", "System Users", "Credentials", "Billing"] as const;
@@ -114,6 +114,12 @@ function ClientDetail() {
   });
 
   const through = paidThrough(payments);
+  const daysLeft = daysUntil(through);
+  const overdue = through === null || (daysLeft !== null && daysLeft < 0);
+  const daysOverdue = daysLeft !== null && daysLeft < 0 ? Math.abs(daysLeft) : 0;
+  const lastPayment = payments[0] ?? null;
+  const daysSinceLastPayment = lastPayment ? Math.abs(daysUntil(lastPayment.payment_date) ?? 0) : null;
+  const graceLeft = Math.max(0, GRACE_DAYS - daysOverdue);
 
   return (
     <AppShell
@@ -125,6 +131,51 @@ function ClientDetail() {
         </Link>
       }
     >
+      <section
+        className={`surface-card relative overflow-hidden p-5 ${overdue ? "border-destructive/40" : ""}`}
+      >
+        <div
+          className={`absolute -right-16 -top-16 size-48 rounded-full opacity-60 blur-3xl ${
+            overdue ? "bg-[var(--leaf-deep)]" : "gradient-leaf"
+          }`}
+        />
+        <div className="relative flex flex-wrap items-center justify-between gap-6">
+          <div>
+            <p className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              {overdue ? <AlertTriangle className="size-3.5" /> : <CalendarClock className="size-3.5" />}
+              {overdue ? "Overdue since due date" : "Time until next payment is due"}
+            </p>
+            <p className="mt-2 font-display text-3xl font-semibold">
+              {through === null
+                ? "No payment on record"
+                : overdue
+                  ? `${daysOverdue} day${daysOverdue === 1 ? "" : "s"} overdue`
+                  : `${daysLeft} day${daysLeft === 1 ? "" : "s"} left`}
+            </p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {through ? `Paid through ${fmtDate(through)}` : "This client has never been billed through."}
+              {overdue && through ? ` · ${graceLeft} day${graceLeft === 1 ? "" : "s"} of grace remaining` : ""}
+            </p>
+          </div>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+            <div className="rounded-2xl border border-border bg-card/70 p-3">
+              <p className="text-xs text-muted-foreground">Last payment</p>
+              <p className="mt-1 font-display text-base font-semibold">{fmtDate(lastPayment?.payment_date)}</p>
+            </div>
+            <div className="rounded-2xl border border-border bg-card/70 p-3">
+              <p className="text-xs text-muted-foreground">Days since last payment</p>
+              <p className="mt-1 font-display text-base font-semibold">
+                {daysSinceLastPayment === null ? "—" : `${daysSinceLastPayment}d`}
+              </p>
+            </div>
+            <div className="rounded-2xl border border-border bg-card/70 p-3">
+              <p className="text-xs text-muted-foreground">Monthly rate</p>
+              <p className="mt-1 font-display text-base font-semibold">{money(sub?.monthly_rate)}</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <div className="surface-card flex flex-wrap gap-1 p-1.5">
         {TABS.map((t) => (
           <button

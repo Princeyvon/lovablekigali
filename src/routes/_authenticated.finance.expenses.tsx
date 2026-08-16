@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Empty, Panel, Pill, Stat, TD, TH, Table } from "@/components/dash";
+import { FilterSelect, SearchInput, matches, uniqueOptions } from "@/components/search";
 import { supabase } from "@/integrations/supabase/client";
 import { fmtDate, money, todayISO } from "@/lib/agency";
 
@@ -25,6 +26,9 @@ const field = "rounded-xl border border-input bg-background px-3 py-2 text-sm";
 function Expenses() {
   const qc = useQueryClient();
   const [form, setForm] = useState({ date: todayISO(), category: "Hosting", amount: "", vendor: "", note: "" });
+  const [q, setQ] = useState("");
+  const [cat, setCat] = useState("all");
+  const [month, setMonth] = useState("all");
 
   const { data: expenses = [] } = useQuery({
     queryKey: ["expenses"],
@@ -65,6 +69,18 @@ function Expenses() {
   }, [expenses]);
 
   const max = Math.max(1, ...byCategory.map(([, v]) => v));
+
+  const months = useMemo(() => uniqueOptions(expenses.map((e) => e.date?.slice(0, 7))).reverse(), [expenses]);
+  const visible = useMemo(
+    () =>
+      expenses.filter(
+        (e) =>
+          (cat === "all" || e.category === cat) &&
+          (month === "all" || (e.date ?? "").startsWith(month)) &&
+          matches(q, e.vendor, e.category, e.note, String(e.amount)),
+      ),
+    [expenses, cat, month, q],
+  );
 
   return (
     <>
@@ -117,9 +133,19 @@ function Expenses() {
         </Panel>
       </div>
 
-      <Panel title="History" right={<Pill tone="mist">{expenses.length}</Pill>}>
-        {expenses.length === 0 ? (
-          <Empty>No expenses yet.</Empty>
+      <Panel
+        title="History"
+        right={
+          <div className="flex flex-wrap items-center gap-2">
+            <FilterSelect label="Category" value={cat} onChange={setCat} options={uniqueOptions(expenses.map((e) => e.category))} />
+            <FilterSelect label="Month" value={month} onChange={setMonth} options={months} />
+            <SearchInput value={q} onChange={setQ} placeholder="Search expenses…" />
+            <Pill tone="mist">{visible.length}</Pill>
+          </div>
+        }
+      >
+        {visible.length === 0 ? (
+          <Empty>No expenses match.</Empty>
         ) : (
           <Table
             head={
@@ -132,7 +158,8 @@ function Expenses() {
               </>
             }
           >
-            {expenses.map((e) => (
+            {visible.map((e) => (
+
               <tr key={e.id}>
                 <TD>{fmtDate(e.date)}</TD>
                 <TD>

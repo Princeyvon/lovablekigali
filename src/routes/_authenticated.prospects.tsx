@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
-import { SearchInput, matches } from "@/components/search";
+import { FilterSelect, SearchInput, matches, uniqueOptions } from "@/components/search";
 import { Empty, Panel, Pill } from "@/components/dash";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -37,6 +37,8 @@ function Prospects() {
   });
   const [customSector, setCustomSector] = useState("");
   const [q, setQ] = useState("");
+  const [sector, setSector] = useState("all");
+  const [rep, setRep] = useState("all");
 
   const { data: members = [] } = useQuery({
     queryKey: ["members"],
@@ -75,10 +77,13 @@ function Prospects() {
 
   const visible = useMemo(
     () =>
-      prospects.filter((p) =>
-        matches(q, p.business_name, p.industry, p.contact_name, p.contact_email, p.contact_phone, p.source),
+      prospects.filter(
+        (p) =>
+          (sector === "all" || (p.industry ?? "") === sector) &&
+          (rep === "all" || p.assigned_rep === rep) &&
+          matches(q, p.business_name, p.industry, p.contact_name, p.contact_email, p.contact_phone, p.source),
       ),
-    [prospects, q],
+    [prospects, q, sector, rep],
   );
 
   return (
@@ -88,6 +93,8 @@ function Prospects() {
       actions={
         <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-center">
         <SearchInput value={q} onChange={setQ} placeholder="Search prospects…" />
+        <FilterSelect label="Sector" value={sector} onChange={setSector} options={uniqueOptions(prospects.map((p) => p.industry))} />
+        <FilterSelect label="Rep" value={rep} onChange={setRep} options={members.map((m) => ({ value: m.id, label: m.full_name }))} />
         <button
           onClick={() => setOpen((v) => !v)}
           className="gradient-leaf rounded-xl px-4 py-2 text-sm font-semibold text-primary-foreground"

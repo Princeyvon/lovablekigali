@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
-import { SearchInput, matches } from "@/components/search";
+import { FilterSelect, SearchInput, matches } from "@/components/search";
 import { Empty, Panel, Pill, Stat, TD, TH, Table } from "@/components/dash";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -36,6 +36,8 @@ function Apps() {
   const { role, memberId } = useAuth();
   const [channel, setChannel] = useState<Channel>("whatsapp");
   const [q, setQ] = useState("");
+  const [appStatus, setAppStatus] = useState("all");
+  const [billing, setBilling] = useState("all");
 
   const { data: clients = [] } = useQuery({
     queryKey: ["clients"],
@@ -69,8 +71,15 @@ function Apps() {
   }, [clients, payments, subs, reminders]);
 
   const visible = useMemo(
-    () => rows.filter((r) => matches(q, r.business_name, r.app_url, r.app_status, r.industry as string | null)),
-    [rows, q],
+    () =>
+      rows.filter(
+        (r) =>
+          (appStatus === "all" || r.app_status === appStatus) &&
+          (billing === "all" ||
+            (billing === "overdue" ? r.overdue : billing === "grace" ? r.overdue && !r.suspendable : billing === "past-grace" ? r.suspendable : !r.overdue)) &&
+          matches(q, r.business_name, r.app_url, r.app_status, r.industry as string | null),
+      ),
+    [rows, q, appStatus, billing],
   );
 
   const suspended = visible.filter((r) => r.app_status === "Suspended" || r.app_status === "Closed");
@@ -123,6 +132,13 @@ function Apps() {
       actions={
         <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-center">
         <SearchInput value={q} onChange={setQ} placeholder="Search apps…" />
+        <FilterSelect label="App" value={appStatus} onChange={setAppStatus} options={["Live","Suspended","Closed"].map((v)=>({value:v,label:v}))} />
+        <FilterSelect
+          label="Billing"
+          value={billing}
+          onChange={setBilling}
+          options={[{value:"overdue",label:"Overdue"},{value:"grace",label:"In grace"},{value:"past-grace",label:"Past grace"},{value:"current",label:"Current"}]}
+        />
         <select
           value={channel}
           onChange={(e) => setChannel(e.target.value as Channel)}
