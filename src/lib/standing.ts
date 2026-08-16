@@ -58,7 +58,6 @@ export function buildStanding(
       const monthsUnpaid = state.overdue ? Math.max(1, Math.ceil(state.daysOverdue / 30)) : 0;
       return {
         ...c,
-        through,
         ...state,
         rate,
         monthsUnpaid,
