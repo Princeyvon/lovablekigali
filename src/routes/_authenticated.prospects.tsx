@@ -96,6 +96,7 @@ function Prospects() {
         <SearchInput value={q} onChange={setQ} placeholder="Search prospects…" />
         <FilterSelect label="Sector" value={sector} onChange={setSector} options={uniqueOptions(prospects.map((p) => p.industry))} />
         <FilterSelect label="Rep" value={rep} onChange={setRep} options={members.map((m) => ({ value: m.id, label: m.full_name }))} />
+        <FilterSelect label="Stage" value={stage} onChange={setStage} options={STAGES.map((s) => ({ value: s, label: s }))} allLabel="All stages" />
         <button
           onClick={() => setOpen((v) => !v)}
           className="gradient-leaf rounded-xl px-4 py-2 text-sm font-semibold text-primary-foreground"
