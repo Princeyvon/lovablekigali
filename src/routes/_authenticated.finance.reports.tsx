@@ -200,7 +200,101 @@ function Reports() {
 
     const bestDay = [...buckets].sort((a, b) => b.revenue - a.revenue)[0];
 
+    // extra metrics for the long-form report
+    const activeSubs = subs.filter((s: any) => s.status === "Active");
+    const activeCount = clients.filter((c: any) => c.status === "Active").length;
+    const arpu = activeCount ? mrr / activeCount : 0;
+    const avgTicket = pIn.length ? revenue / pIn.length : 0;
+    const collectible = mrr + owed;
+    const collectionRate = collectible ? Math.round((revenue / collectible) * 100) : 0;
+    const runway = spend ? revenue / spend : 0;
+    const churnRate = clients.length ? Math.round((churned.length / clients.length) * 100) : 0;
+    const avgTenure = clients.length
+      ? Math.round(
+          clients.reduce((s: number, c: any) => s + (Date.now() - new Date(c.signed_date).getTime()) / 86400000, 0) /
+            clients.length,
+        )
+      : 0;
+    const ltv = arpu * (churnRate > 0 ? 100 / churnRate : 24);
+
+    const sectorMap = new Map<string, { name: string; clients: number; mrr: number }>();
+    for (const c of clients) {
+      const key = c.industry || "Unspecified";
+      const row = sectorMap.get(key) ?? { name: key, clients: 0, mrr: 0 };
+      row.clients += 1;
+      row.mrr += Number(subs.find((s: any) => s.client_id === c.id)?.monthly_rate ?? 0);
+      sectorMap.set(key, row);
+    }
+    const sectorRows = [...sectorMap.values()].sort((a, b) => b.mrr - a.mrr);
+
+    const topClients = clients
+      .map((c: any) => ({
+        name: c.business_name,
+        collected: payments
+          .filter((p: any) => p.client_id === c.id)
+          .reduce((s: number, p: any) => s + Number(p.amount ?? 0), 0),
+        rate: Number(subs.find((s: any) => s.client_id === c.id)?.monthly_rate ?? 0),
+      }))
+      .sort((a, b) => b.collected - a.collected);
+    const topFiveShare = revenue
+      ? Math.round((topClients.slice(0, 5).reduce((s, c) => s + c.rate, 0) / Math.max(mrr, 1)) * 100)
+      : 0;
+
+    // trailing 6 periods
+    const trailing: { label: string; revenue: number; spend: number; net: number }[] = [];
+    for (let i = 5; i >= 0; i--) {
+      const s = new Date(start);
+      const e2 = new Date(end);
+      if (mode === "week") {
+        s.setDate(s.getDate() - i * 7);
+        e2.setDate(e2.getDate() - i * 7);
+      } else {
+        s.setMonth(s.getMonth() - i);
+        e2.setMonth(e2.getMonth() - i);
+      }
+      const rev = sum(payments.filter((p: any) => within(p.payment_date, s, e2)), "amount");
+      const sp = sum(expenses.filter((x: any) => within(x.date, s, e2)), "amount");
+      trailing.push({
+        label: mode === "week" ? `${s.getDate()}/${s.getMonth() + 1}` : s.toLocaleString("en", { month: "short" }),
+        revenue: rev,
+        spend: sp,
+        net: rev - sp,
+      });
+    }
+    const bestTrailing = [...trailing].sort((a, b) => b.revenue - a.revenue)[0];
+    const worstTrailing = [...trailing].sort((a, b) => a.revenue - b.revenue)[0];
+
+    const appLive = clients.filter((c: any) => c.app_status === "Live").length;
+    const appSuspended = clients.filter((c: any) => c.app_status === "Suspended").length;
+    const appClosed = clients.filter((c: any) => c.app_status === "Closed").length;
+
+    const conversion = prospects.length
+      ? Math.round((prospects.filter((p: any) => p.stage === "Signed").length / prospects.length) * 100)
+      : 0;
+    const lostRate = prospects.length
+      ? Math.round((prospects.filter((p: any) => p.stage === "Lost").length / prospects.length) * 100)
+      : 0;
+
     return {
+      arpu,
+      avgTicket,
+      collectionRate,
+      runway,
+      churnRate,
+      avgTenure,
+      ltv,
+      sectorRows,
+      topClients,
+      topFiveShare,
+      trailing,
+      bestTrailing,
+      worstTrailing,
+      appLive,
+      appSuspended,
+      appClosed,
+      conversion,
+      lostRate,
+      activeSubs,
       pIn,
       eIn,
       poIn,
