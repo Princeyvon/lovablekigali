@@ -161,13 +161,13 @@ function Prospects() {
         </Panel>
       )}
 
-      <div className="grid gap-4 lg:grid-cols-5">
-        {STAGES.map((stage) => {
-          const items = visible.filter((p) => p.stage === stage);
+      <div className="-mx-1 flex gap-4 overflow-x-auto px-1 pb-2">
+        {STAGES.filter((s) => stage === "all" || s === stage).map((col) => {
+          const items = visible.filter((p) => p.stage === col);
           return (
-            <div key={stage} className="surface-card p-4">
+            <div key={col} className="surface-card w-[19rem] shrink-0 p-4">
               <div className="mb-3 flex items-center justify-between">
-                <h3 className="text-sm font-semibold">{stage}</h3>
+                <h3 className="text-sm font-semibold">{col}</h3>
                 <Pill tone="mist">{items.length}</Pill>
               </div>
               <div className="space-y-2">
