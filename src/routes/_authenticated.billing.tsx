@@ -99,9 +99,10 @@ function Billing() {
         (p) =>
           (method === "all" || p.method === method) &&
           (clientFilter === "all" || p.client_id === clientFilter) &&
+          inRange(p.payment_date, range) &&
           matches(q, clients.find((c) => c.id === p.client_id)?.business_name, p.method, String(p.amount)),
       ),
-    [payments, clients, q, method, clientFilter],
+    [payments, clients, q, method, clientFilter, range],
   );
 
   return (
