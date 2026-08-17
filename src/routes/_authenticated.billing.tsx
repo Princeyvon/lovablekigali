@@ -4,7 +4,16 @@ import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { Empty, Panel, Pill, Stat, TD, TH, Table } from "@/components/dash";
-import { Combobox, FilterSelect, SearchInput, matches } from "@/components/search";
+import {
+  Combobox,
+  DateRangeFilter,
+  EMPTY_RANGE,
+  FilterSelect,
+  SearchInput,
+  inRange,
+  matches,
+  type DateRange,
+} from "@/components/search";
 import { buildStanding, summarise, type ClientRow } from "@/lib/standing";
 import { supabase } from "@/integrations/supabase/client";
 import { MONTH_OPTIONS, PAYMENT_METHODS, addMonths, fmtDate, money, paidThrough, todayISO } from "@/lib/agency";
