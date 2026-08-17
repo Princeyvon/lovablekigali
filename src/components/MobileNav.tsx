@@ -136,7 +136,7 @@ export function BottomNav() {
 
   return (
     <nav className="fixed inset-x-0 bottom-0 z-40 lg:hidden">
-      <div className="mx-auto mb-3 flex max-w-lg items-stretch gap-1 rounded-2xl border border-border bg-card/95 p-1.5 shadow-[0_18px_40px_-18px_rgba(0,0,0,0.55)] backdrop-blur">
+      <div className="mx-3 mb-3 flex max-w-lg items-stretch gap-1 rounded-2xl border border-border bg-card/95 p-1.5 shadow-[0_18px_40px_-18px_rgba(0,0,0,0.55)] backdrop-blur sm:mx-auto">
         {TABS.map((t) => {
           const active = t.match.some((m) => pathname === m || pathname.startsWith(m + "/"));
           return (
