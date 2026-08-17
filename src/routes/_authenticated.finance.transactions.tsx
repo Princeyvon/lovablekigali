@@ -65,9 +65,14 @@ function Transactions() {
   const visible = useMemo(
     () =>
       tx.filter(
-        (t) => (dir === "all" || t.direction === dir) && matches(q, t.payee, t.category, t.method, t.note),
+        (t) =>
+          (dir === "all" || t.direction === dir) &&
+          (category === "all" || t.category === category) &&
+          (method === "all" || t.method === method) &&
+          inRange(t.occurred_at, range) &&
+          matches(q, t.payee, t.category, t.method, t.note),
       ),
-    [tx, q, dir],
+    [tx, q, dir, category, method, range],
   );
 
   return (
