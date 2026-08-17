@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import type { ReactNode } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { BottomNav, ProfileBadge, SalesSubTabs, useIsSalesSection } from "@/components/MobileNav";
 import { cn } from "@/lib/utils";
 
 const manage = [
