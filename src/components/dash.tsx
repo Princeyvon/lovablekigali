@@ -13,10 +13,14 @@ export function Panel({
   children: ReactNode;
 }) {
   return (
-    <section className={cn("surface-card p-5", className)}>
+    <section className={cn("surface-card rise-in p-4 sm:p-5", className)}>
       {(title || right) && (
-        <div className="mb-4 flex items-center justify-between gap-3">
-          {title ? <h2 className="text-base font-semibold">{title}</h2> : <span />}
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+          {title ? (
+            <h2 className="text-[13px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">{title}</h2>
+          ) : (
+            <span />
+          )}
           {right}
         </div>
       )}
@@ -39,30 +43,30 @@ export function Stat({
   icon?: ReactNode;
 }) {
   return (
-    <div className="surface-card relative overflow-hidden p-5">
-      <div
+    <div className="surface-card rise-in relative flex min-w-0 flex-col overflow-hidden p-4 sm:p-5">
+      <span
+        aria-hidden
         className={cn(
-          "absolute -right-10 -top-10 size-28 rounded-full blur-2xl opacity-70",
-          tone === "leaf" && "gradient-leaf",
-          tone === "mist" && "gradient-mist",
+          "absolute inset-x-0 top-0 h-px",
+          tone === "leaf" && "bg-primary/70",
+          tone === "mist" && "bg-[var(--leaf-soft)]",
           tone === "deep" && "bg-[var(--leaf-deep)]",
         )}
       />
-      <div className="relative flex items-start justify-between">
-        <div>
-          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{label}</p>
-          <p className="mt-2 font-display text-2xl font-semibold">{value}</p>
-          {hint ? <p className="mt-1 text-xs text-muted-foreground">{hint}</p> : null}
-        </div>
+      <div className="flex items-start justify-between gap-2">
+        <p className="min-w-0 text-[11px] font-medium uppercase tracking-[0.1em] text-muted-foreground">{label}</p>
         {icon ? (
-          <span className="gradient-leaf flex size-10 items-center justify-center rounded-xl text-primary-foreground">
+          <span className="flex size-7 shrink-0 items-center justify-center rounded-md bg-secondary text-secondary-foreground">
             {icon}
           </span>
         ) : null}
       </div>
+      <p className="numeric mt-2 font-display text-xl font-semibold leading-tight sm:text-2xl">{value}</p>
+      {hint ? <p className="mt-1 text-xs leading-snug text-muted-foreground">{hint}</p> : null}
     </div>
   );
 }
+
 
 export function Bars({ data }: { data: { label: string; a: number; b: number }[] }) {
   const max = Math.max(1, ...data.map((d) => d.a + d.b));
