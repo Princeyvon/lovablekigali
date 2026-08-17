@@ -99,17 +99,20 @@ function Transactions() {
         title="Ledger"
         right={
           <div className="flex flex-wrap items-center gap-2">
-            <div className="flex rounded-xl bg-secondary p-1 text-xs font-medium">
+            <div className="flex h-9 rounded-md bg-secondary p-1 text-xs font-medium">
               {(["all", "in", "out"] as const).map((d) => (
                 <button
                   key={d}
                   onClick={() => setDir(d)}
-                  className={`rounded-lg px-3 py-1.5 capitalize ${dir === d ? "bg-card shadow-sm" : "text-muted-foreground"}`}
+                  className={`rounded-sm px-3 capitalize ${dir === d ? "bg-card shadow-sm" : "text-muted-foreground"}`}
                 >
                   {d}
                 </button>
               ))}
             </div>
+            <FilterSelect label="Category" value={category} onChange={setCategory} options={uniqueOptions(tx.map((t) => t.category))} />
+            <FilterSelect label="Method" value={method} onChange={setMethod} options={uniqueOptions(tx.map((t) => t.method))} />
+            <DateRangeFilter value={range} onChange={setRange} />
             <SearchInput value={q} onChange={setQ} placeholder="Search ledger…" />
           </div>
         }
