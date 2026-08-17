@@ -15,19 +15,37 @@ export function Panel({
   return (
     <section className={cn("surface-card rise-in p-4 sm:p-5", className)}>
       {(title || right) && (
-        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <div className="mb-4 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
           {title ? (
-            <h2 className="text-[13px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">{title}</h2>
+            <h2 className="min-w-0 truncate text-[13px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+              {title}
+            </h2>
           ) : (
             <span />
           )}
-          {right}
+          <div className="shrink-0">{right}</div>
         </div>
       )}
       {children}
     </section>
   );
 }
+
+/**
+ * Pastel stat card — LuckyJob-style tinted surface with a hairline border.
+ * Legacy tones (leaf / mist / deep) map onto the pastel palette so every
+ * existing screen inherits the new look without touching each route.
+ */
+const TINTS = {
+  leaf: "bg-[var(--tint-mint)]",
+  mist: "bg-[var(--tint-peach)]",
+  deep: "bg-[var(--tint-lilac)]",
+  sky: "bg-[var(--tint-sky)]",
+  blush: "bg-[var(--tint-blush)]",
+  plain: "bg-card",
+} as const;
+
+export type StatTone = keyof typeof TINTS;
 
 export function Stat({
   label,
@@ -39,29 +57,25 @@ export function Stat({
   label: string;
   value: string;
   hint?: string;
-  tone?: "leaf" | "mist" | "deep";
+  tone?: StatTone;
   icon?: ReactNode;
 }) {
   return (
-    <div className="surface-card rise-in relative flex min-w-0 flex-col overflow-hidden p-4 sm:p-5">
-      <span
-        aria-hidden
-        className={cn(
-          "absolute inset-x-0 top-0 h-px",
-          tone === "leaf" && "bg-primary/70",
-          tone === "mist" && "bg-[var(--leaf-soft)]",
-          tone === "deep" && "bg-[var(--leaf-deep)]",
-        )}
-      />
+    <div
+      className={cn(
+        "rise-in relative flex min-w-0 flex-col overflow-hidden rounded-xl border border-border/70 p-4 shadow-[var(--shadow-soft)] transition-transform duration-500 ease-[var(--ease-quiet)] hover:-translate-y-0.5 sm:p-5",
+        TINTS[tone],
+      )}
+    >
       <div className="flex items-start justify-between gap-2">
         <p className="min-w-0 text-[11px] font-medium uppercase tracking-[0.1em] text-muted-foreground">{label}</p>
         {icon ? (
-          <span className="flex size-7 shrink-0 items-center justify-center rounded-md bg-secondary text-secondary-foreground">
+          <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-card/70 text-foreground">
             {icon}
           </span>
         ) : null}
       </div>
-      <p className="numeric mt-2 font-display text-xl font-semibold leading-tight sm:text-2xl">{value}</p>
+      <p className="numeric mt-2 break-words font-display text-xl font-semibold leading-tight sm:text-2xl">{value}</p>
       {hint ? <p className="mt-1 text-xs leading-snug text-muted-foreground">{hint}</p> : null}
     </div>
   );
@@ -128,20 +142,43 @@ export function Pill({ children, tone = "leaf" }: { children: ReactNode; tone?: 
 
 export function TH({ children, className }: { children?: ReactNode; className?: string }) {
   return (
-    <th className={cn("px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-muted-foreground", className)}>
+    <th
+      className={cn(
+        "px-2 py-3 text-left text-[11px] font-medium uppercase tracking-wide text-muted-foreground sm:px-4",
+        className,
+      )}
+    >
       {children}
     </th>
   );
 }
 
 export function TD({ children, className }: { children: ReactNode; className?: string }) {
-  return <td className={cn("px-4 py-3 text-sm", className)}>{children}</td>;
+  return <td className={cn("px-2 py-3 text-sm sm:px-4", className)}>{children}</td>;
 }
 
+/**
+ * Tables stay inside the viewport on phones — cells wrap instead of forcing
+ * a horizontal scroll. Secondary columns opt out with `hidden md:table-cell`.
+ */
 export function Table({ head, children }: { head: ReactNode; children: ReactNode }) {
   return (
+    <div className="w-full">
+      <table className="w-full table-fixed border-collapse">
+        <thead className="border-b border-border">
+          <tr>{head}</tr>
+        </thead>
+        <tbody className="divide-y divide-border">{children}</tbody>
+      </table>
+    </div>
+  );
+}
+
+/** Escape hatch for genuinely wide grids (kanban etc.). */
+export function ScrollTable({ head, children }: { head: ReactNode; children: ReactNode }) {
+  return (
     <div className="overflow-x-auto">
-      <table className="w-full border-collapse">
+      <table className="w-full min-w-[720px] border-collapse">
         <thead className="border-b border-border">
           <tr>{head}</tr>
         </thead>
