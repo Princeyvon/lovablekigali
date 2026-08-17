@@ -39,6 +39,7 @@ function Prospects() {
   const [q, setQ] = useState("");
   const [sector, setSector] = useState("all");
   const [rep, setRep] = useState("all");
+  const [stage, setStage] = useState("all");
 
   const { data: members = [] } = useQuery({
     queryKey: ["members"],
