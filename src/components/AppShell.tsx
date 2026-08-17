@@ -88,7 +88,7 @@ export function AppShell({
   const isSales = useIsSalesSection();
 
   return (
-    <div className="gradient-page min-h-screen p-3 md:p-6">
+    <div className="gradient-page min-h-screen px-4 pb-4 pt-5 md:p-6">
       <div className="mx-auto flex max-w-[1500px] gap-6">
         <aside className="gradient-rail sticky top-6 hidden h-[calc(100vh-3rem)] w-64 shrink-0 flex-col rounded-3xl pb-4 pt-6 shadow-[var(--shadow-rail)] lg:flex">
           <div className="flex items-center gap-2 px-5">
