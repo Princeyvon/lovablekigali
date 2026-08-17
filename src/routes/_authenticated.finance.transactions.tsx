@@ -3,7 +3,16 @@ import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { ArrowDownLeft, ArrowUpRight } from "lucide-react";
 import { Empty, Panel, Pill, Stat, TD, TH, Table } from "@/components/dash";
-import { SearchInput, matches } from "@/components/search";
+import {
+  DateRangeFilter,
+  EMPTY_RANGE,
+  FilterSelect,
+  SearchInput,
+  inRange,
+  matches,
+  uniqueOptions,
+  type DateRange,
+} from "@/components/search";
 import { supabase } from "@/integrations/supabase/client";
 import { fmtDate, money } from "@/lib/agency";
 
