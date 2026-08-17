@@ -77,14 +77,14 @@ function Transactions() {
 
   return (
     <>
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <Stat label="Net position" value={money(totals.net)} hint={`${tx.length} movements logged`} />
         <Stat label="MoMo balance" value={money(totals.per.momo)} tone="mist" />
         <Stat label="Bank balance" value={money(totals.per.bank)} tone="deep" />
         <Stat label="Cash balance" value={money(totals.per.cash)} tone="leaf" />
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-2">
         <Panel title="Money in">
           <p className="font-display text-3xl font-semibold text-primary">{money(totals.inflow)}</p>
           <p className="mt-1 text-sm text-muted-foreground">Client payments recorded in billing.</p>

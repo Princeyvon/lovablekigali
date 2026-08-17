@@ -110,7 +110,7 @@ function Dashboard() {
 
   return (
     <AppShell title="Dashboard" subtitle="Everything that needs your attention this week.">
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <Stat label="Monthly recurring" value={money(mrr)} hint={`${active} active clients`} icon={<Wallet className="size-4" />} />
         <Stat label="Due within 5 days" value={String(dueSoon.length)} hint="Reminders queued" tone="mist" />
         <Stat label="Overdue accounts" value={String(overdue.length)} hint="Past paid-through date" tone="deep" />

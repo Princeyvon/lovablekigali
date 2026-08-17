@@ -80,7 +80,7 @@ function Payouts() {
 
   return (
     <>
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3">
         <Stat label="Paid out all-time" value={money(payouts.reduce((s, p) => s + Number(p.amount ?? 0), 0))} />
         <Stat label="This month" value={money(thisMonth)} tone="mist" />
         <Stat label="Payouts logged" value={String(payouts.length)} tone="deep" />

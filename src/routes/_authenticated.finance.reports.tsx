@@ -370,7 +370,7 @@ function Reports() {
 
       {/* PAGE 1 */}
       <Page n={1} kicker={period.label} title="Executive summary">
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-2 xl:grid-cols-4">
           <Stat label="Collected" value={shortMoney(r.revenue)} hint={`${r.revenueDelta >= 0 ? "+" : ""}${r.revenueDelta}% vs last ${unit}`} tone="leaf" />
           <Stat label="Spent" value={shortMoney(r.spend)} hint={`${r.spendDelta >= 0 ? "+" : ""}${r.spendDelta}% vs last ${unit}`} tone="mist" />
           <Stat label="Net" value={shortMoney(r.net)} hint="Collected − expenses & payouts" tone="deep" />
@@ -644,7 +644,7 @@ function Reports() {
           </ResponsiveContainer>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-3">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-3">
           <Stat label="Expenses" value={shortMoney(r.eIn.reduce((s: number, e: any) => s + Number(e.amount ?? 0), 0))} tone="mist" />
           <Stat label="Payouts" value={shortMoney(r.poIn.reduce((s: number, p: any) => s + Number(p.amount ?? 0), 0))} tone="deep" />
           <Stat label="Net for the period" value={shortMoney(r.net)} tone="leaf" />
@@ -653,7 +653,7 @@ function Reports() {
 
       {/* PAGE 6 */}
       <Page n={6} kicker="Unit economics" title="What each client is worth">
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-2 xl:grid-cols-4">
           <Stat label="ARPU / month" value={shortMoney(r.arpu)} hint="MRR ÷ active clients" tone="leaf" />
           <Stat label="Average ticket" value={shortMoney(r.avgTicket)} hint={`${r.pIn.length} payments this ${unit}`} tone="mist" />
           <Stat label="Estimated LTV" value={shortMoney(r.ltv)} hint="ARPU × expected lifetime" tone="deep" />
@@ -744,7 +744,7 @@ function Reports() {
 
       {/* PAGE 8 */}
       <Page n={8} kicker="Momentum" title="Rolling performance over six periods">
-        <div className="grid gap-4 sm:grid-cols-3">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-3">
           <Stat label={`Best ${unit}`} value={r.bestTrailing ? shortMoney(r.bestTrailing.revenue) : "—"} hint={r.bestTrailing?.label ?? ""} tone="leaf" />
           <Stat label={`Weakest ${unit}`} value={r.worstTrailing ? shortMoney(r.worstTrailing.revenue) : "—"} hint={r.worstTrailing?.label ?? ""} tone="mist" />
           <Stat label="Collection rate" value={`${r.collectionRate}%`} hint="Collected vs collectible" tone="deep" />
@@ -785,7 +785,7 @@ function Reports() {
 
       {/* PAGE 9 */}
       <Page n={9} kicker="Delivery" title="App estate and service risk">
-        <div className="grid gap-4 sm:grid-cols-3">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-3">
           <Stat label="Live apps" value={String(r.appLive)} tone="leaf" />
           <Stat label="Suspended" value={String(r.appSuspended)} hint="Past grace, unpaid" tone="mist" />
           <Stat label="Closed" value={String(r.appClosed)} tone="deep" />
@@ -813,7 +813,7 @@ function Reports() {
 
       {/* PAGE 10 */}
       <Page n={10} kicker="Outlook" title="Priorities for the next period">
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-2 xl:grid-cols-4">
           <Stat label="Recurring base" value={shortMoney(r.mrr)} hint="Per month" tone="leaf" />
           <Stat label="Expected revenue" value={shortMoney(r.owed)} hint="Past grace" tone="mist" />
           <Stat label="Churn rate" value={`${r.churnRate}%`} tone="deep" />
