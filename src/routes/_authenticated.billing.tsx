@@ -225,6 +225,7 @@ function Billing() {
               onChange={setClientFilter}
               options={clients.map((c) => ({ value: c.id, label: c.business_name }))}
             />
+            <DateRangeFilter label="Paid on" value={range} onChange={setRange} />
             <SearchInput value={q} onChange={setQ} placeholder="Search payments…" />
           </div>
         }
