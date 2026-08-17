@@ -1,18 +1,25 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import {
+  Bell,
   CreditCard,
   Gauge,
   LogOut,
+  Moon,
   ScrollText,
   ShieldAlert,
   ShieldCheck,
+  Sun,
   UserCog,
   UserSquare2,
   Wallet,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
+import { dueState, paidThrough } from "@/lib/agency";
 import { cn } from "@/lib/utils";
+
 
 const TABS = [
   { to: "/dashboard", label: "Dashboard", icon: Gauge, match: ["/dashboard"] },
