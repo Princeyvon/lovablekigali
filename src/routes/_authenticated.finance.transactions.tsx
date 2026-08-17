@@ -3,7 +3,16 @@ import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { ArrowDownLeft, ArrowUpRight } from "lucide-react";
 import { Empty, Panel, Pill, Stat, TD, TH, Table } from "@/components/dash";
-import { SearchInput, matches } from "@/components/search";
+import {
+  DateRangeFilter,
+  EMPTY_RANGE,
+  FilterSelect,
+  SearchInput,
+  inRange,
+  matches,
+  uniqueOptions,
+  type DateRange,
+} from "@/components/search";
 import { supabase } from "@/integrations/supabase/client";
 import { fmtDate, money } from "@/lib/agency";
 
@@ -28,6 +37,9 @@ const BUCKETS = [
 function Transactions() {
   const [q, setQ] = useState("");
   const [dir, setDir] = useState<"all" | "in" | "out">("all");
+  const [category, setCategory] = useState("all");
+  const [method, setMethod] = useState("all");
+  const [range, setRange] = useState<DateRange>(EMPTY_RANGE);
 
   const { data: tx = [], isLoading } = useQuery({
     queryKey: ["transactions"],
@@ -53,9 +65,14 @@ function Transactions() {
   const visible = useMemo(
     () =>
       tx.filter(
-        (t) => (dir === "all" || t.direction === dir) && matches(q, t.payee, t.category, t.method, t.note),
+        (t) =>
+          (dir === "all" || t.direction === dir) &&
+          (category === "all" || t.category === category) &&
+          (method === "all" || t.method === method) &&
+          inRange(t.occurred_at, range) &&
+          matches(q, t.payee, t.category, t.method, t.note),
       ),
-    [tx, q, dir],
+    [tx, q, dir, category, method, range],
   );
 
   return (
@@ -82,17 +99,20 @@ function Transactions() {
         title="Ledger"
         right={
           <div className="flex flex-wrap items-center gap-2">
-            <div className="flex rounded-xl bg-secondary p-1 text-xs font-medium">
+            <div className="flex h-9 rounded-md bg-secondary p-1 text-xs font-medium">
               {(["all", "in", "out"] as const).map((d) => (
                 <button
                   key={d}
                   onClick={() => setDir(d)}
-                  className={`rounded-lg px-3 py-1.5 capitalize ${dir === d ? "bg-card shadow-sm" : "text-muted-foreground"}`}
+                  className={`rounded-sm px-3 capitalize ${dir === d ? "bg-card shadow-sm" : "text-muted-foreground"}`}
                 >
                   {d}
                 </button>
               ))}
             </div>
+            <FilterSelect label="Category" value={category} onChange={setCategory} options={uniqueOptions(tx.map((t) => t.category))} />
+            <FilterSelect label="Method" value={method} onChange={setMethod} options={uniqueOptions(tx.map((t) => t.method))} />
+            <DateRangeFilter value={range} onChange={setRange} />
             <SearchInput value={q} onChange={setQ} placeholder="Search ledger…" />
           </div>
         }

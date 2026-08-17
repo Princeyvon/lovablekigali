@@ -39,6 +39,7 @@ function Prospects() {
   const [q, setQ] = useState("");
   const [sector, setSector] = useState("all");
   const [rep, setRep] = useState("all");
+  const [stage, setStage] = useState("all");
 
   const { data: members = [] } = useQuery({
     queryKey: ["members"],
@@ -95,6 +96,7 @@ function Prospects() {
         <SearchInput value={q} onChange={setQ} placeholder="Search prospects…" />
         <FilterSelect label="Sector" value={sector} onChange={setSector} options={uniqueOptions(prospects.map((p) => p.industry))} />
         <FilterSelect label="Rep" value={rep} onChange={setRep} options={members.map((m) => ({ value: m.id, label: m.full_name }))} />
+        <FilterSelect label="Stage" value={stage} onChange={setStage} options={STAGES.map((s) => ({ value: s, label: s }))} allLabel="All stages" />
         <button
           onClick={() => setOpen((v) => !v)}
           className="gradient-leaf rounded-xl px-4 py-2 text-sm font-semibold text-primary-foreground"
@@ -159,13 +161,13 @@ function Prospects() {
         </Panel>
       )}
 
-      <div className="grid gap-4 lg:grid-cols-5">
-        {STAGES.map((stage) => {
-          const items = visible.filter((p) => p.stage === stage);
+      <div className="-mx-1 flex gap-4 overflow-x-auto px-1 pb-2">
+        {STAGES.filter((s) => stage === "all" || s === stage).map((col) => {
+          const items = visible.filter((p) => p.stage === col);
           return (
-            <div key={stage} className="surface-card p-4">
+            <div key={col} className="surface-card w-[19rem] shrink-0 p-4">
               <div className="mb-3 flex items-center justify-between">
-                <h3 className="text-sm font-semibold">{stage}</h3>
+                <h3 className="text-sm font-semibold">{col}</h3>
                 <Pill tone="mist">{items.length}</Pill>
               </div>
               <div className="space-y-2">

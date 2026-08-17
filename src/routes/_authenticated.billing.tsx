@@ -4,7 +4,16 @@ import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { Empty, Panel, Pill, Stat, TD, TH, Table } from "@/components/dash";
-import { Combobox, FilterSelect, SearchInput, matches } from "@/components/search";
+import {
+  Combobox,
+  DateRangeFilter,
+  EMPTY_RANGE,
+  FilterSelect,
+  SearchInput,
+  inRange,
+  matches,
+  type DateRange,
+} from "@/components/search";
 import { buildStanding, summarise, type ClientRow } from "@/lib/standing";
 import { supabase } from "@/integrations/supabase/client";
 import { MONTH_OPTIONS, PAYMENT_METHODS, addMonths, fmtDate, money, paidThrough, todayISO } from "@/lib/agency";
@@ -28,6 +37,7 @@ function Billing() {
   const [q, setQ] = useState("");
   const [method, setMethod] = useState("all");
   const [clientFilter, setClientFilter] = useState("all");
+  const [range, setRange] = useState<DateRange>(EMPTY_RANGE);
 
   const { data: clients = [] } = useQuery({
     queryKey: ["clients"],
@@ -89,9 +99,10 @@ function Billing() {
         (p) =>
           (method === "all" || p.method === method) &&
           (clientFilter === "all" || p.client_id === clientFilter) &&
+          inRange(p.payment_date, range) &&
           matches(q, clients.find((c) => c.id === p.client_id)?.business_name, p.method, String(p.amount)),
       ),
-    [payments, clients, q, method, clientFilter],
+    [payments, clients, q, method, clientFilter, range],
   );
 
   return (
@@ -214,6 +225,7 @@ function Billing() {
               onChange={setClientFilter}
               options={clients.map((c) => ({ value: c.id, label: c.business_name }))}
             />
+            <DateRangeFilter label="Paid on" value={range} onChange={setRange} />
             <SearchInput value={q} onChange={setQ} placeholder="Search payments…" />
           </div>
         }

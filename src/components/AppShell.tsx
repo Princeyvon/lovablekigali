@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import type { ReactNode } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { BottomNav, ProfileBadge, SalesSubTabs, useIsSalesSection } from "@/components/MobileNav";
 import { cn } from "@/lib/utils";
 
 const manage = [
@@ -84,6 +85,7 @@ export function AppShell({
 }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { user, role, signOut } = useAuth();
+  const isSales = useIsSalesSection();
 
   return (
     <div className="gradient-page min-h-screen p-3 md:p-6">
@@ -116,16 +118,19 @@ export function AppShell({
         </aside>
 
         <main className="min-w-0 flex-1">
-          <header className="surface-card gradient-halo mb-6 flex flex-wrap items-center justify-between gap-4 px-6 py-5">
-            <div>
+          <header className="surface-card gradient-halo mb-6 flex flex-wrap items-center justify-between gap-4 px-6 py-5 pr-20 lg:pr-6">
+            <div className="min-w-0">
               <h1 className="text-2xl font-semibold">{title}</h1>
               {subtitle ? <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p> : null}
             </div>
             <div className="flex items-center gap-3">{actions}</div>
           </header>
-          <div className="space-y-6 pb-10">{children}</div>
+          {isSales ? <SalesSubTabs /> : null}
+          <div className="space-y-6 pb-28 lg:pb-10">{children}</div>
         </main>
       </div>
+      <ProfileBadge />
+      <BottomNav />
     </div>
   );
 }
