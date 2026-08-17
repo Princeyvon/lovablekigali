@@ -35,7 +35,7 @@ export function useIsSalesSection() {
 export function SalesSubTabs() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   return (
-    <div className="surface-card sticky top-2 z-30 mb-4 flex gap-1 rounded-lg p-1 lg:hidden">
+    <div className="sticky top-2 z-30 mb-4 flex gap-6 border-b border-border lg:hidden">
       {SALES_TABS.map((t) => {
         const active = pathname.startsWith(t.to);
         return (
@@ -43,10 +43,10 @@ export function SalesSubTabs() {
             key={t.to}
             to={t.to}
             className={cn(
-              "flex-1 rounded-md px-3 py-2 text-center text-sm font-medium transition",
+              "-mb-px border-b-2 px-1 pb-2.5 text-sm font-medium transition-colors",
               active
-                ? "gradient-leaf text-primary-foreground"
-                : "text-muted-foreground hover:bg-secondary hover:text-foreground",
+                ? "border-primary text-foreground"
+                : "border-transparent text-muted-foreground hover:text-foreground",
             )}
           >
             {t.label}
@@ -73,18 +73,20 @@ export function ProfileBadge() {
   }, [open]);
 
   return (
-    <div ref={ref} className="fixed right-3 top-3 z-50 lg:hidden">
+    <div ref={ref} className="relative z-50 shrink-0 lg:hidden">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-label="Account menu"
-        className="gradient-leaf flex size-11 items-center justify-center rounded-full text-sm font-semibold text-primary-foreground shadow-[0_12px_28px_-12px_rgba(0,0,0,0.6)] ring-4 ring-background"
+        aria-expanded={open}
+        style={{ touchAction: "manipulation" }}
+        className="flex size-10 items-center justify-center rounded-full border border-border bg-card text-xs font-semibold tracking-wide text-foreground transition-transform active:scale-95"
       >
         {initials}
       </button>
 
       {open ? (
-        <div className="surface-card absolute right-0 mt-2 w-60 overflow-hidden rounded-xl p-0 shadow-xl">
+        <div className="surface-card absolute right-0 mt-2 w-60 overflow-hidden p-0">
           <div className="border-b border-border px-4 py-3">
             <p className="truncate text-sm font-semibold">{user?.email?.split("@")[0] ?? "Signed in"}</p>
             <p className="mt-0.5 text-xs capitalize text-muted-foreground">{role ?? "…"} access</p>
@@ -135,20 +137,25 @@ export function BottomNav() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-40 lg:hidden">
-      <div className="mx-3 mb-3 flex max-w-lg items-stretch gap-1 rounded-2xl border border-border bg-card/95 p-1.5 shadow-[0_18px_40px_-18px_rgba(0,0,0,0.55)] backdrop-blur sm:mx-auto">
+    <nav
+      className="fixed inset-x-0 bottom-0 z-40 lg:hidden"
+      style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}
+    >
+      <div className="mx-3 flex max-w-lg items-stretch gap-0.5 rounded-xl border border-border bg-card/85 p-1 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_16px_36px_-24px_rgba(0,0,0,0.35)] backdrop-blur-xl sm:mx-auto">
         {TABS.map((t) => {
           const active = t.match.some((m) => pathname === m || pathname.startsWith(m + "/"));
           return (
             <Link
               key={t.to}
               to={t.to}
+              aria-current={active ? "page" : undefined}
+              style={{ touchAction: "manipulation" }}
               className={cn(
-                "flex flex-1 flex-col items-center gap-1 rounded-xl px-1 py-2 text-[10px] font-medium transition",
-                active ? "gradient-leaf text-primary-foreground" : "text-muted-foreground",
+                "flex flex-1 flex-col items-center gap-1 rounded-lg px-1 py-2 text-[10px] font-medium transition-colors duration-200 active:scale-[0.97]",
+                active ? "bg-secondary text-foreground" : "text-muted-foreground",
               )}
             >
-              <t.icon className="size-5" />
+              <t.icon className={cn("size-[18px]", active && "text-primary")} strokeWidth={active ? 2.2 : 1.7} />
               <span className="truncate">{t.label}</span>
             </Link>
           );
@@ -157,3 +164,4 @@ export function BottomNav() {
     </nav>
   );
 }
+
