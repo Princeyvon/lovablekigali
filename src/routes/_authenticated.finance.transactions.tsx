@@ -37,6 +37,9 @@ const BUCKETS = [
 function Transactions() {
   const [q, setQ] = useState("");
   const [dir, setDir] = useState<"all" | "in" | "out">("all");
+  const [category, setCategory] = useState("all");
+  const [method, setMethod] = useState("all");
+  const [range, setRange] = useState<DateRange>(EMPTY_RANGE);
 
   const { data: tx = [], isLoading } = useQuery({
     queryKey: ["transactions"],
