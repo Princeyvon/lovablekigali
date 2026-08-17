@@ -745,8 +745,8 @@ function Reports() {
       {/* PAGE 8 */}
       <Page n={8} kicker="Momentum" title="Rolling performance over six periods">
         <div className="grid gap-4 sm:grid-cols-3">
-          <Stat label={`Best ${unit}`} value={r.bestTrailing ? shortMoney(r.bestTrailing.revenue) : "—"} hint={r.bestTrailing?.label} tone="leaf" />
-          <Stat label={`Weakest ${unit}`} value={r.worstTrailing ? shortMoney(r.worstTrailing.revenue) : "—"} hint={r.worstTrailing?.label} tone="mist" />
+          <Stat label={`Best ${unit}`} value={r.bestTrailing ? shortMoney(r.bestTrailing.revenue) : "—"} hint={r.bestTrailing?.label ?? ""} tone="leaf" />
+          <Stat label={`Weakest ${unit}`} value={r.worstTrailing ? shortMoney(r.worstTrailing.revenue) : "—"} hint={r.worstTrailing?.label ?? ""} tone="mist" />
           <Stat label="Collection rate" value={`${r.collectionRate}%`} hint="Collected vs collectible" tone="deep" />
         </div>
         <Prose>
