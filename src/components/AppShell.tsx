@@ -119,7 +119,7 @@ export function AppShell({
 
         <main className="min-w-0 flex-1">
           <header className="mb-5 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4 lg:surface-card lg:mb-6 lg:flex lg:flex-wrap lg:justify-between lg:px-6 lg:py-5">
-            <div className="min-w-0">
+            <div className="min-w-0 pr-36 lg:pr-0">
               <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground lg:hidden">
                 Lovable Solutions
               </p>
@@ -132,6 +132,7 @@ export function AppShell({
             </div>
             {actions ? <div className="col-span-2 flex flex-wrap items-center gap-3 lg:hidden">{actions}</div> : null}
           </header>
+
           {isSales ? <SalesSubTabs /> : null}
           <div className="space-y-4 pb-32 sm:space-y-6 lg:pb-10">{children}</div>
         </main>
