@@ -47,6 +47,14 @@
   --color-chart-3: var(--chart-3);
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
+  --color-tint-peach: var(--tint-peach);
+  --color-tint-mint: var(--tint-mint);
+  --color-tint-lilac: var(--tint-lilac);
+  --color-tint-sky: var(--tint-sky);
+  --color-tint-blush: var(--tint-blush);
+  --color-nav: var(--nav);
+  --color-nav-foreground: var(--nav-foreground);
+  --color-nav-active: var(--nav-active);
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-primary: var(--sidebar-primary);
