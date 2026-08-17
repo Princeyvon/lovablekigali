@@ -153,7 +153,7 @@ function Apps() {
         </div>
       }
     >
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-2 xl:grid-cols-4">
         <Stat label="Live apps" value={String(rows.filter((r) => r.app_status === "Live").length)} tone="leaf" />
         <Stat label="In grace period" value={String(inGrace.length)} hint="Overdue, still running" tone="mist" />
         <Stat label="Eligible for shutdown" value={String(atRisk.length)} hint={`>${GRACE_DAYS} days past due`} tone="deep" />

@@ -84,7 +84,7 @@ function Expenses() {
 
   return (
     <>
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3">
         <Stat label="All time" value={money(total)} tone="leaf" />
         <Stat label="This month" value={money(thisMonth)} tone="mist" />
         <Stat label="Entries" value={String(expenses.length)} tone="deep" />

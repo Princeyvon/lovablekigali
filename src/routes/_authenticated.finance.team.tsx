@@ -50,7 +50,7 @@ function FinanceTeam() {
 
   return (
     <>
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3">
         <Stat label="People" value={String(members.length)} hint={`${rows.filter((m) => m.active).length} active`} />
         <Stat label="Commissions earned" value={money(rows.reduce((s, m) => s + m.earned, 0))} tone="mist" />
         <Stat label="Still owed to team" value={money(owed)} tone="deep" />

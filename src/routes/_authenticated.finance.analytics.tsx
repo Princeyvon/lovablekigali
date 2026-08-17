@@ -293,7 +293,7 @@ function Analytics() {
         </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-2 xl:grid-cols-4">
         <Stat label="Collected" value={shortMoney(totals.revenue)} hint={`${scopedPayments.length} payments`} tone="leaf" />
         <Stat label="Spent" value={shortMoney(totals.spend)} hint={`${expenses.length} expenses`} tone="mist" />
         <Stat label="Net" value={shortMoney(totals.profit)} hint={`${totals.margin}% margin`} tone="deep" />

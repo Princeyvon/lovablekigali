@@ -107,7 +107,7 @@ function Billing() {
 
   return (
     <AppShell title="Billing" subtitle="Multi-month payments, paid-through math handled for you.">
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-2 xl:grid-cols-4">
         <Stat label="Expected revenue" value={money(summary.expectedRevenue)} hint="Owed by apps past the grace window" tone="deep" />
         <Stat label="Total owed" value={money(summary.totalOwed)} hint={`${summary.overdue.length} overdue clients`} tone="mist" />
         <Stat label="Collected all-time" value={money(summary.collected)} tone="leaf" />
