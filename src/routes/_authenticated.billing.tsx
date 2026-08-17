@@ -37,6 +37,7 @@ function Billing() {
   const [q, setQ] = useState("");
   const [method, setMethod] = useState("all");
   const [clientFilter, setClientFilter] = useState("all");
+  const [range, setRange] = useState<DateRange>(EMPTY_RANGE);
 
   const { data: clients = [] } = useQuery({
     queryKey: ["clients"],
