@@ -85,6 +85,7 @@ export function AppShell({
 }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { user, role, signOut } = useAuth();
+  const isSales = useIsSalesSection();
 
   return (
     <div className="gradient-page min-h-screen p-3 md:p-6">
