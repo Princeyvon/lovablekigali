@@ -650,6 +650,203 @@ function Reports() {
           <Stat label="Net for the period" value={shortMoney(r.net)} tone="leaf" />
         </div>
       </Page>
+
+      {/* PAGE 6 */}
+      <Page n={6} kicker="Unit economics" title="What each client is worth">
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <Stat label="ARPU / month" value={shortMoney(r.arpu)} hint="MRR ÷ active clients" tone="leaf" />
+          <Stat label="Average ticket" value={shortMoney(r.avgTicket)} hint={`${r.pIn.length} payments this ${unit}`} tone="mist" />
+          <Stat label="Estimated LTV" value={shortMoney(r.ltv)} hint="ARPU × expected lifetime" tone="deep" />
+          <Stat label="Average tenure" value={`${r.avgTenure}d`} hint="Since signing date" />
+        </div>
+        <Prose>
+          <p>
+            Each active client contributes an average of <strong>{money(r.arpu)}</strong> per month, and the typical
+            payment recorded this {unit} was {money(r.avgTicket)} — the gap between those two numbers is the multi-month
+            effect: clients frequently settle several months in one transfer, which flatters cash in a given {unit} and
+            leaves the following one looking quiet even when nothing has gone wrong.
+          </p>
+          <p>
+            Holding churn at its current {r.churnRate}% of the roster, the expected lifetime value of a client works out
+            to roughly <strong>{money(r.ltv)}</strong>. That figure is the single most useful ceiling when deciding how
+            much effort or discount a new signing is worth: anything spent to win an account should stay comfortably
+            below it, and anything spent to retain one is almost always cheaper than replacing it.
+          </p>
+          <p>
+            Average tenure across the whole roster is {r.avgTenure} days. A rising tenure with flat churn means the base
+            is maturing healthily; a rising tenure with rising churn means new signings are not sticking and the average
+            is being propped up by a handful of long-standing accounts.
+          </p>
+        </Prose>
+        <div className="h-64">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={r.topClients.slice(0, 10)} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
+              <XAxis dataKey="name" tickLine={false} axisLine={false} fontSize={10} interval={0} angle={-20} height={50} textAnchor="end" stroke="var(--muted-foreground)" />
+              <YAxis tickFormatter={(v: number) => shortMoney(v)} width={70} tickLine={false} axisLine={false} fontSize={12} stroke="var(--muted-foreground)" />
+              <Tooltip formatter={(v: number) => money(v)} {...tip} />
+              <Legend verticalAlign="top" height={24} />
+              <Bar name="Lifetime collected" dataKey="collected" fill="var(--leaf)" radius={[6, 6, 0, 0]} maxBarSize={28} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </Page>
+
+      {/* PAGE 7 */}
+      <Page n={7} kicker="Concentration" title="Sector mix and dependency risk">
+        <Prose>
+          <p>
+            The roster spans {r.sectorRows.length} sectors.{" "}
+            {r.sectorRows[0]
+              ? `${r.sectorRows[0].name} is the largest by recurring value at ${money(r.sectorRows[0].mrr)} across ${
+                  r.sectorRows[0].clients
+                } client${r.sectorRows[0].clients === 1 ? "" : "s"}.`
+              : "No sector data has been recorded yet."}{" "}
+            Sector spread matters because shocks tend to arrive by industry rather than by individual business — a bad
+            season for one trade hits every client in it at the same time.
+          </p>
+          <p>
+            The five largest accounts represent about <strong>{r.topFiveShare}%</strong> of monthly recurring revenue.
+            Below roughly 30% the business is comfortably diversified; above 50% the loss of one or two relationships
+            would materially change the monthly picture and justifies deliberate effort to widen the base.
+          </p>
+        </Prose>
+        <div className="h-72">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={r.sectorRows.slice(0, 12)} layout="vertical" margin={{ top: 8, right: 16, left: 8, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" horizontal={false} />
+              <XAxis type="number" tickFormatter={(v: number) => shortMoney(v)} tickLine={false} axisLine={false} fontSize={12} stroke="var(--muted-foreground)" />
+              <YAxis type="category" dataKey="name" width={130} tickLine={false} axisLine={false} fontSize={11} stroke="var(--muted-foreground)" />
+              <Tooltip formatter={(v: number) => money(v)} {...tip} />
+              <Legend verticalAlign="top" height={24} />
+              <Bar name="Sector MRR" dataKey="mrr" fill="var(--leaf)" radius={[0, 6, 6, 0]} maxBarSize={20} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+        <Table
+          head={
+            <>
+              <TH>Sector</TH>
+              <TH>Clients</TH>
+              <TH className="text-right">Monthly value</TH>
+            </>
+          }
+        >
+          {r.sectorRows.slice(0, 15).map((s) => (
+            <tr key={s.name}>
+              <TD className="font-medium">{s.name}</TD>
+              <TD>{s.clients}</TD>
+              <TD className="text-right font-medium text-primary">{money(s.mrr)}</TD>
+            </tr>
+          ))}
+        </Table>
+      </Page>
+
+      {/* PAGE 8 */}
+      <Page n={8} kicker="Momentum" title="Rolling performance over six periods">
+        <div className="grid gap-4 sm:grid-cols-3">
+          <Stat label={`Best ${unit}`} value={r.bestTrailing ? shortMoney(r.bestTrailing.revenue) : "—"} hint={r.bestTrailing?.label} tone="leaf" />
+          <Stat label={`Weakest ${unit}`} value={r.worstTrailing ? shortMoney(r.worstTrailing.revenue) : "—"} hint={r.worstTrailing?.label} tone="mist" />
+          <Stat label="Collection rate" value={`${r.collectionRate}%`} hint="Collected vs collectible" tone="deep" />
+        </div>
+        <Prose>
+          <p>
+            Reading six {unit}s at once removes the noise of a single strong or quiet stretch.{" "}
+            {r.bestTrailing && r.worstTrailing
+              ? `The strongest of the six was ${r.bestTrailing.label} at ${money(
+                  r.bestTrailing.revenue,
+                )}, the weakest ${r.worstTrailing.label} at ${money(r.worstTrailing.revenue)}.`
+              : ""}{" "}
+            The distance between those two is the volatility the business has to plan around; the closer they sit, the
+            more confidently fixed costs can be committed.
+          </p>
+          <p>
+            Against the money that could realistically have been collected this {unit} — recurring base plus overdue
+            balances — the business captured <strong>{r.collectionRate}%</strong>. Cover of costs by collections stands
+            at {r.runway.toFixed(2)}× ; anything under 1.0× means the period consumed reserves rather than adding to
+            them.
+          </p>
+        </Prose>
+        <div className="h-72">
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={r.trailing} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
+              <XAxis dataKey="label" tickLine={false} axisLine={false} fontSize={12} stroke="var(--muted-foreground)" />
+              <YAxis tickFormatter={(v: number) => shortMoney(v)} width={70} tickLine={false} axisLine={false} fontSize={12} stroke="var(--muted-foreground)" />
+              <Tooltip formatter={(v: number) => money(v)} {...tip} />
+              <Legend verticalAlign="top" height={24} />
+              <Line name="Collected" type="monotone" dataKey="revenue" stroke="var(--leaf)" strokeWidth={2.5} dot />
+              <Line name="Spent" type="monotone" dataKey="spend" stroke="var(--leaf-deep)" strokeWidth={2} dot={false} />
+              <Line name="Net" type="monotone" dataKey="net" stroke="var(--muted-foreground)" strokeWidth={1.5} strokeDasharray="4 4" dot={false} />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      </Page>
+
+      {/* PAGE 9 */}
+      <Page n={9} kicker="Delivery" title="App estate and service risk">
+        <div className="grid gap-4 sm:grid-cols-3">
+          <Stat label="Live apps" value={String(r.appLive)} tone="leaf" />
+          <Stat label="Suspended" value={String(r.appSuspended)} hint="Past grace, unpaid" tone="mist" />
+          <Stat label="Closed" value={String(r.appClosed)} tone="deep" />
+        </div>
+        <Prose>
+          <p>
+            Of {clients.length} client apps, {r.appLive} are live, {r.appSuspended} are suspended for non-payment and{" "}
+            {r.appClosed} have been closed. Suspension is never immediate: a client keeps full service through the{" "}
+            {GRACE_DAYS}-day grace window while reminders go out every two days, and only an account that has crossed
+            that line is eligible to be taken offline.
+          </p>
+          <p>
+            Suspension is a collection tool, not a punishment — every suspended app is revenue that has already been
+            earned and merely not yet received. The {r.pastGrace.length} account
+            {r.pastGrace.length === 1 ? "" : "s"} currently past grace represent {money(r.owed)} of expected revenue,
+            and restoring service the same day payment lands is what keeps that lever usable a second time.
+          </p>
+          <p>
+            Conversion through the pipeline sits at {r.conversion}% signed against {r.lostRate}% lost. A healthy funnel
+            loses prospects early and cheaply; losses late in the pipeline, after demos and negotiation, are the
+            expensive kind and are worth reviewing case by case.
+          </p>
+        </Prose>
+      </Page>
+
+      {/* PAGE 10 */}
+      <Page n={10} kicker="Outlook" title="Priorities for the next period">
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <Stat label="Recurring base" value={shortMoney(r.mrr)} hint="Per month" tone="leaf" />
+          <Stat label="Expected revenue" value={shortMoney(r.owed)} hint="Past grace" tone="mist" />
+          <Stat label="Churn rate" value={`${r.churnRate}%`} tone="deep" />
+          <Stat label="Pipeline" value={String(prospects.length)} hint={`${r.conversion}% conversion`} />
+        </div>
+        <Prose>
+          <p>
+            Taken together, this {unit} leaves the business with a recurring base of <strong>{money(r.mrr)}</strong>, a
+            net result of <strong>{money(r.net)}</strong> and <strong>{money(r.owed)}</strong> sitting in overdue
+            balances that has already been earned. The order of priority for the coming {unit} follows directly from
+            those three figures.
+          </p>
+          <p>
+            First, collection. The overdue balance is the cheapest revenue available — no selling, no delivery, only
+            follow-up. Second, retention of the largest accounts, which carry roughly {r.topFiveShare}% of the monthly
+            base between five relationships. Third, pipeline: {prospects.length} records with a {r.conversion}%
+            conversion rate implies the next signings are already in the system and need working rather than replacing.
+          </p>
+          <p>
+            Cost discipline stays the quiet lever.{" "}
+            {r.categories.length > 0
+              ? `${r.categories[0]!.name} remains the heaviest line at ${money(r.categories[0]!.value)} this ${unit}.`
+              : "No expense concentration to flag this period."}{" "}
+            With collections covering costs {r.runway.toFixed(2)}× over, a modest improvement on either side of that
+            ratio compounds quickly across the six-{unit} view on the previous page.
+          </p>
+          <p>
+            This report was generated from live records — payments, expenses, payouts, subscriptions, clients and the
+            prospect pipeline — for {period.label.toLowerCase()}. Every figure recalculates when the underlying data
+            changes, so it can be re-run and printed at the close of any {unit} without manual preparation.
+          </p>
+        </Prose>
+      </Page>
     </>
   );
 }
