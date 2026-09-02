@@ -101,25 +101,7 @@ function AuthPage() {
 
   return (
     <div className="gradient-page flex min-h-screen items-center justify-center p-4">
-      <div className="grid w-full max-w-4xl overflow-hidden rounded-3xl shadow-[var(--shadow-rail)] md:grid-cols-2">
-        <div className="gradient-rail relative hidden flex-col justify-between p-10 md:flex">
-          <div className="gradient-halo pointer-events-none absolute inset-0" />
-          <div className="relative">
-            <p className="font-display text-2xl font-semibold text-sidebar-foreground">Lovable Solutions</p>
-            <p className="mt-3 max-w-xs text-sm text-sidebar-foreground/70">
-              One source of truth for clients, credentials, billing and the people who build it all.
-            </p>
-          </div>
-          <div className="relative space-y-3">
-            {["Audited credential vault", "Multi-month billing in RWF", "Rep-scoped visibility"].map((t) => (
-              <div key={t} className="flex items-center gap-3 rounded-xl bg-white/5 px-4 py-3">
-                <span className="gradient-leaf size-2.5 rounded-full" />
-                <span className="text-sm text-sidebar-foreground/85">{t}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
+      <div className="w-full max-w-md overflow-hidden rounded-3xl shadow-[var(--shadow-rail)]">
         <div className="bg-card p-8 md:p-10">
           <h1 className="text-2xl font-semibold">
             {mode === "signin" ? "Sign in" : mode === "signup" ? "Create account" : "Reset password"}
@@ -210,6 +192,5 @@ function AuthPage() {
           </div>
         </div>
       </div>
-    </div>
   );
 }
