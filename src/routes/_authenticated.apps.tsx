@@ -168,9 +168,9 @@ function Apps() {
             head={
               <>
                 <TH>Client</TH>
-                <TH>App</TH>
-                <TH>Closed on</TH>
-                <TH>Reason</TH>
+                <TH className="hidden md:table-cell">App</TH>
+                <TH className="hidden sm:table-cell">Closed on</TH>
+                <TH className="hidden lg:table-cell">Reason</TH>
                 <TH>MRR lost</TH>
                 <TH />
               </>
@@ -183,9 +183,9 @@ function Apps() {
                     {r.business_name}
                   </Link>
                 </TD>
-                <TD className="text-muted-foreground">{r.app_url ?? "—"}</TD>
-                <TD>{fmtDate(r.suspended_at)}</TD>
-                <TD className="text-muted-foreground">{r.suspension_reason ?? "—"}</TD>
+                <TD className="hidden text-muted-foreground md:table-cell">{r.app_url ?? "—"}</TD>
+                <TD className="hidden sm:table-cell">{fmtDate(r.suspended_at)}</TD>
+                <TD className="hidden text-muted-foreground lg:table-cell">{r.suspension_reason ?? "—"}</TD>
                 <TD className="font-medium text-primary">{money(r.rate)}</TD>
                 <TD>
                   {role === "admin" && (
