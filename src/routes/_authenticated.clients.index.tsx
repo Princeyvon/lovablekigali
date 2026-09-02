@@ -85,7 +85,7 @@ function Clients() {
       title="Clients"
       subtitle="Signed relationships, owner-credited and audited."
       actions={
-        <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-center">
+        <div className="flex w-full flex-wrap items-center justify-end gap-2">
         <SearchInput value={q} onChange={setQ} placeholder="Search clients…" />
         <FilterSelect label="Status" value={status} onChange={setStatus} options={["Active","Paused","Churned"].map((v)=>({value:v,label:v}))} />
         <FilterSelect label="Sector" value={industry} onChange={setIndustry} options={uniqueOptions(clients.map((c) => c.industry))} />
