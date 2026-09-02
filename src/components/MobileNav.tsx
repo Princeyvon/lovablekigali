@@ -42,7 +42,7 @@ export function useIsSalesSection() {
 export function SalesSubTabs() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   return (
-    <div className="sticky top-2 z-30 mb-4 flex gap-6 border-b border-border lg:hidden">
+    <div className="surface-card sticky top-3 z-30 mb-4 flex gap-1 p-1.5 md:top-6">
       {SALES_TABS.map((t) => {
         const active = pathname.startsWith(t.to);
         return (
@@ -50,10 +50,10 @@ export function SalesSubTabs() {
             key={t.to}
             to={t.to}
             className={cn(
-              "-mb-px border-b-2 px-1 pb-2.5 text-sm font-medium transition-colors",
+              "flex-1 whitespace-nowrap rounded-xl px-4 py-2 text-center text-sm font-medium transition",
               active
-                ? "border-primary text-foreground"
-                : "border-transparent text-muted-foreground hover:text-foreground",
+                ? "gradient-leaf text-primary-foreground shadow-[0_10px_20px_-12px_rgba(0,0,0,0.5)]"
+                : "text-muted-foreground hover:bg-secondary hover:text-foreground",
             )}
           >
             {t.label}
@@ -106,7 +106,7 @@ function useAlerts() {
   }, [clients, payments]);
 }
 
-export function ProfileBadge() {
+export function ProfileBadge({ variant = "fixed" }: { variant?: "fixed" | "inline" }) {
   const { user, role, signOut } = useAuth();
   const [menu, setMenu] = useState<null | "profile" | "bell">(null);
   const ref = useRef<HTMLDivElement>(null);
@@ -127,8 +127,8 @@ export function ProfileBadge() {
   return (
     <div
       ref={ref}
-      className="fixed right-3 z-50 lg:hidden"
-      style={{ top: "max(0.75rem, env(safe-area-inset-top))" }}
+      className={cn("z-50", variant === "fixed" ? "fixed right-3 lg:hidden" : "relative")}
+      style={variant === "fixed" ? { top: "max(0.75rem, env(safe-area-inset-top))" } : undefined}
     >
       <div className="flex items-center gap-1 rounded-2xl border border-border bg-card/85 p-1 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_16px_36px_-24px_rgba(0,0,0,0.35)] backdrop-blur-xl">
         <button
@@ -198,6 +198,15 @@ export function ProfileBadge() {
             ))}
             {!alerts.length ? <p className="px-3 py-4 text-sm text-muted-foreground">All clients are current.</p> : null}
           </div>
+          <div className="border-t border-border p-1">
+            <Link
+              to="/notifications"
+              onClick={close}
+              className="block rounded-md px-3 py-2.5 text-center text-sm font-semibold text-primary hover:bg-secondary"
+            >
+              See all notifications
+            </Link>
+          </div>
         </div>
       ) : null}
 
@@ -258,7 +267,7 @@ export function BottomNav() {
       className="fixed inset-x-0 bottom-0 z-40 lg:hidden"
       style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}
     >
-      <div className="mx-3 flex max-w-lg items-stretch gap-0.5 rounded-xl border border-border bg-card/85 p-1 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_16px_36px_-24px_rgba(0,0,0,0.35)] backdrop-blur-xl sm:mx-auto">
+      <div className="mx-3 flex max-w-lg items-stretch gap-0.5 rounded-2xl border border-white/10 bg-[var(--nav)]/95 p-1 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_16px_36px_-24px_rgba(0,0,0,0.35)] backdrop-blur-xl sm:mx-auto">
         {TABS.map((t) => {
           const active = t.match.some((m) => pathname === m || pathname.startsWith(m + "/"));
           return (
@@ -269,10 +278,15 @@ export function BottomNav() {
               style={{ touchAction: "manipulation" }}
               className={cn(
                 "flex flex-1 flex-col items-center gap-1 rounded-lg px-1 py-2 text-[10px] font-medium transition-colors duration-200 active:scale-[0.97]",
-                active ? "bg-secondary text-foreground" : "text-muted-foreground",
+                active
+                  ? "bg-white/10 text-[var(--nav-foreground)]"
+                  : "text-[var(--nav-foreground)]/60 hover:text-[var(--nav-foreground)]",
               )}
             >
-              <t.icon className={cn("size-[18px]", active && "text-primary")} strokeWidth={active ? 2.2 : 1.7} />
+              <t.icon
+                className={cn("size-[18px]", active && "text-[var(--nav-active)]")}
+                strokeWidth={active ? 2.2 : 1.7}
+              />
               <span className="truncate">{t.label}</span>
             </Link>
           );

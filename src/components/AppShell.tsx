@@ -128,6 +128,9 @@ export function AppShell({
             </div>
             <div className="flex shrink-0 items-center gap-3">
               <div className="hidden items-center gap-3 lg:flex">{actions}</div>
+              <div className="hidden lg:block">
+                <ProfileBadge variant="inline" />
+              </div>
               <ProfileBadge />
             </div>
             {actions ? <div className="col-span-2 flex flex-wrap items-center gap-3 lg:hidden">{actions}</div> : null}

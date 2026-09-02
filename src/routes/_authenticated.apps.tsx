@@ -130,7 +130,7 @@ function Apps() {
       title="App status"
       subtitle={`Reminders every 2 days while overdue. Shutdown only allowed after ${GRACE_DAYS} days.`}
       actions={
-        <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-center">
+        <div className="flex w-full flex-wrap items-center justify-end gap-2">
         <SearchInput value={q} onChange={setQ} placeholder="Search apps…" />
         <FilterSelect label="App" value={appStatus} onChange={setAppStatus} options={["Live","Suspended","Closed"].map((v)=>({value:v,label:v}))} />
         <FilterSelect
@@ -142,7 +142,7 @@ function Apps() {
         <select
           value={channel}
           onChange={(e) => setChannel(e.target.value as Channel)}
-          className="rounded-xl border border-input bg-background px-3 py-2 text-sm"
+          className="h-9 rounded-md border border-input bg-background px-3 text-sm"
         >
           {REMINDER_CHANNELS.map((c) => (
             <option key={c.value} value={c.value}>
@@ -168,9 +168,9 @@ function Apps() {
             head={
               <>
                 <TH>Client</TH>
-                <TH>App</TH>
-                <TH>Closed on</TH>
-                <TH>Reason</TH>
+                <TH className="hidden md:table-cell">App</TH>
+                <TH className="hidden sm:table-cell">Closed on</TH>
+                <TH className="hidden lg:table-cell">Reason</TH>
                 <TH>MRR lost</TH>
                 <TH />
               </>
@@ -183,9 +183,9 @@ function Apps() {
                     {r.business_name}
                   </Link>
                 </TD>
-                <TD className="text-muted-foreground">{r.app_url ?? "—"}</TD>
-                <TD>{fmtDate(r.suspended_at)}</TD>
-                <TD className="text-muted-foreground">{r.suspension_reason ?? "—"}</TD>
+                <TD className="hidden text-muted-foreground md:table-cell">{r.app_url ?? "—"}</TD>
+                <TD className="hidden sm:table-cell">{fmtDate(r.suspended_at)}</TD>
+                <TD className="hidden text-muted-foreground lg:table-cell">{r.suspension_reason ?? "—"}</TD>
                 <TD className="font-medium text-primary">{money(r.rate)}</TD>
                 <TD>
                   {role === "admin" && (
@@ -211,9 +211,9 @@ function Apps() {
             head={
               <>
                 <TH>Client</TH>
-                <TH>Paid through</TH>
+                <TH className="hidden sm:table-cell">Paid through</TH>
                 <TH>Days overdue</TH>
-                <TH>Reminders</TH>
+                <TH className="hidden md:table-cell">Reminders</TH>
                 <TH>Action</TH>
               </>
             }
@@ -225,11 +225,11 @@ function Apps() {
                     {r.business_name}
                   </Link>
                 </TD>
-                <TD>{fmtDate(r.through)}</TD>
+                <TD className="hidden sm:table-cell">{fmtDate(r.through)}</TD>
                 <TD>
                   <Pill tone={r.suspendable ? "warn" : "mist"}>{r.daysOverdue} d</Pill>
                 </TD>
-                <TD className="text-muted-foreground">
+                <TD className="hidden text-muted-foreground md:table-cell">
                   {r.remindersSent} sent{r.lastReminder ? ` · last ${fmtDate(r.lastReminder)}` : ""}
                 </TD>
                 <TD>
@@ -270,7 +270,7 @@ function Apps() {
                 <TH>Sent</TH>
                 <TH>Client</TH>
                 <TH>Channel</TH>
-                <TH>Due date</TH>
+                <TH className="hidden sm:table-cell">Due date</TH>
               </>
             }
           >
@@ -281,7 +281,7 @@ function Apps() {
                 <TD>
                   <Pill tone="leaf">{REMINDER_CHANNELS.find((c) => c.value === r.channel)?.label ?? r.channel}</Pill>
                 </TD>
-                <TD>{fmtDate(r.due_date)}</TD>
+                <TD className="hidden sm:table-cell">{fmtDate(r.due_date)}</TD>
               </tr>
             ))}
           </Table>
