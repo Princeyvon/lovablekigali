@@ -120,22 +120,25 @@ export function AppShell({
         </aside>
 
         <main className="min-w-0 flex-1">
-          <header className="mb-5 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4 lg:surface-card lg:mb-6 lg:flex lg:flex-wrap lg:justify-between lg:px-6 lg:py-5">
-            <div className="min-w-0 pr-36 lg:pr-0">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground lg:hidden">
-                Lovable Solutions
-              </p>
-              <h1 className="truncate font-display text-[22px] font-semibold tracking-tight lg:text-2xl">{title}</h1>
-              {subtitle ? <p className="mt-1 text-sm leading-snug text-muted-foreground">{subtitle}</p> : null}
-            </div>
-            <div className="flex shrink-0 items-center gap-3">
-              <div className="hidden items-center gap-3 lg:flex">{actions}</div>
-              <div className="hidden lg:block">
-                <ProfileBadge variant="inline" />
+          <header className="mb-5 lg:surface-card lg:mb-6 lg:px-6 lg:py-5">
+            <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-4">
+              <div className="min-w-0 pr-36 lg:pr-0">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground lg:hidden">
+                  Lovable Solutions
+                </p>
+                <h1 className="truncate font-display text-[22px] font-semibold tracking-tight lg:text-2xl">{title}</h1>
+                {subtitle ? <p className="mt-1 text-sm leading-snug text-muted-foreground">{subtitle}</p> : null}
               </div>
-              <ProfileBadge />
+              <div className="flex shrink-0 items-center gap-3">
+                <div className="hidden lg:block">
+                  <ProfileBadge variant="inline" />
+                </div>
+                <ProfileBadge />
+              </div>
             </div>
-            {actions ? <div className="col-span-2 flex flex-wrap items-center gap-3 lg:hidden">{actions}</div> : null}
+            {actions ? (
+              <div className="mt-4 flex w-full min-w-0 flex-wrap items-center gap-2 lg:justify-end">{actions}</div>
+            ) : null}
           </header>
 
           {isSales ? <SalesSubTabs /> : null}
