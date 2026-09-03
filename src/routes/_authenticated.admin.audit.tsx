@@ -1,10 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { AppShell } from "@/components/AppShell";
+import { SubTabs } from "@/components/SubTabs";
 import { Empty, Panel, Pill, TD, TH, Table } from "@/components/dash";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { fmtDate } from "@/lib/agency";
+
+const ADMIN_TABS = [
+  { to: "/admin/access", label: "Access control" },
+  { to: "/admin/audit", label: "Audit log" },
+] as const;
 
 export const Route = createFileRoute("/_authenticated/admin/audit")({
   head: () => ({
@@ -46,6 +52,7 @@ function Audit() {
 
   return (
     <AppShell title="Audit log" subtitle="Append-only record of sensitive activity.">
+      <SubTabs tabs={ADMIN_TABS} />
       <Panel title="Activity" right={<Pill tone="mist">{events.length} events</Pill>}>
         {events.length === 0 ? (
           <Empty>Nothing logged yet.</Empty>

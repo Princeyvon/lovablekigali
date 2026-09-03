@@ -19,6 +19,7 @@ import { Route as AuthenticatedBillingRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated.dashboard'
 import { Route as AuthenticatedExpensesRouteImport } from './routes/_authenticated.expenses'
 import { Route as AuthenticatedFinanceRouteImport } from './routes/_authenticated.finance'
+import { Route as AuthenticatedLibraryRouteImport } from './routes/_authenticated.library'
 import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated.notifications'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated.profile'
 import { Route as AuthenticatedProspectsRouteImport } from './routes/_authenticated.prospects'
@@ -34,6 +35,8 @@ import { Route as AuthenticatedFinancePayoutsRouteImport } from './routes/_authe
 import { Route as AuthenticatedFinanceReportsRouteImport } from './routes/_authenticated.finance.reports'
 import { Route as AuthenticatedFinanceTeamRouteImport } from './routes/_authenticated.finance.team'
 import { Route as AuthenticatedFinanceTransactionsRouteImport } from './routes/_authenticated.finance.transactions'
+import { Route as AuthenticatedLibraryIndexRouteImport } from './routes/_authenticated.library.index'
+import { Route as AuthenticatedLibrarySkillsRouteImport } from './routes/_authenticated.library.skills'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -82,6 +85,11 @@ const AuthenticatedExpensesRoute = AuthenticatedExpensesRouteImport.update({
 const AuthenticatedFinanceRoute = AuthenticatedFinanceRouteImport.update({
   id: '/finance',
   path: '/finance',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedLibraryRoute = AuthenticatedLibraryRouteImport.update({
+  id: '/library',
+  path: '/library',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedNotificationsRoute =
@@ -169,6 +177,18 @@ const AuthenticatedFinanceTransactionsRoute =
     path: '/transactions',
     getParentRoute: () => AuthenticatedFinanceRoute,
   } as any)
+const AuthenticatedLibraryIndexRoute =
+  AuthenticatedLibraryIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedLibraryRoute,
+  } as any)
+const AuthenticatedLibrarySkillsRoute =
+  AuthenticatedLibrarySkillsRouteImport.update({
+    id: '/skills',
+    path: '/skills',
+    getParentRoute: () => AuthenticatedLibraryRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -180,6 +200,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/expenses': typeof AuthenticatedExpensesRoute
   '/finance': typeof AuthenticatedFinanceRouteWithChildren
+  '/library': typeof AuthenticatedLibraryRouteWithChildren
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/prospects': typeof AuthenticatedProspectsRoute
@@ -193,8 +214,10 @@ export interface FileRoutesByFullPath {
   '/finance/reports': typeof AuthenticatedFinanceReportsRoute
   '/finance/team': typeof AuthenticatedFinanceTeamRoute
   '/finance/transactions': typeof AuthenticatedFinanceTransactionsRoute
+  '/library/skills': typeof AuthenticatedLibrarySkillsRoute
   '/clients/': typeof AuthenticatedClientsIndexRoute
   '/finance/': typeof AuthenticatedFinanceIndexRoute
+  '/library/': typeof AuthenticatedLibraryIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -218,8 +241,10 @@ export interface FileRoutesByTo {
   '/finance/reports': typeof AuthenticatedFinanceReportsRoute
   '/finance/team': typeof AuthenticatedFinanceTeamRoute
   '/finance/transactions': typeof AuthenticatedFinanceTransactionsRoute
+  '/library/skills': typeof AuthenticatedLibrarySkillsRoute
   '/clients': typeof AuthenticatedClientsIndexRoute
   '/finance': typeof AuthenticatedFinanceIndexRoute
+  '/library': typeof AuthenticatedLibraryIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -233,6 +258,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/expenses': typeof AuthenticatedExpensesRoute
   '/_authenticated/finance': typeof AuthenticatedFinanceRouteWithChildren
+  '/_authenticated/library': typeof AuthenticatedLibraryRouteWithChildren
   '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/prospects': typeof AuthenticatedProspectsRoute
@@ -246,8 +272,10 @@ export interface FileRoutesById {
   '/_authenticated/finance/reports': typeof AuthenticatedFinanceReportsRoute
   '/_authenticated/finance/team': typeof AuthenticatedFinanceTeamRoute
   '/_authenticated/finance/transactions': typeof AuthenticatedFinanceTransactionsRoute
+  '/_authenticated/library/skills': typeof AuthenticatedLibrarySkillsRoute
   '/_authenticated/clients/': typeof AuthenticatedClientsIndexRoute
   '/_authenticated/finance/': typeof AuthenticatedFinanceIndexRoute
+  '/_authenticated/library/': typeof AuthenticatedLibraryIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -261,6 +289,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/expenses'
     | '/finance'
+    | '/library'
     | '/notifications'
     | '/profile'
     | '/prospects'
@@ -274,8 +303,10 @@ export interface FileRouteTypes {
     | '/finance/reports'
     | '/finance/team'
     | '/finance/transactions'
+    | '/library/skills'
     | '/clients/'
     | '/finance/'
+    | '/library/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -299,8 +330,10 @@ export interface FileRouteTypes {
     | '/finance/reports'
     | '/finance/team'
     | '/finance/transactions'
+    | '/library/skills'
     | '/clients'
     | '/finance'
+    | '/library'
   id:
     | '__root__'
     | '/'
@@ -313,6 +346,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/expenses'
     | '/_authenticated/finance'
+    | '/_authenticated/library'
     | '/_authenticated/notifications'
     | '/_authenticated/profile'
     | '/_authenticated/prospects'
@@ -326,8 +360,10 @@ export interface FileRouteTypes {
     | '/_authenticated/finance/reports'
     | '/_authenticated/finance/team'
     | '/_authenticated/finance/transactions'
+    | '/_authenticated/library/skills'
     | '/_authenticated/clients/'
     | '/_authenticated/finance/'
+    | '/_authenticated/library/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -407,6 +443,13 @@ declare module '@tanstack/react-router' {
       path: '/finance'
       fullPath: '/finance'
       preLoaderRoute: typeof AuthenticatedFinanceRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/library': {
+      id: '/_authenticated/library'
+      path: '/library'
+      fullPath: '/library'
+      preLoaderRoute: typeof AuthenticatedLibraryRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/notifications': {
@@ -514,6 +557,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedFinanceTransactionsRouteImport
       parentRoute: typeof AuthenticatedFinanceRoute
     }
+    '/_authenticated/library/': {
+      id: '/_authenticated/library/'
+      path: '/'
+      fullPath: '/library/'
+      preLoaderRoute: typeof AuthenticatedLibraryIndexRouteImport
+      parentRoute: typeof AuthenticatedLibraryRoute
+    }
+    '/_authenticated/library/skills': {
+      id: '/_authenticated/library/skills'
+      path: '/skills'
+      fullPath: '/library/skills'
+      preLoaderRoute: typeof AuthenticatedLibrarySkillsRouteImport
+      parentRoute: typeof AuthenticatedLibraryRoute
+    }
   }
 }
 
@@ -540,6 +597,19 @@ const AuthenticatedFinanceRouteChildren: AuthenticatedFinanceRouteChildren = {
 const AuthenticatedFinanceRouteWithChildren =
   AuthenticatedFinanceRoute._addFileChildren(AuthenticatedFinanceRouteChildren)
 
+interface AuthenticatedLibraryRouteChildren {
+  AuthenticatedLibrarySkillsRoute: typeof AuthenticatedLibrarySkillsRoute
+  AuthenticatedLibraryIndexRoute: typeof AuthenticatedLibraryIndexRoute
+}
+
+const AuthenticatedLibraryRouteChildren: AuthenticatedLibraryRouteChildren = {
+  AuthenticatedLibrarySkillsRoute: AuthenticatedLibrarySkillsRoute,
+  AuthenticatedLibraryIndexRoute: AuthenticatedLibraryIndexRoute,
+}
+
+const AuthenticatedLibraryRouteWithChildren =
+  AuthenticatedLibraryRoute._addFileChildren(AuthenticatedLibraryRouteChildren)
+
 interface AuthenticatedRouteChildren {
   AuthenticatedAnalyticsRoute: typeof AuthenticatedAnalyticsRoute
   AuthenticatedAppsRoute: typeof AuthenticatedAppsRoute
@@ -547,6 +617,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedExpensesRoute: typeof AuthenticatedExpensesRoute
   AuthenticatedFinanceRoute: typeof AuthenticatedFinanceRouteWithChildren
+  AuthenticatedLibraryRoute: typeof AuthenticatedLibraryRouteWithChildren
   AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedProspectsRoute: typeof AuthenticatedProspectsRoute
@@ -564,6 +635,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedExpensesRoute: AuthenticatedExpensesRoute,
   AuthenticatedFinanceRoute: AuthenticatedFinanceRouteWithChildren,
+  AuthenticatedLibraryRoute: AuthenticatedLibraryRouteWithChildren,
   AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedProspectsRoute: AuthenticatedProspectsRoute,

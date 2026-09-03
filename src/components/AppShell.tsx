@@ -1,13 +1,11 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
+  BookMarked,
   CreditCard,
   Gauge,
   LogOut,
-  ScrollText,
-  Send,
   ShieldAlert,
   ShieldCheck,
-  UserCog,
   UserSquare2,
   Wallet,
 } from "lucide-react";
@@ -17,22 +15,18 @@ import { BottomNav, ProfileBadge, SalesSubTabs, useIsSalesSection } from "@/comp
 import { cn } from "@/lib/utils";
 
 const manage = [
+  { to: "/prospects", label: "Sales", icon: UserSquare2 },
   { to: "/dashboard", label: "Dashboard", icon: Gauge },
-  { to: "/prospects", label: "Prospects", icon: Send },
-  { to: "/clients", label: "Clients", icon: UserSquare2 },
   { to: "/billing", label: "Billing", icon: CreditCard },
   { to: "/apps", label: "App Status", icon: ShieldAlert },
 ] as const;
 
 const operate = [
   { to: "/finance/team", label: "Finance", icon: Wallet },
-  { to: "/profile", label: "My Profile", icon: UserCog },
+  { to: "/library/skills", label: "Library", icon: BookMarked },
 ] as const;
 
-const adminOnly = [
-  { to: "/admin/access", label: "Access Control", icon: ShieldCheck },
-  { to: "/admin/audit", label: "Audit Log", icon: ScrollText },
-] as const;
+const adminOnly = [{ to: "/admin/access", label: "Access Control", icon: ShieldCheck }] as const;
 
 function NavGroup({ label, items, pathname }: { label: string; items: readonly { to: string; label: string; icon: typeof Gauge }[]; pathname: string }) {
   return (
@@ -42,8 +36,16 @@ function NavGroup({ label, items, pathname }: { label: string; items: readonly {
       </p>
       <nav className="mt-2 space-y-1">
         {items.map((item) => {
-          const section = item.to.startsWith("/finance") ? "/finance" : item.to;
-          const active = pathname === section || pathname.startsWith(section + "/");
+          const sections = item.to.startsWith("/finance")
+            ? ["/finance"]
+            : item.to.startsWith("/library")
+              ? ["/library"]
+              : item.to.startsWith("/admin")
+                ? ["/admin"]
+                : item.to === "/prospects"
+                  ? ["/prospects", "/clients"]
+                  : [item.to];
+          const active = sections.some((s) => pathname === s || pathname.startsWith(s + "/"));
           return (
             <Link
               key={item.to}
@@ -118,22 +120,25 @@ export function AppShell({
         </aside>
 
         <main className="min-w-0 flex-1">
-          <header className="mb-5 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4 lg:surface-card lg:mb-6 lg:flex lg:flex-wrap lg:justify-between lg:px-6 lg:py-5">
-            <div className="min-w-0 pr-36 lg:pr-0">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground lg:hidden">
-                Lovable Solutions
-              </p>
-              <h1 className="truncate font-display text-[22px] font-semibold tracking-tight lg:text-2xl">{title}</h1>
-              {subtitle ? <p className="mt-1 text-sm leading-snug text-muted-foreground">{subtitle}</p> : null}
-            </div>
-            <div className="flex shrink-0 items-center gap-3">
-              <div className="hidden items-center gap-3 lg:flex">{actions}</div>
-              <div className="hidden lg:block">
-                <ProfileBadge variant="inline" />
+          <header className="mb-5 lg:surface-card lg:mb-6 lg:px-6 lg:py-5">
+            <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-4">
+              <div className="min-w-0 pr-36 lg:pr-0">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground lg:hidden">
+                  Lovable Solutions
+                </p>
+                <h1 className="truncate font-display text-[22px] font-semibold tracking-tight lg:text-2xl">{title}</h1>
+                {subtitle ? <p className="mt-1 text-sm leading-snug text-muted-foreground">{subtitle}</p> : null}
               </div>
-              <ProfileBadge />
+              <div className="flex shrink-0 items-center gap-3">
+                <div className="hidden lg:block">
+                  <ProfileBadge variant="inline" />
+                </div>
+                <ProfileBadge />
+              </div>
             </div>
-            {actions ? <div className="col-span-2 flex flex-wrap items-center gap-3 lg:hidden">{actions}</div> : null}
+            {actions ? (
+              <div className="mt-4 flex w-full min-w-0 flex-wrap items-center gap-2 lg:justify-end">{actions}</div>
+            ) : null}
           </header>
 
           {isSales ? <SalesSubTabs /> : null}
