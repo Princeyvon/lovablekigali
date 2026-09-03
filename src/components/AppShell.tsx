@@ -1,13 +1,11 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
+  BookMarked,
   CreditCard,
   Gauge,
   LogOut,
-  ScrollText,
-  Send,
   ShieldAlert,
   ShieldCheck,
-  UserCog,
   UserSquare2,
   Wallet,
 } from "lucide-react";
@@ -17,22 +15,18 @@ import { BottomNav, ProfileBadge, SalesSubTabs, useIsSalesSection } from "@/comp
 import { cn } from "@/lib/utils";
 
 const manage = [
+  { to: "/prospects", label: "Sales", icon: UserSquare2 },
   { to: "/dashboard", label: "Dashboard", icon: Gauge },
-  { to: "/prospects", label: "Prospects", icon: Send },
-  { to: "/clients", label: "Clients", icon: UserSquare2 },
   { to: "/billing", label: "Billing", icon: CreditCard },
   { to: "/apps", label: "App Status", icon: ShieldAlert },
 ] as const;
 
 const operate = [
   { to: "/finance/team", label: "Finance", icon: Wallet },
-  { to: "/profile", label: "My Profile", icon: UserCog },
+  { to: "/library/skills", label: "Library", icon: BookMarked },
 ] as const;
 
-const adminOnly = [
-  { to: "/admin/access", label: "Access Control", icon: ShieldCheck },
-  { to: "/admin/audit", label: "Audit Log", icon: ScrollText },
-] as const;
+const adminOnly = [{ to: "/admin/access", label: "Access Control", icon: ShieldCheck }] as const;
 
 function NavGroup({ label, items, pathname }: { label: string; items: readonly { to: string; label: string; icon: typeof Gauge }[]; pathname: string }) {
   return (
