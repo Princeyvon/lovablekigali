@@ -144,7 +144,7 @@ export function TH({ children, className }: { children?: ReactNode; className?: 
   return (
     <th
       className={cn(
-        "px-2 py-3 text-left text-[11px] font-medium uppercase tracking-wide text-muted-foreground sm:px-4",
+        "px-2 py-3 text-left align-bottom text-[11px] font-medium uppercase tracking-wide text-muted-foreground [overflow-wrap:anywhere] sm:px-4",
         className,
       )}
     >
@@ -154,7 +154,11 @@ export function TH({ children, className }: { children?: ReactNode; className?: 
 }
 
 export function TD({ children, className }: { children: ReactNode; className?: string }) {
-  return <td className={cn("px-2 py-3 text-sm sm:px-4", className)}>{children}</td>;
+  return (
+    <td className={cn("px-2 py-3 align-top text-sm leading-snug [overflow-wrap:anywhere]", "sm:px-4", className)}>
+      {children}
+    </td>
+  );
 }
 
 /**
