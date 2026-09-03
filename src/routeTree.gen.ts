@@ -36,6 +36,7 @@ import { Route as AuthenticatedFinanceReportsRouteImport } from './routes/_authe
 import { Route as AuthenticatedFinanceTeamRouteImport } from './routes/_authenticated.finance.team'
 import { Route as AuthenticatedFinanceTransactionsRouteImport } from './routes/_authenticated.finance.transactions'
 import { Route as AuthenticatedLibraryIndexRouteImport } from './routes/_authenticated.library.index'
+import { Route as AuthenticatedLibrarySkillsRouteImport } from './routes/_authenticated.library.skills'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -182,6 +183,12 @@ const AuthenticatedLibraryIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedLibraryRoute,
   } as any)
+const AuthenticatedLibrarySkillsRoute =
+  AuthenticatedLibrarySkillsRouteImport.update({
+    id: '/skills',
+    path: '/skills',
+    getParentRoute: () => AuthenticatedLibraryRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -207,6 +214,7 @@ export interface FileRoutesByFullPath {
   '/finance/reports': typeof AuthenticatedFinanceReportsRoute
   '/finance/team': typeof AuthenticatedFinanceTeamRoute
   '/finance/transactions': typeof AuthenticatedFinanceTransactionsRoute
+  '/library/skills': typeof AuthenticatedLibrarySkillsRoute
   '/clients/': typeof AuthenticatedClientsIndexRoute
   '/finance/': typeof AuthenticatedFinanceIndexRoute
   '/library/': typeof AuthenticatedLibraryIndexRoute
@@ -233,6 +241,7 @@ export interface FileRoutesByTo {
   '/finance/reports': typeof AuthenticatedFinanceReportsRoute
   '/finance/team': typeof AuthenticatedFinanceTeamRoute
   '/finance/transactions': typeof AuthenticatedFinanceTransactionsRoute
+  '/library/skills': typeof AuthenticatedLibrarySkillsRoute
   '/clients': typeof AuthenticatedClientsIndexRoute
   '/finance': typeof AuthenticatedFinanceIndexRoute
   '/library': typeof AuthenticatedLibraryIndexRoute
@@ -263,6 +272,7 @@ export interface FileRoutesById {
   '/_authenticated/finance/reports': typeof AuthenticatedFinanceReportsRoute
   '/_authenticated/finance/team': typeof AuthenticatedFinanceTeamRoute
   '/_authenticated/finance/transactions': typeof AuthenticatedFinanceTransactionsRoute
+  '/_authenticated/library/skills': typeof AuthenticatedLibrarySkillsRoute
   '/_authenticated/clients/': typeof AuthenticatedClientsIndexRoute
   '/_authenticated/finance/': typeof AuthenticatedFinanceIndexRoute
   '/_authenticated/library/': typeof AuthenticatedLibraryIndexRoute
@@ -293,6 +303,7 @@ export interface FileRouteTypes {
     | '/finance/reports'
     | '/finance/team'
     | '/finance/transactions'
+    | '/library/skills'
     | '/clients/'
     | '/finance/'
     | '/library/'
@@ -319,6 +330,7 @@ export interface FileRouteTypes {
     | '/finance/reports'
     | '/finance/team'
     | '/finance/transactions'
+    | '/library/skills'
     | '/clients'
     | '/finance'
     | '/library'
@@ -348,6 +360,7 @@ export interface FileRouteTypes {
     | '/_authenticated/finance/reports'
     | '/_authenticated/finance/team'
     | '/_authenticated/finance/transactions'
+    | '/_authenticated/library/skills'
     | '/_authenticated/clients/'
     | '/_authenticated/finance/'
     | '/_authenticated/library/'
@@ -551,6 +564,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLibraryIndexRouteImport
       parentRoute: typeof AuthenticatedLibraryRoute
     }
+    '/_authenticated/library/skills': {
+      id: '/_authenticated/library/skills'
+      path: '/skills'
+      fullPath: '/library/skills'
+      preLoaderRoute: typeof AuthenticatedLibrarySkillsRouteImport
+      parentRoute: typeof AuthenticatedLibraryRoute
+    }
   }
 }
 
@@ -578,10 +598,12 @@ const AuthenticatedFinanceRouteWithChildren =
   AuthenticatedFinanceRoute._addFileChildren(AuthenticatedFinanceRouteChildren)
 
 interface AuthenticatedLibraryRouteChildren {
+  AuthenticatedLibrarySkillsRoute: typeof AuthenticatedLibrarySkillsRoute
   AuthenticatedLibraryIndexRoute: typeof AuthenticatedLibraryIndexRoute
 }
 
 const AuthenticatedLibraryRouteChildren: AuthenticatedLibraryRouteChildren = {
+  AuthenticatedLibrarySkillsRoute: AuthenticatedLibrarySkillsRoute,
   AuthenticatedLibraryIndexRoute: AuthenticatedLibraryIndexRoute,
 }
 
