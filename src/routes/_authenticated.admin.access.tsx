@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
+import { SubTabs } from "@/components/SubTabs";
 import { Empty, Panel, Pill, TD, TH, Table } from "@/components/dash";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -10,6 +11,11 @@ import { adminIssueOtp, adminSetRole } from "@/lib/account.functions";
 import { fmtDate } from "@/lib/agency";
 
 const ROLES = ["admin", "sales", "dev", "support"] as const;
+
+const ADMIN_TABS = [
+  { to: "/admin/access", label: "Access control" },
+  { to: "/admin/audit", label: "Audit log" },
+] as const;
 
 export const Route = createFileRoute("/_authenticated/admin/access")({
   head: () => ({
@@ -84,6 +90,7 @@ function AccessAdmin() {
 
   return (
     <AppShell title="Access control" subtitle="Who can see what, and how they get back in.">
+      <SubTabs tabs={ADMIN_TABS} />
       {otp && (
         <Panel title="One-time password" right={<Pill tone="warn">Share securely</Pill>}>
           <p className="text-sm text-muted-foreground">
