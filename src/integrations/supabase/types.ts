@@ -373,6 +373,96 @@ export type Database = {
           },
         ]
       }
+      library_prompts: {
+        Row: {
+          body: string
+          category: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          title: string
+        }
+        Insert: {
+          body: string
+          category?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          title: string
+        }
+        Update: {
+          body?: string
+          category?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          title?: string
+        }
+        Relationships: []
+      }
+      library_skills: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string | null
+          file_name: string | null
+          file_path: string | null
+          id: string
+          link: string | null
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          file_name?: string | null
+          file_path?: string | null
+          id?: string
+          link?: string | null
+          title: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          file_name?: string | null
+          file_path?: string | null
+          id?: string
+          link?: string | null
+          title?: string
+        }
+        Relationships: []
+      }
+      library_themes: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          image_path: string
+          notes: string | null
+          source_url: string | null
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          image_path: string
+          notes?: string | null
+          source_url?: string | null
+          title: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          image_path?: string
+          notes?: string | null
+          source_url?: string | null
+          title?: string
+        }
+        Relationships: []
+      }
       payment_reminders: {
         Row: {
           channel: string
