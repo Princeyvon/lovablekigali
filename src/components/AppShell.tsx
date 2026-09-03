@@ -36,8 +36,16 @@ function NavGroup({ label, items, pathname }: { label: string; items: readonly {
       </p>
       <nav className="mt-2 space-y-1">
         {items.map((item) => {
-          const section = item.to.startsWith("/finance") ? "/finance" : item.to;
-          const active = pathname === section || pathname.startsWith(section + "/");
+          const sections = item.to.startsWith("/finance")
+            ? ["/finance"]
+            : item.to.startsWith("/library")
+              ? ["/library"]
+              : item.to.startsWith("/admin")
+                ? ["/admin"]
+                : item.to === "/prospects"
+                  ? ["/prospects", "/clients"]
+                  : [item.to];
+          const active = sections.some((s) => pathname === s || pathname.startsWith(s + "/"));
           return (
             <Link
               key={item.to}
