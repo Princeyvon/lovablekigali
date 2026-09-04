@@ -36,7 +36,9 @@ import { Route as AuthenticatedFinanceReportsRouteImport } from './routes/_authe
 import { Route as AuthenticatedFinanceTeamRouteImport } from './routes/_authenticated.finance.team'
 import { Route as AuthenticatedFinanceTransactionsRouteImport } from './routes/_authenticated.finance.transactions'
 import { Route as AuthenticatedLibraryIndexRouteImport } from './routes/_authenticated.library.index'
+import { Route as AuthenticatedLibraryPromptsRouteImport } from './routes/_authenticated.library.prompts'
 import { Route as AuthenticatedLibrarySkillsRouteImport } from './routes/_authenticated.library.skills'
+import { Route as AuthenticatedLibraryThemesRouteImport } from './routes/_authenticated.library.themes'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -183,10 +185,22 @@ const AuthenticatedLibraryIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedLibraryRoute,
   } as any)
+const AuthenticatedLibraryPromptsRoute =
+  AuthenticatedLibraryPromptsRouteImport.update({
+    id: '/prompts',
+    path: '/prompts',
+    getParentRoute: () => AuthenticatedLibraryRoute,
+  } as any)
 const AuthenticatedLibrarySkillsRoute =
   AuthenticatedLibrarySkillsRouteImport.update({
     id: '/skills',
     path: '/skills',
+    getParentRoute: () => AuthenticatedLibraryRoute,
+  } as any)
+const AuthenticatedLibraryThemesRoute =
+  AuthenticatedLibraryThemesRouteImport.update({
+    id: '/themes',
+    path: '/themes',
     getParentRoute: () => AuthenticatedLibraryRoute,
   } as any)
 
@@ -214,7 +228,9 @@ export interface FileRoutesByFullPath {
   '/finance/reports': typeof AuthenticatedFinanceReportsRoute
   '/finance/team': typeof AuthenticatedFinanceTeamRoute
   '/finance/transactions': typeof AuthenticatedFinanceTransactionsRoute
+  '/library/prompts': typeof AuthenticatedLibraryPromptsRoute
   '/library/skills': typeof AuthenticatedLibrarySkillsRoute
+  '/library/themes': typeof AuthenticatedLibraryThemesRoute
   '/clients/': typeof AuthenticatedClientsIndexRoute
   '/finance/': typeof AuthenticatedFinanceIndexRoute
   '/library/': typeof AuthenticatedLibraryIndexRoute
@@ -241,7 +257,9 @@ export interface FileRoutesByTo {
   '/finance/reports': typeof AuthenticatedFinanceReportsRoute
   '/finance/team': typeof AuthenticatedFinanceTeamRoute
   '/finance/transactions': typeof AuthenticatedFinanceTransactionsRoute
+  '/library/prompts': typeof AuthenticatedLibraryPromptsRoute
   '/library/skills': typeof AuthenticatedLibrarySkillsRoute
+  '/library/themes': typeof AuthenticatedLibraryThemesRoute
   '/clients': typeof AuthenticatedClientsIndexRoute
   '/finance': typeof AuthenticatedFinanceIndexRoute
   '/library': typeof AuthenticatedLibraryIndexRoute
@@ -272,7 +290,9 @@ export interface FileRoutesById {
   '/_authenticated/finance/reports': typeof AuthenticatedFinanceReportsRoute
   '/_authenticated/finance/team': typeof AuthenticatedFinanceTeamRoute
   '/_authenticated/finance/transactions': typeof AuthenticatedFinanceTransactionsRoute
+  '/_authenticated/library/prompts': typeof AuthenticatedLibraryPromptsRoute
   '/_authenticated/library/skills': typeof AuthenticatedLibrarySkillsRoute
+  '/_authenticated/library/themes': typeof AuthenticatedLibraryThemesRoute
   '/_authenticated/clients/': typeof AuthenticatedClientsIndexRoute
   '/_authenticated/finance/': typeof AuthenticatedFinanceIndexRoute
   '/_authenticated/library/': typeof AuthenticatedLibraryIndexRoute
@@ -303,7 +323,9 @@ export interface FileRouteTypes {
     | '/finance/reports'
     | '/finance/team'
     | '/finance/transactions'
+    | '/library/prompts'
     | '/library/skills'
+    | '/library/themes'
     | '/clients/'
     | '/finance/'
     | '/library/'
@@ -330,7 +352,9 @@ export interface FileRouteTypes {
     | '/finance/reports'
     | '/finance/team'
     | '/finance/transactions'
+    | '/library/prompts'
     | '/library/skills'
+    | '/library/themes'
     | '/clients'
     | '/finance'
     | '/library'
@@ -360,7 +384,9 @@ export interface FileRouteTypes {
     | '/_authenticated/finance/reports'
     | '/_authenticated/finance/team'
     | '/_authenticated/finance/transactions'
+    | '/_authenticated/library/prompts'
     | '/_authenticated/library/skills'
+    | '/_authenticated/library/themes'
     | '/_authenticated/clients/'
     | '/_authenticated/finance/'
     | '/_authenticated/library/'
@@ -564,11 +590,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLibraryIndexRouteImport
       parentRoute: typeof AuthenticatedLibraryRoute
     }
+    '/_authenticated/library/prompts': {
+      id: '/_authenticated/library/prompts'
+      path: '/prompts'
+      fullPath: '/library/prompts'
+      preLoaderRoute: typeof AuthenticatedLibraryPromptsRouteImport
+      parentRoute: typeof AuthenticatedLibraryRoute
+    }
     '/_authenticated/library/skills': {
       id: '/_authenticated/library/skills'
       path: '/skills'
       fullPath: '/library/skills'
       preLoaderRoute: typeof AuthenticatedLibrarySkillsRouteImport
+      parentRoute: typeof AuthenticatedLibraryRoute
+    }
+    '/_authenticated/library/themes': {
+      id: '/_authenticated/library/themes'
+      path: '/themes'
+      fullPath: '/library/themes'
+      preLoaderRoute: typeof AuthenticatedLibraryThemesRouteImport
       parentRoute: typeof AuthenticatedLibraryRoute
     }
   }
@@ -598,12 +638,16 @@ const AuthenticatedFinanceRouteWithChildren =
   AuthenticatedFinanceRoute._addFileChildren(AuthenticatedFinanceRouteChildren)
 
 interface AuthenticatedLibraryRouteChildren {
+  AuthenticatedLibraryPromptsRoute: typeof AuthenticatedLibraryPromptsRoute
   AuthenticatedLibrarySkillsRoute: typeof AuthenticatedLibrarySkillsRoute
+  AuthenticatedLibraryThemesRoute: typeof AuthenticatedLibraryThemesRoute
   AuthenticatedLibraryIndexRoute: typeof AuthenticatedLibraryIndexRoute
 }
 
 const AuthenticatedLibraryRouteChildren: AuthenticatedLibraryRouteChildren = {
+  AuthenticatedLibraryPromptsRoute: AuthenticatedLibraryPromptsRoute,
   AuthenticatedLibrarySkillsRoute: AuthenticatedLibrarySkillsRoute,
+  AuthenticatedLibraryThemesRoute: AuthenticatedLibraryThemesRoute,
   AuthenticatedLibraryIndexRoute: AuthenticatedLibraryIndexRoute,
 }
 
