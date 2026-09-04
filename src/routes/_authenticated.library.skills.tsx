@@ -76,7 +76,10 @@ function LibrarySkills() {
 
   const download = async (path: string, name: string) => {
     const url = await signedUrl(path);
-    if (!url) return toast.error("File is unavailable");
+    if (!url) {
+      toast.error("File is unavailable");
+      return;
+    }
     downloadUrl(url, name);
   };
 
