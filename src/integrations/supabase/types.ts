@@ -380,6 +380,7 @@ export type Database = {
           created_at: string
           created_by: string | null
           id: string
+          sort_order: number
           title: string
         }
         Insert: {
@@ -388,6 +389,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           id?: string
+          sort_order?: number
           title: string
         }
         Update: {
@@ -396,6 +398,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           id?: string
+          sort_order?: number
           title?: string
         }
         Relationships: []
@@ -409,6 +412,7 @@ export type Database = {
           file_path: string | null
           id: string
           link: string | null
+          sort_order: number
           title: string
         }
         Insert: {
@@ -419,6 +423,7 @@ export type Database = {
           file_path?: string | null
           id?: string
           link?: string | null
+          sort_order?: number
           title: string
         }
         Update: {
@@ -429,6 +434,7 @@ export type Database = {
           file_path?: string | null
           id?: string
           link?: string | null
+          sort_order?: number
           title?: string
         }
         Relationships: []
@@ -440,6 +446,7 @@ export type Database = {
           id: string
           image_path: string
           notes: string | null
+          sort_order: number
           source_url: string | null
           title: string
         }
@@ -449,6 +456,7 @@ export type Database = {
           id?: string
           image_path: string
           notes?: string | null
+          sort_order?: number
           source_url?: string | null
           title: string
         }
@@ -458,6 +466,7 @@ export type Database = {
           id?: string
           image_path?: string
           notes?: string | null
+          sort_order?: number
           source_url?: string | null
           title?: string
         }
