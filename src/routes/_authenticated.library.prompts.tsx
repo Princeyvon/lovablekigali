@@ -1,13 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { Check, ChevronDown, Copy, Plus, Trash2 } from "lucide-react";
+import { Check, ChevronDown, Copy, GripVertical, Pencil, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Empty, Panel, Pill } from "@/components/dash";
 import { SearchInput, matches } from "@/components/search";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { copyText } from "@/lib/library";
+import { useDragOrder } from "@/hooks/useDragOrder";
+import { copyText, saveOrder } from "@/lib/library";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/library/prompts")({
@@ -28,6 +29,7 @@ function LibraryPrompts() {
   const qc = useQueryClient();
   const { user } = useAuth();
   const [open, setOpen] = useState(false);
+  const [editing, setEditing] = useState<string | null>(null);
   const [q, setQ] = useState("");
   const [form, setForm] = useState(EMPTY);
   const [expanded, setExpanded] = useState<string | null>(null);
@@ -36,23 +38,32 @@ function LibraryPrompts() {
   const { data: prompts = [], isLoading } = useQuery({
     queryKey: ["library-prompts"],
     queryFn: async () =>
-      (await supabase.from("library_prompts").select("*").order("created_at", { ascending: false })).data ?? [],
+      (
+        await supabase
+          .from("library_prompts")
+          .select("*")
+          .order("sort_order", { ascending: true })
+          .order("created_at", { ascending: false })
+      ).data ?? [],
   });
 
-  const create = useMutation({
+  const closeForm = () => {
+    setForm(EMPTY);
+    setEditing(null);
+    setOpen(false);
+  };
+
+  const save = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase.from("library_prompts").insert({
-        title: form.title,
-        category: form.category || null,
-        body: form.body,
-        created_by: user?.id ?? null,
-      });
+      const payload = { title: form.title, category: form.category || null, body: form.body };
+      const { error } = editing
+        ? await supabase.from("library_prompts").update(payload).eq("id", editing)
+        : await supabase.from("library_prompts").insert({ ...payload, created_by: user?.id ?? null });
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("Prompt saved");
-      setForm(EMPTY);
-      setOpen(false);
+      toast.success(editing ? "Prompt updated" : "Prompt saved");
+      closeForm();
       qc.invalidateQueries({ queryKey: ["library-prompts"] });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -78,6 +89,15 @@ function LibraryPrompts() {
   };
 
   const visible = prompts.filter((p) => matches(q, p.title, p.category, p.body));
+  const { list, dragId, dragProps } = useDragOrder(visible, (ids) => {
+    void saveOrder("library_prompts", ids).then(() => qc.invalidateQueries({ queryKey: ["library-prompts"] }));
+  });
+
+  const startEdit = (p: (typeof prompts)[number]) => {
+    setForm({ title: p.title, category: p.category ?? "", body: p.body });
+    setEditing(p.id);
+    setOpen(true);
+  };
 
   return (
     <>
@@ -88,7 +108,7 @@ function LibraryPrompts() {
             <SearchInput value={q} onChange={setQ} placeholder="Search prompts…" className="sm:w-56" />
             <button
               type="button"
-              onClick={() => setOpen((v) => !v)}
+              onClick={() => (open ? closeForm() : setOpen(true))}
               className="gradient-leaf inline-flex h-9 items-center gap-1.5 rounded-md px-3 text-sm font-semibold text-primary-foreground"
             >
               <Plus className="size-4" /> {open ? "Close" : "New prompt"}
@@ -121,26 +141,34 @@ function LibraryPrompts() {
             />
             <button
               type="button"
-              onClick={() => create.mutate()}
-              disabled={!form.title || !form.body || create.isPending}
+              onClick={() => save.mutate()}
+              disabled={!form.title || !form.body || save.isPending}
               className="mt-3 h-9 rounded-md bg-primary px-4 text-sm font-semibold text-primary-foreground disabled:opacity-50"
             >
-              {create.isPending ? "Saving…" : "Save prompt"}
+              {save.isPending ? "Saving…" : editing ? "Update prompt" : "Save prompt"}
             </button>
           </div>
         ) : null}
 
         {isLoading ? (
           <Empty>Loading…</Empty>
-        ) : visible.length === 0 ? (
+        ) : list.length === 0 ? (
           <Empty>No prompts saved yet.</Empty>
         ) : (
           <div className="space-y-2">
-            {visible.map((p) => {
+            {list.map((p) => {
               const isOpen = expanded === p.id;
               return (
-                <div key={p.id} className="overflow-hidden rounded-xl border border-border bg-card">
-                  <div className="flex items-center gap-2 p-3">
+                <div
+                  key={p.id}
+                  {...dragProps(p.id)}
+                  className={cn(
+                    "group overflow-hidden rounded-xl border border-border bg-card transition",
+                    dragId === p.id && "opacity-50 ring-2 ring-primary/40",
+                  )}
+                >
+                  <div className="flex items-center gap-1.5 p-3">
+                    <GripVertical className="size-4 shrink-0 cursor-grab text-muted-foreground/40 opacity-0 transition-opacity group-hover:opacity-100" />
                     <button
                       type="button"
                       onClick={() => setExpanded(isOpen ? null : p.id)}
@@ -162,8 +190,16 @@ function LibraryPrompts() {
                     </button>
                     <button
                       type="button"
+                      onClick={() => startEdit(p)}
+                      className="inline-flex size-8 shrink-0 items-center justify-center rounded-md text-muted-foreground opacity-0 transition hover:bg-secondary hover:text-foreground group-hover:opacity-100"
+                      aria-label="Edit prompt"
+                    >
+                      <Pencil className="size-3.5" />
+                    </button>
+                    <button
+                      type="button"
                       onClick={() => remove.mutate(p.id)}
-                      className="inline-flex size-8 shrink-0 items-center justify-center rounded-md text-destructive hover:bg-destructive/10"
+                      className="inline-flex size-8 shrink-0 items-center justify-center rounded-md text-destructive opacity-0 transition hover:bg-destructive/10 group-hover:opacity-100"
                       aria-label="Remove prompt"
                     >
                       <Trash2 className="size-3.5" />

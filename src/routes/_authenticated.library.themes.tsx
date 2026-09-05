@@ -1,13 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { Copy, Download, ExternalLink, Plus, Trash2, X } from "lucide-react";
+import { Copy, Download, ExternalLink, GripVertical, Pencil, Plus, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import { Empty, Panel } from "@/components/dash";
 import { SearchInput, matches } from "@/components/search";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { copyImage, downloadUrl, removeFromLibrary, signedUrl, uploadToLibrary } from "@/lib/library";
+import { useDragOrder } from "@/hooks/useDragOrder";
+import { copyImage, downloadUrl, removeFromLibrary, saveOrder, signedUrl, uploadToLibrary } from "@/lib/library";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/library/themes")({
   head: () => ({
@@ -31,11 +33,18 @@ function LibraryThemes() {
   const [form, setForm] = useState(EMPTY);
   const [file, setFile] = useState<File | null>(null);
   const [zoom, setZoom] = useState<{ url: string; title: string } | null>(null);
+  const [editing, setEditing] = useState<string | null>(null);
 
   const { data: themes = [], isLoading } = useQuery({
     queryKey: ["library-themes"],
     queryFn: async () =>
-      (await supabase.from("library_themes").select("*").order("created_at", { ascending: false })).data ?? [],
+      (
+        await supabase
+          .from("library_themes")
+          .select("*")
+          .order("sort_order", { ascending: true })
+          .order("created_at", { ascending: false })
+      ).data ?? [],
   });
 
   const { data: urls = {} } = useQuery({
@@ -49,24 +58,37 @@ function LibraryThemes() {
     },
   });
 
+  const closeForm = () => {
+    setForm(EMPTY);
+    setFile(null);
+    setEditing(null);
+    setOpen(false);
+  };
+
   const create = useMutation({
     mutationFn: async () => {
+      const base = { title: form.title, notes: form.notes || null, source_url: form.source_url || null };
+      if (editing) {
+        const image_path = file ? await uploadToLibrary("themes", file) : null;
+        const { error } = await supabase
+          .from("library_themes")
+          .update(image_path ? { ...base, image_path } : base)
+          .eq("id", editing);
+        if (error) throw error;
+        return;
+      }
       if (!file) throw new Error("Pick an image first");
       const image_path = await uploadToLibrary("themes", file);
       const { error } = await supabase.from("library_themes").insert({
-        title: form.title,
-        notes: form.notes || null,
-        source_url: form.source_url || null,
+        ...base,
         image_path,
         created_by: user?.id ?? null,
       });
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("Theme saved");
-      setForm(EMPTY);
-      setFile(null);
-      setOpen(false);
+      toast.success(editing ? "Theme updated" : "Theme saved");
+      closeForm();
       qc.invalidateQueries({ queryKey: ["library-themes"] });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -93,6 +115,16 @@ function LibraryThemes() {
   }, [zoom]);
 
   const visible = themes.filter((t) => matches(q, t.title, t.notes, t.source_url));
+  const { list, dragId, dragProps } = useDragOrder(visible, (ids) => {
+    void saveOrder("library_themes", ids).then(() => qc.invalidateQueries({ queryKey: ["library-themes"] }));
+  });
+
+  const startEdit = (t: (typeof themes)[number]) => {
+    setForm({ title: t.title, notes: t.notes ?? "", source_url: t.source_url ?? "" });
+    setFile(null);
+    setEditing(t.id);
+    setOpen(true);
+  };
 
   return (
     <>
@@ -103,7 +135,7 @@ function LibraryThemes() {
             <SearchInput value={q} onChange={setQ} placeholder="Search themes…" className="sm:w-56" />
             <button
               type="button"
-              onClick={() => setOpen((v) => !v)}
+              onClick={() => (open ? closeForm() : setOpen(true))}
               className="gradient-leaf inline-flex h-9 items-center gap-1.5 rounded-md px-3 text-sm font-semibold text-primary-foreground"
             >
               <Plus className="size-4" /> {open ? "Close" : "New theme"}
@@ -143,10 +175,10 @@ function LibraryThemes() {
             <button
               type="button"
               onClick={() => create.mutate()}
-              disabled={!form.title || !file || create.isPending}
+              disabled={!form.title || (!file && !editing) || create.isPending}
               className="mt-3 h-9 rounded-md bg-primary px-4 text-sm font-semibold text-primary-foreground disabled:opacity-50"
             >
-              {create.isPending ? "Uploading…" : "Save theme"}
+              {create.isPending ? "Uploading…" : editing ? "Update theme" : "Save theme"}
             </button>
           </div>
         ) : null}
@@ -157,13 +189,30 @@ function LibraryThemes() {
           <Empty>No themes yet. Upload the first screenshot.</Empty>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-            {visible.map((t) => {
+            {list.map((t) => {
               const url = urls[t.id] ?? null;
               return (
                 <figure
                   key={t.id}
-                  className="group relative overflow-hidden rounded-xl border border-border bg-card shadow-[var(--shadow-soft)]"
+                  {...dragProps(t.id)}
+                  className={cn(
+                    "group relative overflow-hidden rounded-xl border border-border bg-card shadow-[var(--shadow-soft)]",
+                    dragId === t.id && "opacity-50 ring-2 ring-primary/40",
+                  )}
                 >
+                  <div className="pointer-events-none absolute right-2 top-2 z-10 flex items-center gap-1 opacity-0 transition-opacity group-hover:pointer-events-auto group-hover:opacity-100">
+                    <button
+                      type="button"
+                      onClick={() => startEdit(t)}
+                      className="inline-flex size-7 items-center justify-center rounded-md bg-white/90 text-black"
+                      aria-label="Edit theme"
+                    >
+                      <Pencil className="size-3.5" />
+                    </button>
+                    <span className="inline-flex size-7 cursor-grab items-center justify-center rounded-md bg-white/90 text-black">
+                      <GripVertical className="size-3.5" />
+                    </span>
+                  </div>
                   <button
                     type="button"
                     onClick={() => url && setZoom({ url, title: t.title })}
