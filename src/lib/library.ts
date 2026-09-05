@@ -49,3 +49,11 @@ export function downloadUrl(url: string, filename: string) {
   a.click();
   a.remove();
 }
+
+/** Persists a new manual order for a library table. */
+export async function saveOrder(
+  table: "library_skills" | "library_themes" | "library_prompts",
+  ids: string[],
+) {
+  await Promise.all(ids.map((id, i) => supabase.from(table).update({ sort_order: i }).eq("id", id)));
+}
