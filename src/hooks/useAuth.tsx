@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
+import { canAccess } from "@/lib/access";
 
 export type AppRole = "admin" | "sales" | "dev" | "support";
 
@@ -10,6 +11,9 @@ type AuthState = {
   role: AppRole | null;
   memberId: string | null;
   loading: boolean;
+  active: boolean;
+  denied: Set<string>;
+  can: (pageKey: string) => boolean;
   signOut: () => Promise<void>;
 };
 
@@ -19,6 +23,9 @@ const AuthContext = createContext<AuthState>({
   role: null,
   memberId: null,
   loading: true,
+  active: true,
+  denied: new Set<string>(),
+  can: () => true,
   signOut: async () => {},
 });
 
@@ -26,6 +33,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [role, setRole] = useState<AppRole | null>(null);
   const [memberId, setMemberId] = useState<string | null>(null);
+  const [active, setActive] = useState(true);
+  const [denied, setDenied] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -63,9 +72,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .select("id")
         .eq("user_id", session.user.id)
         .maybeSingle();
+      const { data: profileRow } = await supabase
+        .from("profiles")
+        .select("is_active")
+        .eq("id", session.user.id)
+        .maybeSingle();
+      const { data: accessRows } = await supabase
+        .from("user_page_access")
+        .select("page_key, allowed")
+        .eq("user_id", session.user.id);
       if (cancelled) return;
       setRole((bootstrapped as AppRole | null) ?? "sales");
       setMemberId(memberRow?.id ?? null);
+      setActive(profileRow?.is_active ?? true);
+      setDenied(new Set((accessRows ?? []).filter((r) => !r.allowed).map((r) => r.page_key)));
       setLoading(false);
     })();
     return () => {
@@ -79,6 +99,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     role,
     memberId,
     loading,
+    active,
+    denied,
+    can: (pageKey: string) => canAccess(pageKey, role, denied),
     signOut: async () => {
       await supabase.auth.signOut();
     },
