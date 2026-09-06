@@ -153,9 +153,9 @@
 
 .dark {
   /* FlowSync-inspired: near-black canvas, high-contrast green accents */
-  --leaf: oklch(0.78 0.19 148);
-  --leaf-deep: oklch(0.6 0.16 150);
-  --leaf-soft: oklch(0.86 0.14 148);
+  --leaf: oklch(0.705 0.136 152.8);
+  --leaf-deep: oklch(0.575 0.115 152.8);
+  --leaf-soft: oklch(0.82 0.1 152.8);
   --mist: oklch(0.32 0.05 150);
   --background: oklch(0.155 0.008 150);
   --foreground: oklch(0.97 0.008 120);
