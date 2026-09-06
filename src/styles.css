@@ -153,9 +153,9 @@
 
 .dark {
   /* FlowSync-inspired: near-black canvas, high-contrast green accents */
-  --leaf: oklch(0.78 0.19 148);
-  --leaf-deep: oklch(0.6 0.16 150);
-  --leaf-soft: oklch(0.86 0.14 148);
+  --leaf: oklch(0.705 0.136 152.8);
+  --leaf-deep: oklch(0.575 0.115 152.8);
+  --leaf-soft: oklch(0.82 0.1 152.8);
   --mist: oklch(0.32 0.05 150);
   --background: oklch(0.155 0.008 150);
   --foreground: oklch(0.97 0.008 120);
@@ -163,7 +163,7 @@
   --card-foreground: oklch(0.97 0.008 120);
   --popover: oklch(0.2 0.011 152);
   --popover-foreground: oklch(0.97 0.008 120);
-  --primary: oklch(0.78 0.19 148);
+  --primary: oklch(0.705 0.136 152.8);
   --primary-foreground: oklch(0.16 0.02 150);
   --secondary: oklch(0.245 0.018 152);
   --secondary-foreground: oklch(0.95 0.015 120);
@@ -173,12 +173,12 @@
   --accent-foreground: oklch(0.95 0.02 130);
   --border: oklch(1 0 0 / 9%);
   --input: oklch(1 0 0 / 14%);
-  --ring: oklch(0.78 0.19 148);
+  --ring: oklch(0.705 0.136 152.8);
   --canvas: oklch(0.135 0.007 150);
 
-  --chart-1: oklch(0.78 0.19 148);
-  --chart-2: oklch(0.62 0.14 150);
-  --chart-3: oklch(0.86 0.12 148);
+  --chart-1: oklch(0.705 0.136 152.8);
+  --chart-2: oklch(0.6 0.11 152);
+  --chart-3: oklch(0.82 0.1 152.8);
   --chart-4: oklch(0.42 0.07 152);
   --chart-5: oklch(0.8 0.13 90);
 
@@ -191,9 +191,9 @@
 
   --nav: oklch(0.215 0.014 152);
   --nav-foreground: oklch(0.93 0.01 125);
-  --nav-active: oklch(0.78 0.19 148);
+  --nav-active: oklch(0.705 0.136 152.8);
 
-  --gradient-leaf: linear-gradient(135deg, oklch(0.82 0.19 150), oklch(0.66 0.17 147));
+  --gradient-leaf: linear-gradient(135deg, oklch(0.75 0.135 155), oklch(0.62 0.125 150));
   --gradient-rail: linear-gradient(
     170deg,
     oklch(0.225 0.016 152) 0%,

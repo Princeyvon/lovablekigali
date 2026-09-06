@@ -157,6 +157,9 @@ export type Database = {
         Row: {
           app_status: Database["public"]["Enums"]["app_status"]
           app_url: string | null
+          build_stage: Database["public"]["Enums"]["build_stage"]
+          build_started_at: string | null
+          built_by: string | null
           business_name: string
           contact_email: string | null
           contact_name: string | null
@@ -165,6 +168,8 @@ export type Database = {
           id: string
           industry: string | null
           onboarded_by: string | null
+          project_name: string | null
+          shipped_at: string | null
           signed_date: string
           status: Database["public"]["Enums"]["client_status"]
           suspended_at: string | null
@@ -173,6 +178,9 @@ export type Database = {
         Insert: {
           app_status?: Database["public"]["Enums"]["app_status"]
           app_url?: string | null
+          build_stage?: Database["public"]["Enums"]["build_stage"]
+          build_started_at?: string | null
+          built_by?: string | null
           business_name: string
           contact_email?: string | null
           contact_name?: string | null
@@ -181,6 +189,8 @@ export type Database = {
           id?: string
           industry?: string | null
           onboarded_by?: string | null
+          project_name?: string | null
+          shipped_at?: string | null
           signed_date?: string
           status?: Database["public"]["Enums"]["client_status"]
           suspended_at?: string | null
@@ -189,6 +199,9 @@ export type Database = {
         Update: {
           app_status?: Database["public"]["Enums"]["app_status"]
           app_url?: string | null
+          build_stage?: Database["public"]["Enums"]["build_stage"]
+          build_started_at?: string | null
+          built_by?: string | null
           business_name?: string
           contact_email?: string | null
           contact_name?: string | null
@@ -197,12 +210,21 @@ export type Database = {
           id?: string
           industry?: string | null
           onboarded_by?: string | null
+          project_name?: string | null
+          shipped_at?: string | null
           signed_date?: string
           status?: Database["public"]["Enums"]["client_status"]
           suspended_at?: string | null
           suspension_reason?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "clients_built_by_fkey"
+            columns: ["built_by"]
+            isOneToOne: false
+            referencedRelation: "team_members"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "clients_onboarded_by_fkey"
             columns: ["onboarded_by"]
@@ -444,7 +466,8 @@ export type Database = {
           created_at: string
           created_by: string | null
           id: string
-          image_path: string
+          image_path: string | null
+          image_url: string | null
           notes: string | null
           sort_order: number
           source_url: string | null
@@ -454,7 +477,8 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           id?: string
-          image_path: string
+          image_path?: string | null
+          image_url?: string | null
           notes?: string | null
           sort_order?: number
           source_url?: string | null
@@ -464,7 +488,8 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           id?: string
-          image_path?: string
+          image_path?: string | null
+          image_url?: string | null
           notes?: string | null
           sort_order?: number
           source_url?: string | null
@@ -574,6 +599,7 @@ export type Database = {
           email: string | null
           full_name: string | null
           id: string
+          is_active: boolean
           job_title: string | null
           phone: string | null
           username: string | null
@@ -584,6 +610,7 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           id: string
+          is_active?: boolean
           job_title?: string | null
           phone?: string | null
           username?: string | null
@@ -594,6 +621,7 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           id?: string
+          is_active?: boolean
           job_title?: string | null
           phone?: string | null
           username?: string | null
@@ -913,6 +941,33 @@ export type Database = {
         }
         Relationships: []
       }
+      user_page_access: {
+        Row: {
+          allowed: boolean
+          created_at: string
+          id: string
+          page_key: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          allowed?: boolean
+          created_at?: string
+          id?: string
+          page_key: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          allowed?: boolean
+          created_at?: string
+          id?: string
+          page_key?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string
@@ -985,6 +1040,7 @@ export type Database = {
     Enums: {
       app_role: "admin" | "sales" | "dev" | "support"
       app_status: "Live" | "Suspended" | "Closed"
+      build_stage: "Planning" | "Building" | "Testing" | "Shipped"
       client_status: "Active" | "Paused" | "Churned"
       commission_status: "Pending" | "Paid"
       commission_type: "Signing Bonus" | "Recurring %"
@@ -1123,6 +1179,7 @@ export const Constants = {
     Enums: {
       app_role: ["admin", "sales", "dev", "support"],
       app_status: ["Live", "Suspended", "Closed"],
+      build_stage: ["Planning", "Building", "Testing", "Shipped"],
       client_status: ["Active", "Paused", "Churned"],
       commission_status: ["Pending", "Paid"],
       commission_type: ["Signing Bonus", "Recurring %"],
