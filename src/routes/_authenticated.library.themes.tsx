@@ -23,7 +23,7 @@ export const Route = createFileRoute("/_authenticated/library/themes")({
   component: LibraryThemes,
 });
 
-const EMPTY = { title: "", notes: "", source_url: "" };
+const EMPTY = { title: "", notes: "", source_url: "", image_url: "" };
 
 function LibraryThemes() {
   const qc = useQueryClient();
@@ -52,7 +52,7 @@ function LibraryThemes() {
     enabled: themes.length > 0,
     queryFn: async () => {
       const entries = await Promise.all(
-        themes.map(async (t) => [t.id, await signedUrl(t.image_path)] as const),
+        themes.map(async (t) => [t.id, t.image_url ?? (await signedUrl(t.image_path))] as const),
       );
       return Object.fromEntries(entries) as Record<string, string | null>;
     },
@@ -67,7 +67,12 @@ function LibraryThemes() {
 
   const create = useMutation({
     mutationFn: async () => {
-      const base = { title: form.title, notes: form.notes || null, source_url: form.source_url || null };
+      const base = {
+        title: form.title,
+        notes: form.notes || null,
+        source_url: form.source_url || null,
+        image_url: form.image_url.trim() || null,
+      };
       if (editing) {
         const image_path = file ? await uploadToLibrary("themes", file) : null;
         const { error } = await supabase
@@ -77,8 +82,8 @@ function LibraryThemes() {
         if (error) throw error;
         return;
       }
-      if (!file) throw new Error("Pick an image first");
-      const image_path = await uploadToLibrary("themes", file);
+      if (!file && !form.image_url.trim()) throw new Error("Upload an image or paste an image link");
+      const image_path = file ? await uploadToLibrary("themes", file) : null;
       const { error } = await supabase.from("library_themes").insert({
         ...base,
         image_path,
@@ -96,7 +101,7 @@ function LibraryThemes() {
 
   const remove = useMutation({
     mutationFn: async (row: (typeof themes)[number]) => {
-      await removeFromLibrary(row.image_path);
+      if (row.image_path) await removeFromLibrary(row.image_path);
       const { error } = await supabase.from("library_themes").delete().eq("id", row.id);
       if (error) throw error;
     },
@@ -120,7 +125,12 @@ function LibraryThemes() {
   });
 
   const startEdit = (t: (typeof themes)[number]) => {
-    setForm({ title: t.title, notes: t.notes ?? "", source_url: t.source_url ?? "" });
+    setForm({
+      title: t.title,
+      notes: t.notes ?? "",
+      source_url: t.source_url ?? "",
+      image_url: t.image_url ?? "",
+    });
     setFile(null);
     setEditing(t.id);
     setOpen(true);
@@ -159,6 +169,12 @@ function LibraryThemes() {
                 className="h-9 rounded-md border border-input bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring/40"
               />
               <input
+                value={form.image_url}
+                onChange={(e) => setForm({ ...form, image_url: e.target.value })}
+                placeholder="Paste image link (https://…)"
+                className="h-9 rounded-md border border-input bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring/40"
+              />
+              <input
                 type="file"
                 accept="image/*"
                 onChange={(e) => setFile(e.target.files?.[0] ?? null)}
@@ -175,7 +191,7 @@ function LibraryThemes() {
             <button
               type="button"
               onClick={() => create.mutate()}
-              disabled={!form.title || (!file && !editing) || create.isPending}
+              disabled={!form.title || (!file && !form.image_url.trim() && !editing) || create.isPending}
               className="mt-3 h-9 rounded-md bg-primary px-4 text-sm font-semibold text-primary-foreground disabled:opacity-50"
             >
               {create.isPending ? "Uploading…" : editing ? "Update theme" : "Save theme"}

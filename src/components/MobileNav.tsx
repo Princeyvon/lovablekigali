@@ -4,7 +4,6 @@ import { useQuery } from "@tanstack/react-query";
 import {
   Bell,
   BookMarked,
-  CreditCard,
   Gauge,
   LogOut,
   Moon,
@@ -24,20 +23,23 @@ import { cn } from "@/lib/utils";
 
 const TABS = [
   { to: "/dashboard", label: "Dashboard", icon: Gauge, match: ["/dashboard"] },
-  { to: "/prospects", label: "Sales", icon: UserSquare2, match: ["/prospects", "/clients"] },
-  { to: "/billing", label: "Billing", icon: CreditCard, match: ["/billing"] },
+  { to: "/prospects", label: "Sales", icon: UserSquare2, match: ["/prospects", "/clients", "/billing"] },
   { to: "/apps", label: "Apps", icon: ShieldAlert, match: ["/apps"] },
+  { to: "/library/skills", label: "Library", icon: BookMarked, match: ["/library"] },
   { to: "/finance/team", label: "Finance", icon: Wallet, match: ["/finance"] },
 ] as const;
 
 export const SALES_TABS = [
   { to: "/prospects", label: "Prospects" },
   { to: "/clients", label: "Clients" },
+  { to: "/billing", label: "Billing" },
 ] as const;
 
 export function useIsSalesSection() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  return pathname.startsWith("/prospects") || pathname.startsWith("/clients");
+  return (
+    pathname.startsWith("/prospects") || pathname.startsWith("/clients") || pathname.startsWith("/billing")
+  );
 }
 
 export function SalesSubTabs() {
