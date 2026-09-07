@@ -297,7 +297,14 @@ function AccessAdmin() {
                   <div className="space-y-1.5">
                     {pages.map((page) => {
                       const locked = page.adminOnly || ALWAYS_ALLOWED.has(page.key);
-                      const allowed = currentRole === "admin" || locked ? !page.adminOnly || currentRole === "admin" : !denied.has(page.key);
+                      const allowed =
+                        currentRole === "admin"
+                          ? true
+                          : page.adminOnly
+                            ? false
+                            : ALWAYS_ALLOWED.has(page.key)
+                              ? true
+                              : !denied.has(page.key);
                       return (
                         <button
                           key={page.key}
