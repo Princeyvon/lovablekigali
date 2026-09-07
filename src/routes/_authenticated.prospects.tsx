@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
+import { PhoneInput } from "@/components/PhoneInput";
 import { FilterSelect, SearchInput, matches, uniqueOptions } from "@/components/search";
 import { Empty, Panel, Pill } from "@/components/dash";
 import { supabase } from "@/integrations/supabase/client";
@@ -109,7 +110,7 @@ function Prospects() {
       {open && (
         <Panel title="Add prospect">
           <div className="grid gap-3 md:grid-cols-3">
-            {(["business_name", "contact_name", "contact_email", "contact_phone", "source"] as const).map((k) => (
+            {(["business_name", "contact_name", "contact_email", "source"] as const).map((k) => (
               <input
                 key={k}
                 value={form[k]}
@@ -118,6 +119,10 @@ function Prospects() {
                 className="rounded-xl border border-input bg-background px-3 py-2 text-sm capitalize outline-none focus:ring-2 focus:ring-ring"
               />
             ))}
+            <PhoneInput
+              value={form.contact_phone}
+              onChange={(v) => setForm({ ...form, contact_phone: v })}
+            />
             <select
               value={SECTORS.includes(form.industry as (typeof SECTORS)[number]) || form.industry === "" ? form.industry : "__other"}
               onChange={(e) => {
