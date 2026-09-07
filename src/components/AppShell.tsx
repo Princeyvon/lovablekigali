@@ -1,11 +1,9 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
   BookMarked,
-  CreditCard,
   Gauge,
   LogOut,
   ShieldAlert,
-  ShieldCheck,
   UserSquare2,
   Wallet,
 } from "lucide-react";
@@ -40,7 +38,7 @@ function NavGroup({ label, items, pathname }: { label: string; items: readonly {
               : item.to.startsWith("/admin")
                 ? ["/admin"]
                 : item.to === "/prospects"
-                  ? ["/prospects", "/clients"]
+                  ? ["/prospects", "/clients", "/billing"]
                   : [item.to];
           const active = sections.some((s) => pathname === s || pathname.startsWith(s + "/"));
           return (
@@ -100,7 +98,6 @@ export function AppShell({
           <div className="flex-1 overflow-y-auto">
             <NavGroup label="Manage" items={manage} pathname={pathname} />
             <NavGroup label="Operate" items={operate} pathname={pathname} />
-            {role === "admin" ? <NavGroup label="Admin" items={adminOnly} pathname={pathname} /> : null}
           </div>
           <div className="mx-3 mt-4 overflow-hidden rounded-2xl bg-white/5 p-4">
             <p className="text-sm font-semibold text-sidebar-foreground">
