@@ -53,6 +53,10 @@ function Apps() {
     queryKey: ["subs"],
     queryFn: async () => (await supabase.from("subscriptions").select("*")).data ?? [],
   });
+  const { data: accounts = [] } = useQuery({
+    queryKey: ["lovable-accounts"],
+    queryFn: async () => (await supabase.from("lovable_accounts").select("*").order("email")).data ?? [],
+  });
   const { data: reminders = [] } = useQuery({
     queryKey: ["reminders"],
     queryFn: async () =>
@@ -155,12 +159,53 @@ function Apps() {
         </div>
       }
     >
+      <SubTabs tabs={APP_TABS} />
+
       <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-2 xl:grid-cols-4">
         <Stat label="Live apps" value={String(rows.filter((r) => r.app_status === "Live").length)} tone="leaf" />
         <Stat label="In grace period" value={String(inGrace.length)} hint="Overdue, still running" tone="mist" />
         <Stat label="Eligible for shutdown" value={String(atRisk.length)} hint={`>${GRACE_DAYS} days past due`} tone="deep" />
         <Stat label="Revenue paused" value={money(lostRevenue)} hint="MRR of switched-off apps" tone="leaf" />
       </div>
+
+      <Panel title="Build pipeline" right={<Pill tone="mist">{visible.length}</Pill>}>
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          {(["Planning", "Building", "Testing", "Shipped"] as const).map((stage) => {
+            const list = visible.filter((r) => r.build_stage === stage);
+            return (
+              <div key={stage} className="rounded-2xl border border-border bg-card/60 p-3">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm font-semibold">{stage}</p>
+                  <Pill tone={stage === "Shipped" ? "leaf" : "mist"}>{list.length}</Pill>
+                </div>
+                <div className="mt-3 space-y-2">
+                  {list.length === 0 ? (
+                    <p className="text-xs text-muted-foreground">Nothing here.</p>
+                  ) : (
+                    list.slice(0, 6).map((r) => (
+                      <Link
+                        key={r.id}
+                        to="/clients/$id"
+                        params={{ id: r.id }}
+                        className="block rounded-xl border border-border/70 px-3 py-2 text-xs transition hover:bg-secondary"
+                      >
+                        <span className="block truncate font-medium">{r.project_name || r.business_name}</span>
+                        <span className="numeric block text-muted-foreground">
+                          {r.overdue ? `${r.daysOverdue}d overdue` : r.through ? `next due ${fmtDate(r.through)}` : "not billed yet"}
+                          {r.hosting_account_id
+                            ? ` · ${accounts.find((a) => a.id === r.hosting_account_id)?.email ?? "account"}`
+                            : ""}
+                        </span>
+                      </Link>
+                    ))
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </Panel>
+
 
       <Panel title="Closed for unpaid invoices" right={<Pill tone="warn">{suspended.length}</Pill>}>
         {suspended.length === 0 ? (
