@@ -165,6 +165,7 @@ export type Database = {
           contact_name: string | null
           contact_phone: string | null
           created_at: string
+          hosting_account_id: string | null
           id: string
           industry: string | null
           onboarded_by: string | null
@@ -186,6 +187,7 @@ export type Database = {
           contact_name?: string | null
           contact_phone?: string | null
           created_at?: string
+          hosting_account_id?: string | null
           id?: string
           industry?: string | null
           onboarded_by?: string | null
@@ -207,6 +209,7 @@ export type Database = {
           contact_name?: string | null
           contact_phone?: string | null
           created_at?: string
+          hosting_account_id?: string | null
           id?: string
           industry?: string | null
           onboarded_by?: string | null
@@ -223,6 +226,13 @@ export type Database = {
             columns: ["built_by"]
             isOneToOne: false
             referencedRelation: "team_members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "clients_hosting_account_id_fkey"
+            columns: ["hosting_account_id"]
+            isOneToOne: false
+            referencedRelation: "lovable_accounts"
             referencedColumns: ["id"]
           },
           {
@@ -497,6 +507,51 @@ export type Database = {
         }
         Relationships: []
       }
+      lovable_accounts: {
+        Row: {
+          created_at: string
+          credits_checked_at: string | null
+          credits_remaining: number
+          email: string
+          encrypted_password: string | null
+          id: string
+          is_active: boolean
+          label: string | null
+          notes: string | null
+          plan: string | null
+          recovery_email: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          credits_checked_at?: string | null
+          credits_remaining?: number
+          email: string
+          encrypted_password?: string | null
+          id?: string
+          is_active?: boolean
+          label?: string | null
+          notes?: string | null
+          plan?: string | null
+          recovery_email?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          credits_checked_at?: string | null
+          credits_remaining?: number
+          email?: string
+          encrypted_password?: string | null
+          id?: string
+          is_active?: boolean
+          label?: string | null
+          notes?: string | null
+          plan?: string | null
+          recovery_email?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       payment_reminders: {
         Row: {
           channel: string
@@ -627,6 +682,61 @@ export type Database = {
           username?: string | null
         }
         Relationships: []
+      }
+      project_transfers: {
+        Row: {
+          client_id: string
+          created_at: string
+          from_account_id: string | null
+          id: string
+          moved_at: string
+          moved_by: string | null
+          note: string | null
+          to_account_id: string | null
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          from_account_id?: string | null
+          id?: string
+          moved_at?: string
+          moved_by?: string | null
+          note?: string | null
+          to_account_id?: string | null
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          from_account_id?: string | null
+          id?: string
+          moved_at?: string
+          moved_by?: string | null
+          note?: string | null
+          to_account_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_transfers_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_transfers_from_account_id_fkey"
+            columns: ["from_account_id"]
+            isOneToOne: false
+            referencedRelation: "lovable_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_transfers_to_account_id_fkey"
+            columns: ["to_account_id"]
+            isOneToOne: false
+            referencedRelation: "lovable_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       prospects: {
         Row: {
