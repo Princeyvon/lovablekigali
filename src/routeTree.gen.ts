@@ -27,6 +27,7 @@ import { Route as AuthenticatedTeamRouteImport } from './routes/_authenticated.t
 import { Route as AuthenticatedAdminAccessRouteImport } from './routes/_authenticated.admin.access'
 import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authenticated.admin.audit'
 import { Route as AuthenticatedAppsIndexRouteImport } from './routes/_authenticated.apps.index'
+import { Route as AuthenticatedAppsEmailsRouteImport } from './routes/_authenticated.apps.emails'
 import { Route as AuthenticatedClientsIndexRouteImport } from './routes/_authenticated.clients.index'
 import { Route as AuthenticatedClientsIdRouteImport } from './routes/_authenticated.clients.$id'
 import { Route as AuthenticatedFinanceIndexRouteImport } from './routes/_authenticated.finance.index'
@@ -132,6 +133,11 @@ const AuthenticatedAppsIndexRoute = AuthenticatedAppsIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedAppsRoute,
 } as any)
+const AuthenticatedAppsEmailsRoute = AuthenticatedAppsEmailsRouteImport.update({
+  id: '/emails',
+  path: '/emails',
+  getParentRoute: () => AuthenticatedAppsRoute,
+} as any)
 const AuthenticatedClientsIndexRoute =
   AuthenticatedClientsIndexRouteImport.update({
     id: '/clients/',
@@ -227,6 +233,7 @@ export interface FileRoutesByFullPath {
   '/team': typeof AuthenticatedTeamRoute
   '/admin/access': typeof AuthenticatedAdminAccessRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
+  '/apps/emails': typeof AuthenticatedAppsEmailsRoute
   '/clients/$id': typeof AuthenticatedClientsIdRoute
   '/finance/analytics': typeof AuthenticatedFinanceAnalyticsRoute
   '/finance/expenses': typeof AuthenticatedFinanceExpensesRoute
@@ -256,6 +263,7 @@ export interface FileRoutesByTo {
   '/team': typeof AuthenticatedTeamRoute
   '/admin/access': typeof AuthenticatedAdminAccessRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
+  '/apps/emails': typeof AuthenticatedAppsEmailsRoute
   '/clients/$id': typeof AuthenticatedClientsIdRoute
   '/finance/analytics': typeof AuthenticatedFinanceAnalyticsRoute
   '/finance/expenses': typeof AuthenticatedFinanceExpensesRoute
@@ -290,6 +298,7 @@ export interface FileRoutesById {
   '/_authenticated/team': typeof AuthenticatedTeamRoute
   '/_authenticated/admin/access': typeof AuthenticatedAdminAccessRoute
   '/_authenticated/admin/audit': typeof AuthenticatedAdminAuditRoute
+  '/_authenticated/apps/emails': typeof AuthenticatedAppsEmailsRoute
   '/_authenticated/clients/$id': typeof AuthenticatedClientsIdRoute
   '/_authenticated/finance/analytics': typeof AuthenticatedFinanceAnalyticsRoute
   '/_authenticated/finance/expenses': typeof AuthenticatedFinanceExpensesRoute
@@ -324,6 +333,7 @@ export interface FileRouteTypes {
     | '/team'
     | '/admin/access'
     | '/admin/audit'
+    | '/apps/emails'
     | '/clients/$id'
     | '/finance/analytics'
     | '/finance/expenses'
@@ -353,6 +363,7 @@ export interface FileRouteTypes {
     | '/team'
     | '/admin/access'
     | '/admin/audit'
+    | '/apps/emails'
     | '/clients/$id'
     | '/finance/analytics'
     | '/finance/expenses'
@@ -386,6 +397,7 @@ export interface FileRouteTypes {
     | '/_authenticated/team'
     | '/_authenticated/admin/access'
     | '/_authenticated/admin/audit'
+    | '/_authenticated/apps/emails'
     | '/_authenticated/clients/$id'
     | '/_authenticated/finance/analytics'
     | '/_authenticated/finance/expenses'
@@ -537,6 +549,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppsIndexRouteImport
       parentRoute: typeof AuthenticatedAppsRoute
     }
+    '/_authenticated/apps/emails': {
+      id: '/_authenticated/apps/emails'
+      path: '/emails'
+      fullPath: '/apps/emails'
+      preLoaderRoute: typeof AuthenticatedAppsEmailsRouteImport
+      parentRoute: typeof AuthenticatedAppsRoute
+    }
     '/_authenticated/clients/': {
       id: '/_authenticated/clients/'
       path: '/clients'
@@ -632,10 +651,12 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedAppsRouteChildren {
+  AuthenticatedAppsEmailsRoute: typeof AuthenticatedAppsEmailsRoute
   AuthenticatedAppsIndexRoute: typeof AuthenticatedAppsIndexRoute
 }
 
 const AuthenticatedAppsRouteChildren: AuthenticatedAppsRouteChildren = {
+  AuthenticatedAppsEmailsRoute: AuthenticatedAppsEmailsRoute,
   AuthenticatedAppsIndexRoute: AuthenticatedAppsIndexRoute,
 }
 
