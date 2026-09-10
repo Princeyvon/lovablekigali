@@ -17,7 +17,7 @@ import {
   todayISO,
 } from "@/lib/agency";
 
-export const Route = createFileRoute("/_authenticated/apps")({
+export const Route = createFileRoute("/_authenticated/apps/")({
   head: () => ({
     meta: [
       { title: "App status — Lovable Solutions" },
