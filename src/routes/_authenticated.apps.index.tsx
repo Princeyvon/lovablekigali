@@ -5,6 +5,8 @@ import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { FilterSelect, SearchInput, matches } from "@/components/search";
 import { Empty, Panel, Pill, Stat, TD, TH, Table } from "@/components/dash";
+import { SubTabs } from "@/components/SubTabs";
+import { APP_TABS } from "@/routes/_authenticated.apps";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import {
