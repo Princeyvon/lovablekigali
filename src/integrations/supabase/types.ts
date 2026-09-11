@@ -738,10 +738,94 @@ export type Database = {
           },
         ]
       }
+      projects: {
+        Row: {
+          app_url: string | null
+          build_stage: Database["public"]["Enums"]["build_stage"]
+          built_by: string | null
+          client_id: string
+          created_at: string
+          due_at: string | null
+          hosting_account_id: string | null
+          id: string
+          notes: string | null
+          payment_state: string
+          project_name: string
+          prospect_id: string | null
+          shipped_at: string | null
+          started_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          app_url?: string | null
+          build_stage?: Database["public"]["Enums"]["build_stage"]
+          built_by?: string | null
+          client_id: string
+          created_at?: string
+          due_at?: string | null
+          hosting_account_id?: string | null
+          id?: string
+          notes?: string | null
+          payment_state?: string
+          project_name: string
+          prospect_id?: string | null
+          shipped_at?: string | null
+          started_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          app_url?: string | null
+          build_stage?: Database["public"]["Enums"]["build_stage"]
+          built_by?: string | null
+          client_id?: string
+          created_at?: string
+          due_at?: string | null
+          hosting_account_id?: string | null
+          id?: string
+          notes?: string | null
+          payment_state?: string
+          project_name?: string
+          prospect_id?: string | null
+          shipped_at?: string | null
+          started_at?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "projects_built_by_fkey"
+            columns: ["built_by"]
+            isOneToOne: false
+            referencedRelation: "team_members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "projects_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "projects_hosting_account_id_fkey"
+            columns: ["hosting_account_id"]
+            isOneToOne: false
+            referencedRelation: "lovable_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "projects_prospect_id_fkey"
+            columns: ["prospect_id"]
+            isOneToOne: false
+            referencedRelation: "prospects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       prospects: {
         Row: {
           assigned_rep: string | null
           business_name: string
+          client_id: string | null
           contact_email: string | null
           contact_name: string | null
           contact_phone: string | null
@@ -754,6 +838,7 @@ export type Database = {
         Insert: {
           assigned_rep?: string | null
           business_name: string
+          client_id?: string | null
           contact_email?: string | null
           contact_name?: string | null
           contact_phone?: string | null
@@ -766,6 +851,7 @@ export type Database = {
         Update: {
           assigned_rep?: string | null
           business_name?: string
+          client_id?: string | null
           contact_email?: string | null
           contact_name?: string | null
           contact_phone?: string | null
@@ -781,6 +867,13 @@ export type Database = {
             columns: ["assigned_rep"]
             isOneToOne: false
             referencedRelation: "team_members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "prospects_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
             referencedColumns: ["id"]
           },
         ]
