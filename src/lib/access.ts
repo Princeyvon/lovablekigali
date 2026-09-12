@@ -12,6 +12,8 @@ export const PAGES: readonly PageDef[] = [
   { key: "sales.billing", label: "Billing", path: "/billing", group: "Sales" },
 
   { key: "apps", label: "App Status", path: "/apps", group: "Delivery" },
+  { key: "apps.projects", label: "Projects", path: "/apps/projects", group: "Delivery" },
+  { key: "apps.emails", label: "Emails", path: "/apps/emails", group: "Delivery" },
 
   { key: "finance.team", label: "Team", path: "/finance/team", group: "Finance" },
   { key: "finance.transactions", label: "Transactions", path: "/finance/transactions", group: "Finance" },
