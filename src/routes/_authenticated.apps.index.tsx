@@ -40,6 +40,15 @@ function Apps() {
   const [q, setQ] = useState("");
   const [appStatus, setAppStatus] = useState("all");
   const [billing, setBilling] = useState("all");
+  const [newProject, setNewProject] = useState<{
+    open: boolean;
+    project_name: string;
+    client_id: string;
+    prospect_id: string;
+    hosting_account_id: string;
+    due_at: string;
+    app_url: string;
+  }>({ open: false, project_name: "", client_id: "", prospect_id: "", hosting_account_id: "", due_at: "", app_url: "" });
 
   const { data: clients = [] } = useQuery({
     queryKey: ["clients"],
