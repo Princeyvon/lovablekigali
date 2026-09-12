@@ -28,6 +28,7 @@ import { Route as AuthenticatedAdminAccessRouteImport } from './routes/_authenti
 import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authenticated.admin.audit'
 import { Route as AuthenticatedAppsIndexRouteImport } from './routes/_authenticated.apps.index'
 import { Route as AuthenticatedAppsEmailsRouteImport } from './routes/_authenticated.apps.emails'
+import { Route as AuthenticatedAppsProjectsRouteImport } from './routes/_authenticated.apps.projects'
 import { Route as AuthenticatedClientsIndexRouteImport } from './routes/_authenticated.clients.index'
 import { Route as AuthenticatedClientsIdRouteImport } from './routes/_authenticated.clients.$id'
 import { Route as AuthenticatedFinanceIndexRouteImport } from './routes/_authenticated.finance.index'
@@ -138,6 +139,12 @@ const AuthenticatedAppsEmailsRoute = AuthenticatedAppsEmailsRouteImport.update({
   path: '/emails',
   getParentRoute: () => AuthenticatedAppsRoute,
 } as any)
+const AuthenticatedAppsProjectsRoute =
+  AuthenticatedAppsProjectsRouteImport.update({
+    id: '/projects',
+    path: '/projects',
+    getParentRoute: () => AuthenticatedAppsRoute,
+  } as any)
 const AuthenticatedClientsIndexRoute =
   AuthenticatedClientsIndexRouteImport.update({
     id: '/clients/',
@@ -234,6 +241,7 @@ export interface FileRoutesByFullPath {
   '/admin/access': typeof AuthenticatedAdminAccessRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/apps/emails': typeof AuthenticatedAppsEmailsRoute
+  '/apps/projects': typeof AuthenticatedAppsProjectsRoute
   '/clients/$id': typeof AuthenticatedClientsIdRoute
   '/finance/analytics': typeof AuthenticatedFinanceAnalyticsRoute
   '/finance/expenses': typeof AuthenticatedFinanceExpensesRoute
@@ -264,6 +272,7 @@ export interface FileRoutesByTo {
   '/admin/access': typeof AuthenticatedAdminAccessRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/apps/emails': typeof AuthenticatedAppsEmailsRoute
+  '/apps/projects': typeof AuthenticatedAppsProjectsRoute
   '/clients/$id': typeof AuthenticatedClientsIdRoute
   '/finance/analytics': typeof AuthenticatedFinanceAnalyticsRoute
   '/finance/expenses': typeof AuthenticatedFinanceExpensesRoute
@@ -299,6 +308,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/access': typeof AuthenticatedAdminAccessRoute
   '/_authenticated/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/_authenticated/apps/emails': typeof AuthenticatedAppsEmailsRoute
+  '/_authenticated/apps/projects': typeof AuthenticatedAppsProjectsRoute
   '/_authenticated/clients/$id': typeof AuthenticatedClientsIdRoute
   '/_authenticated/finance/analytics': typeof AuthenticatedFinanceAnalyticsRoute
   '/_authenticated/finance/expenses': typeof AuthenticatedFinanceExpensesRoute
@@ -334,6 +344,7 @@ export interface FileRouteTypes {
     | '/admin/access'
     | '/admin/audit'
     | '/apps/emails'
+    | '/apps/projects'
     | '/clients/$id'
     | '/finance/analytics'
     | '/finance/expenses'
@@ -364,6 +375,7 @@ export interface FileRouteTypes {
     | '/admin/access'
     | '/admin/audit'
     | '/apps/emails'
+    | '/apps/projects'
     | '/clients/$id'
     | '/finance/analytics'
     | '/finance/expenses'
@@ -398,6 +410,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/access'
     | '/_authenticated/admin/audit'
     | '/_authenticated/apps/emails'
+    | '/_authenticated/apps/projects'
     | '/_authenticated/clients/$id'
     | '/_authenticated/finance/analytics'
     | '/_authenticated/finance/expenses'
@@ -556,6 +569,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppsEmailsRouteImport
       parentRoute: typeof AuthenticatedAppsRoute
     }
+    '/_authenticated/apps/projects': {
+      id: '/_authenticated/apps/projects'
+      path: '/projects'
+      fullPath: '/apps/projects'
+      preLoaderRoute: typeof AuthenticatedAppsProjectsRouteImport
+      parentRoute: typeof AuthenticatedAppsRoute
+    }
     '/_authenticated/clients/': {
       id: '/_authenticated/clients/'
       path: '/clients'
@@ -652,11 +672,13 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedAppsRouteChildren {
   AuthenticatedAppsEmailsRoute: typeof AuthenticatedAppsEmailsRoute
+  AuthenticatedAppsProjectsRoute: typeof AuthenticatedAppsProjectsRoute
   AuthenticatedAppsIndexRoute: typeof AuthenticatedAppsIndexRoute
 }
 
 const AuthenticatedAppsRouteChildren: AuthenticatedAppsRouteChildren = {
   AuthenticatedAppsEmailsRoute: AuthenticatedAppsEmailsRoute,
+  AuthenticatedAppsProjectsRoute: AuthenticatedAppsProjectsRoute,
   AuthenticatedAppsIndexRoute: AuthenticatedAppsIndexRoute,
 }
 

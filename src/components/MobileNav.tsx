@@ -227,13 +227,6 @@ export function ProfileBadge({ variant = "fixed" }: { variant?: "fixed" | "inlin
             >
               <UserCog className="size-4 text-muted-foreground" /> My profile
             </Link>
-            <Link
-              to="/library/skills"
-              onClick={close}
-              className="flex items-center gap-3 rounded-md px-3 py-2.5 text-sm hover:bg-secondary"
-            >
-              <BookMarked className="size-4 text-muted-foreground" /> Library
-            </Link>
             {role === "admin" ? (
               <>
                 <Link

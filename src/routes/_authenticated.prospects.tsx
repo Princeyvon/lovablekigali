@@ -85,7 +85,7 @@ function Prospects() {
           (rep === "all" || p.assigned_rep === rep) &&
           matches(q, p.business_name, p.industry, p.contact_name, p.contact_email, p.contact_phone, p.source),
       ),
-    [prospects, q, sector, rep],
+    [prospects, q, sector, rep, stage],
   );
 
   return (

@@ -2,6 +2,7 @@ import { Outlet, createFileRoute } from "@tanstack/react-router";
 
 export const APP_TABS = [
   { to: "/apps", label: "Delivery", exact: true },
+  { to: "/apps/projects", label: "Projects" },
   { to: "/apps/emails", label: "Emails" },
 ] as const;
 

@@ -25,11 +25,8 @@ const operate = [
 
 function NavGroup({ label, items, pathname }: { label: string; items: readonly { to: string; label: string; icon: typeof Gauge }[]; pathname: string }) {
   return (
-    <div className="mt-6">
-      <p className="px-4 text-[10px] font-semibold uppercase tracking-[0.18em] text-sidebar-foreground/45">
-        {label}
-      </p>
-      <nav className="mt-2 space-y-1">
+    <div className="mt-3" data-group={label}>
+      <nav className="space-y-1">
         {items.map((item) => {
           const sections = item.to.startsWith("/finance")
             ? ["/finance"]
