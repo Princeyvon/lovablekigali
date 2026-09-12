@@ -62,6 +62,15 @@ function Apps() {
     queryFn: async () =>
       (await supabase.from("payment_reminders").select("*").order("sent_at", { ascending: false })).data ?? [],
   });
+  const { data: projects = [] } = useQuery({
+    queryKey: ["projects"],
+    queryFn: async () =>
+      (await supabase.from("projects").select("*").order("created_at", { ascending: false })).data ?? [],
+  });
+  const { data: prospects = [] } = useQuery({
+    queryKey: ["prospects"],
+    queryFn: async () => (await supabase.from("prospects").select("id, business_name, client_id").order("business_name")).data ?? [],
+  });
 
   const rows = useMemo(() => {
     return clients
