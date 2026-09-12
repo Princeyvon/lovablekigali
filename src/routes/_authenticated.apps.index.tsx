@@ -149,6 +149,80 @@ function Apps() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const startProject = useMutation({
+    mutationFn: async () => {
+      const p = newProject;
+      if (!p.project_name || !p.client_id) throw new Error("Name the project and pick a client");
+      const { error } = await supabase.from("projects").insert({
+        project_name: p.project_name,
+        client_id: p.client_id,
+        prospect_id: p.prospect_id || null,
+        hosting_account_id: p.hosting_account_id || null,
+        due_at: p.due_at || null,
+        app_url: p.app_url || null,
+        started_at: todayISO(),
+        build_stage: "Planning",
+        built_by: memberId,
+      });
+      if (error) throw new Error(error.message);
+      await supabase
+        .from("clients")
+        .update({
+          project_name: p.project_name,
+          build_stage: "Planning",
+          build_started_at: todayISO(),
+          built_by: memberId,
+          ...(p.hosting_account_id ? { hosting_account_id: p.hosting_account_id } : {}),
+        })
+        .eq("id", p.client_id);
+    },
+    onSuccess: () => {
+      setNewProject({ open: false, project_name: "", client_id: "", prospect_id: "", hosting_account_id: "", due_at: "", app_url: "" });
+      toast.success("Project started");
+      qc.invalidateQueries({ queryKey: ["projects"] });
+      qc.invalidateQueries({ queryKey: ["clients"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const moveStage = useMutation({
+    mutationFn: async (v: { id: string; client_id: string | null; stage: "Planning" | "Building" | "Testing" | "Shipped" }) => {
+      const shipped = v.stage === "Shipped" ? todayISO() : null;
+      const { error } = await supabase
+        .from("projects")
+        .update({ build_stage: v.stage, shipped_at: shipped })
+        .eq("id", v.id);
+      if (error) throw new Error(error.message);
+      if (v.client_id) {
+        await supabase.from("clients").update({ build_stage: v.stage, shipped_at: shipped }).eq("id", v.client_id);
+      }
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["projects"] });
+      qc.invalidateQueries({ queryKey: ["clients"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const projectRows = useMemo(
+    () =>
+      projects
+        .map((p) => {
+          const c = clients.find((x) => x.id === p.client_id);
+          const row = rows.find((r) => r.id === p.client_id);
+          return {
+            ...p,
+            clientName: c?.business_name ?? "No client",
+            account: accounts.find((a) => a.id === p.hosting_account_id)?.email ?? null,
+            overdue: row?.overdue ?? false,
+            daysOverdue: row?.daysOverdue ?? 0,
+            through: row?.through ?? null,
+          };
+        })
+        .filter((p) => matches(q, p.project_name, p.clientName, p.account, p.payment_state)),
+    [projects, clients, rows, accounts, q],
+  );
+
   return (
     <AppShell
       title="App status"
@@ -186,10 +260,96 @@ function Apps() {
         <Stat label="Revenue paused" value={money(lostRevenue)} hint="MRR of switched-off apps" tone="leaf" />
       </div>
 
-      <Panel title="Build pipeline" right={<Pill tone="mist">{visible.length}</Pill>}>
+      <Panel
+        title="Build pipeline"
+        right={
+          <div className="flex items-center gap-2">
+            <Pill tone="mist">{projectRows.length}</Pill>
+            <button
+              onClick={() => setNewProject((s) => ({ ...s, open: !s.open }))}
+              className="gradient-leaf rounded-lg px-3 py-1.5 text-xs font-semibold text-primary-foreground"
+            >
+              {newProject.open ? "Close" : "Start project"}
+            </button>
+          </div>
+        }
+      >
+        {newProject.open ? (
+          <div className="mb-4 grid gap-2 rounded-xl border border-border p-3 md:grid-cols-3">
+            <input
+              className="rounded-lg border border-input bg-background px-3 py-2 text-sm"
+              placeholder="Project name"
+              value={newProject.project_name}
+              onChange={(e) => setNewProject({ ...newProject, project_name: e.target.value })}
+            />
+            <select
+              className="rounded-lg border border-input bg-background px-3 py-2 text-sm"
+              value={newProject.client_id}
+              onChange={(e) => setNewProject({ ...newProject, client_id: e.target.value })}
+            >
+              <option value="">Client…</option>
+              {clients.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.business_name}
+                </option>
+              ))}
+            </select>
+            <select
+              className="rounded-lg border border-input bg-background px-3 py-2 text-sm"
+              value={newProject.prospect_id}
+              onChange={(e) => {
+                const pr = prospects.find((x) => x.id === e.target.value);
+                setNewProject({
+                  ...newProject,
+                  prospect_id: e.target.value,
+                  client_id: pr?.client_id ?? newProject.client_id,
+                });
+              }}
+            >
+              <option value="">Prospect (optional)…</option>
+              {prospects.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.business_name}
+                </option>
+              ))}
+            </select>
+            <select
+              className="rounded-lg border border-input bg-background px-3 py-2 text-sm"
+              value={newProject.hosting_account_id}
+              onChange={(e) => setNewProject({ ...newProject, hosting_account_id: e.target.value })}
+            >
+              <option value="">Hosting account…</option>
+              {accounts.map((a) => (
+                <option key={a.id} value={a.id}>
+                  {a.email}
+                </option>
+              ))}
+            </select>
+            <input
+              type="date"
+              className="rounded-lg border border-input bg-background px-3 py-2 text-sm"
+              value={newProject.due_at}
+              onChange={(e) => setNewProject({ ...newProject, due_at: e.target.value })}
+            />
+            <input
+              className="rounded-lg border border-input bg-background px-3 py-2 text-sm"
+              placeholder="App URL (optional)"
+              value={newProject.app_url}
+              onChange={(e) => setNewProject({ ...newProject, app_url: e.target.value })}
+            />
+            <button
+              onClick={() => startProject.mutate()}
+              disabled={!newProject.project_name || !newProject.client_id}
+              className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground disabled:opacity-50 md:col-span-3"
+            >
+              Start project
+            </button>
+          </div>
+        ) : null}
+
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
           {(["Planning", "Building", "Testing", "Shipped"] as const).map((stage) => {
-            const list = visible.filter((r) => r.build_stage === stage);
+            const list = projectRows.filter((p) => p.build_stage === stage);
             return (
               <div key={stage} className="rounded-2xl border border-border bg-card/60 p-3">
                 <div className="flex items-center justify-between">
@@ -200,21 +360,36 @@ function Apps() {
                   {list.length === 0 ? (
                     <p className="text-xs text-muted-foreground">Nothing here.</p>
                   ) : (
-                    list.slice(0, 6).map((r) => (
-                      <Link
-                        key={r.id}
-                        to="/clients/$id"
-                        params={{ id: r.id }}
-                        className="block rounded-xl border border-border/70 px-3 py-2 text-xs transition hover:bg-secondary"
-                      >
-                        <span className="block truncate font-medium">{r.project_name || r.business_name}</span>
-                        <span className="numeric block text-muted-foreground">
-                          {r.overdue ? `${r.daysOverdue}d overdue` : r.through ? `next due ${fmtDate(r.through)}` : "not billed yet"}
-                          {r.hosting_account_id
-                            ? ` · ${accounts.find((a) => a.id === r.hosting_account_id)?.email ?? "account"}`
-                            : ""}
+                    list.map((p) => (
+                      <div key={p.id} className="rounded-xl border border-border/70 px-3 py-2 text-xs">
+                        <Link to="/apps/projects" className="block truncate font-medium hover:underline">
+                          {p.project_name}
+                        </Link>
+                        <span className="block truncate text-muted-foreground">
+                          {p.clientName}
+                          {p.account ? ` · ${p.account}` : " · no account"}
                         </span>
-                      </Link>
+                        <span className="numeric block text-muted-foreground">
+                          {p.overdue ? `${p.daysOverdue}d overdue` : p.through ? `next due ${fmtDate(p.through)}` : p.payment_state}
+                        </span>
+                        <select
+                          value={p.build_stage}
+                          onChange={(e) =>
+                            moveStage.mutate({
+                              id: p.id,
+                              client_id: p.client_id,
+                              stage: e.target.value as "Planning" | "Building" | "Testing" | "Shipped",
+                            })
+                          }
+                          className="mt-2 w-full rounded-md border border-border bg-card px-2 py-1 text-[11px]"
+                        >
+                          {(["Planning", "Building", "Testing", "Shipped"] as const).map((s) => (
+                            <option key={s} value={s}>
+                              {s}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
                     ))
                   )}
                 </div>
@@ -223,6 +398,7 @@ function Apps() {
           })}
         </div>
       </Panel>
+
 
 
       <Panel title="Closed for unpaid invoices" right={<Pill tone="warn">{suspended.length}</Pill>}>
