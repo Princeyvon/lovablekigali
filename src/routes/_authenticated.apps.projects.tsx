@@ -300,6 +300,10 @@ function Projects() {
               </div>
             </Panel>
 
+            <Panel title="Linked platform accounts" right={<Pill tone="mist">Lovable · AI Studio · Manus · GitHub</Pill>}>
+              <ProjectAccounts projectId={current.id} />
+            </Panel>
+
             <Panel title="Account history" right={<Pill tone="mist">{history.length}</Pill>}>
               {history.length === 0 ? (
                 <Empty>This project has never been moved.</Empty>
