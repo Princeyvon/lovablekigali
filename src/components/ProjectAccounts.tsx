@@ -216,7 +216,10 @@ export function ProjectAccounts({ clientId, projectId }: { clientId?: string; pr
                           <button
                             onClick={async () => {
                               const res = await reveal({ data: { id: a.id } });
-                              if (!res.password) return toast.error("No password stored for this account");
+                              if (!res.password) {
+                                toast.error("No password stored for this account");
+                                return;
+                              }
                               setRevealed((r) => ({ ...r, [a.id]: res.password }));
                             }}
                             className="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline"
