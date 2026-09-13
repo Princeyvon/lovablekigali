@@ -367,6 +367,12 @@ function ClientDetail() {
         </Panel>
       )}
 
+      {tab === "Credentials" && role !== "sales" && (
+        <Panel title="Project accounts" right={<Pill tone="mist">Lovable · AI Studio · Manus · GitHub</Pill>}>
+          <ProjectAccounts clientId={id} />
+        </Panel>
+      )}
+
       {tab === "Credentials" && (
         <Panel
           title="Credential vault"
