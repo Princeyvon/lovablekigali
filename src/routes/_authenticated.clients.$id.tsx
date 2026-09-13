@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { GRACE_DAYS, daysUntil, fmtDate, money, paidThrough } from "@/lib/agency";
 import { revealCredential, saveCredential } from "@/lib/vault.functions";
+import { ProjectAccounts } from "@/components/ProjectAccounts";
 
 const TABS = ["Overview", "Notes", "Service Log", "System Users", "Credentials", "Billing"] as const;
 
