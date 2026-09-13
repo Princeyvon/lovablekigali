@@ -39,19 +39,21 @@ export function ProjectAccounts({ clientId, projectId }: { clientId?: string; pr
   const [form, setForm] = useState(empty);
   const [revealed, setRevealed] = useState<Record<string, string>>({});
 
+  const scope = projectId ?? clientId ?? "";
   const { data: projects = [] } = useQuery({
-    queryKey: ["client-projects", clientId],
-    queryFn: async () =>
-      (await supabase
+    queryKey: ["accounts-projects", projectId, clientId],
+    queryFn: async () => {
+      const base = supabase
         .from("projects")
-        .select("id, project_name, build_stage, payment_state, app_url, hosting_account_id")
-        .eq("client_id", clientId)
-        .order("created_at", { ascending: false })).data ?? [],
+        .select("id, project_name, build_stage, payment_state, app_url, hosting_account_id");
+      const q = projectId ? base.eq("id", projectId) : base.eq("client_id", clientId!);
+      return (await q.order("created_at", { ascending: false })).data ?? [];
+    },
   });
 
   const ids = projects.map((p) => p.id);
   const { data: accounts = [] } = useQuery({
-    queryKey: ["project-accounts", clientId, ids.join(",")],
+    queryKey: ["project-accounts", scope, ids.join(",")],
     enabled: ids.length > 0,
     queryFn: async () =>
       (await supabase.from("project_accounts").select("*").in("project_id", ids).order("platform")).data ?? [],
