@@ -31,7 +31,7 @@ const empty = {
  * to each project a client owns. One client can have many projects, and one
  * project can sit on several platforms under different emails.
  */
-export function ProjectAccounts({ clientId }: { clientId: string }) {
+export function ProjectAccounts({ clientId, projectId }: { clientId?: string; projectId?: string }) {
   const qc = useQueryClient();
   const { role } = useAuth();
   const isAdmin = role === "admin";
