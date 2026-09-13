@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { GRACE_DAYS, daysUntil, fmtDate, money, paidThrough } from "@/lib/agency";
 import { revealCredential, saveCredential } from "@/lib/vault.functions";
+import { ProjectAccounts } from "@/components/ProjectAccounts";
 
 const TABS = ["Overview", "Notes", "Service Log", "System Users", "Credentials", "Billing"] as const;
 
@@ -364,6 +365,12 @@ function ClientDetail() {
               ))}
             </Table>
           )}
+        </Panel>
+      )}
+
+      {tab === "Credentials" && role !== "sales" && (
+        <Panel title="Project accounts" right={<Pill tone="mist">Lovable · AI Studio · Manus · GitHub</Pill>}>
+          <ProjectAccounts clientId={id} />
         </Panel>
       )}
 

@@ -136,7 +136,10 @@ function Emails() {
   const show = async (id: string) => {
     try {
       const res = await reveal({ data: { id } });
-      if (!res.password) return toast.info("No password saved for this account");
+      if (!res.password) {
+        toast.info("No password saved for this account");
+        return;
+      }
       setShown((s) => ({ ...s, [id]: res.password }));
     } catch (e) {
       toast.error((e as Error).message);

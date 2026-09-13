@@ -683,6 +683,66 @@ export type Database = {
         }
         Relationships: []
       }
+      project_accounts: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          email: string | null
+          encrypted_password: string | null
+          id: string
+          lovable_account_id: string | null
+          notes: string | null
+          platform: string
+          project_id: string
+          updated_at: string
+          url: string | null
+          username: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          email?: string | null
+          encrypted_password?: string | null
+          id?: string
+          lovable_account_id?: string | null
+          notes?: string | null
+          platform?: string
+          project_id: string
+          updated_at?: string
+          url?: string | null
+          username?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          email?: string | null
+          encrypted_password?: string | null
+          id?: string
+          lovable_account_id?: string | null
+          notes?: string | null
+          platform?: string
+          project_id?: string
+          updated_at?: string
+          url?: string | null
+          username?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_accounts_lovable_account_id_fkey"
+            columns: ["lovable_account_id"]
+            isOneToOne: false
+            referencedRelation: "lovable_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_accounts_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       project_transfers: {
         Row: {
           client_id: string

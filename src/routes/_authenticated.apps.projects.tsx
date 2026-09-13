@@ -11,6 +11,7 @@ import { FilterSelect, SearchInput, matches } from "@/components/search";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { fmtDate } from "@/lib/agency";
+import { ProjectAccounts } from "@/components/ProjectAccounts";
 
 export const BUILD_STAGES = ["Planning", "Building", "Testing", "Shipped"] as const;
 export const PAYMENT_STATES = ["Unpaid", "Deposit", "Awaiting payment", "Paid"] as const;
@@ -85,7 +86,7 @@ function Projects() {
   const prospect = current ? prospects.find((x) => x.id === current.prospect_id) : undefined;
 
   const update = useMutation({
-    mutationFn: async (patch: Record<string, unknown>) => {
+    mutationFn: async (patch: Partial<(typeof projects)[number]>) => {
       if (!current) return;
       const { error } = await supabase.from("projects").update(patch).eq("id", current.id);
       if (error) throw new Error(error.message);
@@ -298,6 +299,10 @@ function Projects() {
                   </select>
                 </label>
               </div>
+            </Panel>
+
+            <Panel title="Linked platform accounts" right={<Pill tone="mist">Lovable · AI Studio · Manus · GitHub</Pill>}>
+              <ProjectAccounts projectId={current.id} />
             </Panel>
 
             <Panel title="Account history" right={<Pill tone="mist">{history.length}</Pill>}>
