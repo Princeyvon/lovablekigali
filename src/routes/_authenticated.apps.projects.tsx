@@ -11,6 +11,7 @@ import { FilterSelect, SearchInput, matches } from "@/components/search";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { fmtDate } from "@/lib/agency";
+import { ProjectAccounts } from "@/components/ProjectAccounts";
 
 export const BUILD_STAGES = ["Planning", "Building", "Testing", "Shipped"] as const;
 export const PAYMENT_STATES = ["Unpaid", "Deposit", "Awaiting payment", "Paid"] as const;
