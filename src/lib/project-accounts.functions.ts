@@ -30,7 +30,12 @@ export const saveProjectAccount = createServerFn({ method: "POST" })
   .inputValidator((input: ProjectAccountInput) => input)
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    const row: Record<string, unknown> = {
+    let encrypted_password: string | null = null;
+    if (data.password) {
+      const { encryptSecret } = await import("./vault-crypto.server");
+      encrypted_password = await encryptSecret(data.password);
+    }
+    const row = {
       project_id: data.project_id,
       platform: data.platform,
       email: data.email || null,
@@ -38,11 +43,8 @@ export const saveProjectAccount = createServerFn({ method: "POST" })
       url: data.url || null,
       notes: data.notes || null,
       lovable_account_id: data.lovable_account_id || null,
+      ...(encrypted_password ? { encrypted_password } : {}),
     };
-    if (data.password) {
-      const { encryptSecret } = await import("./vault-crypto.server");
-      row.encrypted_password = await encryptSecret(data.password);
-    }
     const res = data.id
       ? await supabase.from("project_accounts").update(row).eq("id", data.id).select("id").single()
       : await supabase
