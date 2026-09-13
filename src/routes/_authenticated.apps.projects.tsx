@@ -86,7 +86,7 @@ function Projects() {
   const prospect = current ? prospects.find((x) => x.id === current.prospect_id) : undefined;
 
   const update = useMutation({
-    mutationFn: async (patch: Record<string, unknown>) => {
+    mutationFn: async (patch: Partial<(typeof projects)[number]>) => {
       if (!current) return;
       const { error } = await supabase.from("projects").update(patch).eq("id", current.id);
       if (error) throw new Error(error.message);
