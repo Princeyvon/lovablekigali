@@ -67,7 +67,7 @@ export function ProjectAccounts({ clientId, projectId }: { clientId?: string; pr
   const reveal = useServerFn(revealProjectAccount);
   const remove = useServerFn(deleteProjectAccount);
 
-  const invalidate = () => qc.invalidateQueries({ queryKey: ["project-accounts", clientId] });
+  const invalidate = () => qc.invalidateQueries({ queryKey: ["project-accounts", scope] });
 
   const add = useMutation({
     mutationFn: async (projectId: string) =>
