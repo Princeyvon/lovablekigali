@@ -124,7 +124,9 @@ export function Combobox({
                   }}
                   className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm hover:bg-secondary"
                 >
-                  <Check className={cn("size-3.5", o.value === value ? "text-primary" : "opacity-0")} />
+                  <Check
+                    className={cn("size-3.5", o.value === value ? "text-primary" : "opacity-0")}
+                  />
                   <span className="flex-1 truncate">{o.label}</span>
                   {o.hint ? <span className="text-xs text-muted-foreground">{o.hint}</span> : null}
                 </button>
@@ -179,7 +181,9 @@ export function FilterSelect({
             : "border-input bg-background text-foreground hover:border-primary/40",
         )}
       >
-        <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{label}</span>
+        <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+          {label}
+        </span>
         <span className="max-w-[10rem] truncate font-medium">{selected?.label ?? allLabel}</span>
         <ChevronDown className={cn("size-3.5 shrink-0 transition", open && "rotate-180")} />
       </button>
@@ -219,7 +223,9 @@ export function FilterSelect({
                 }}
                 className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm hover:bg-secondary"
               >
-                <Check className={cn("size-3.5", value === o.value ? "text-primary" : "opacity-0")} />
+                <Check
+                  className={cn("size-3.5", value === o.value ? "text-primary" : "opacity-0")}
+                />
                 <span className="flex-1 truncate">{o.label}</span>
               </button>
             ))}
@@ -285,7 +291,9 @@ export function DateRangeFilter({
         )}
       >
         <Calendar className="size-3.5 shrink-0" />
-        <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{label}</span>
+        <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+          {label}
+        </span>
         <span className="max-w-[12rem] truncate font-medium">{summary}</span>
       </button>
 

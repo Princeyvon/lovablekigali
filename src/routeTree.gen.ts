@@ -11,37 +11,25 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
-import { Route as AuthRouteImport } from './routes/auth'
-import { Route as ResetPasswordRouteImport } from './routes/reset-password'
-import { Route as AuthenticatedAnalyticsRouteImport } from './routes/_authenticated.analytics'
 import { Route as AuthenticatedAppsRouteImport } from './routes/_authenticated.apps'
 import { Route as AuthenticatedBillingRouteImport } from './routes/_authenticated.billing'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated.dashboard'
-import { Route as AuthenticatedExpensesRouteImport } from './routes/_authenticated.expenses'
 import { Route as AuthenticatedFinanceRouteImport } from './routes/_authenticated.finance'
 import { Route as AuthenticatedLibraryRouteImport } from './routes/_authenticated.library'
-import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated.notifications'
-import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated.profile'
 import { Route as AuthenticatedProspectsRouteImport } from './routes/_authenticated.prospects'
-import { Route as AuthenticatedTeamRouteImport } from './routes/_authenticated.team'
-import { Route as AuthenticatedAdminAccessRouteImport } from './routes/_authenticated.admin.access'
-import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authenticated.admin.audit'
 import { Route as AuthenticatedAppsIndexRouteImport } from './routes/_authenticated.apps.index'
 import { Route as AuthenticatedAppsEmailsRouteImport } from './routes/_authenticated.apps.emails'
 import { Route as AuthenticatedAppsProjectsRouteImport } from './routes/_authenticated.apps.projects'
 import { Route as AuthenticatedClientsIndexRouteImport } from './routes/_authenticated.clients.index'
 import { Route as AuthenticatedClientsIdRouteImport } from './routes/_authenticated.clients.$id'
 import { Route as AuthenticatedFinanceIndexRouteImport } from './routes/_authenticated.finance.index'
-import { Route as AuthenticatedFinanceAnalyticsRouteImport } from './routes/_authenticated.finance.analytics'
 import { Route as AuthenticatedFinanceExpensesRouteImport } from './routes/_authenticated.finance.expenses'
+import { Route as AuthenticatedFinanceInsightsRouteImport } from './routes/_authenticated.finance.insights'
 import { Route as AuthenticatedFinancePayoutsRouteImport } from './routes/_authenticated.finance.payouts'
-import { Route as AuthenticatedFinanceReportsRouteImport } from './routes/_authenticated.finance.reports'
 import { Route as AuthenticatedFinanceTeamRouteImport } from './routes/_authenticated.finance.team'
-import { Route as AuthenticatedFinanceTransactionsRouteImport } from './routes/_authenticated.finance.transactions'
 import { Route as AuthenticatedLibraryIndexRouteImport } from './routes/_authenticated.library.index'
-import { Route as AuthenticatedLibraryPromptsRouteImport } from './routes/_authenticated.library.prompts'
+import { Route as AuthenticatedLibraryAuditRouteImport } from './routes/_authenticated.library.audit'
 import { Route as AuthenticatedLibrarySkillsRouteImport } from './routes/_authenticated.library.skills'
-import { Route as AuthenticatedLibraryThemesRouteImport } from './routes/_authenticated.library.themes'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -51,21 +39,6 @@ const IndexRoute = IndexRouteImport.update({
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
-} as any)
-const AuthRoute = AuthRouteImport.update({
-  id: '/auth',
-  path: '/auth',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ResetPasswordRoute = ResetPasswordRouteImport.update({
-  id: '/reset-password',
-  path: '/reset-password',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthenticatedAnalyticsRoute = AuthenticatedAnalyticsRouteImport.update({
-  id: '/analytics',
-  path: '/analytics',
-  getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedAppsRoute = AuthenticatedAppsRouteImport.update({
   id: '/apps',
@@ -82,11 +55,6 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedExpensesRoute = AuthenticatedExpensesRouteImport.update({
-  id: '/expenses',
-  path: '/expenses',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
 const AuthenticatedFinanceRoute = AuthenticatedFinanceRouteImport.update({
   id: '/finance',
   path: '/finance',
@@ -97,36 +65,9 @@ const AuthenticatedLibraryRoute = AuthenticatedLibraryRouteImport.update({
   path: '/library',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedNotificationsRoute =
-  AuthenticatedNotificationsRouteImport.update({
-    id: '/notifications',
-    path: '/notifications',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
-  id: '/profile',
-  path: '/profile',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
 const AuthenticatedProspectsRoute = AuthenticatedProspectsRouteImport.update({
   id: '/prospects',
   path: '/prospects',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedTeamRoute = AuthenticatedTeamRouteImport.update({
-  id: '/team',
-  path: '/team',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedAdminAccessRoute =
-  AuthenticatedAdminAccessRouteImport.update({
-    id: '/admin/access',
-    path: '/admin/access',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedAdminAuditRoute = AuthenticatedAdminAuditRouteImport.update({
-  id: '/admin/audit',
-  path: '/admin/audit',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedAppsIndexRoute = AuthenticatedAppsIndexRouteImport.update({
@@ -162,16 +103,16 @@ const AuthenticatedFinanceIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedFinanceRoute,
   } as any)
-const AuthenticatedFinanceAnalyticsRoute =
-  AuthenticatedFinanceAnalyticsRouteImport.update({
-    id: '/analytics',
-    path: '/analytics',
-    getParentRoute: () => AuthenticatedFinanceRoute,
-  } as any)
 const AuthenticatedFinanceExpensesRoute =
   AuthenticatedFinanceExpensesRouteImport.update({
     id: '/expenses',
     path: '/expenses',
+    getParentRoute: () => AuthenticatedFinanceRoute,
+  } as any)
+const AuthenticatedFinanceInsightsRoute =
+  AuthenticatedFinanceInsightsRouteImport.update({
+    id: '/insights',
+    path: '/insights',
     getParentRoute: () => AuthenticatedFinanceRoute,
   } as any)
 const AuthenticatedFinancePayoutsRoute =
@@ -180,22 +121,10 @@ const AuthenticatedFinancePayoutsRoute =
     path: '/payouts',
     getParentRoute: () => AuthenticatedFinanceRoute,
   } as any)
-const AuthenticatedFinanceReportsRoute =
-  AuthenticatedFinanceReportsRouteImport.update({
-    id: '/reports',
-    path: '/reports',
-    getParentRoute: () => AuthenticatedFinanceRoute,
-  } as any)
 const AuthenticatedFinanceTeamRoute =
   AuthenticatedFinanceTeamRouteImport.update({
     id: '/team',
     path: '/team',
-    getParentRoute: () => AuthenticatedFinanceRoute,
-  } as any)
-const AuthenticatedFinanceTransactionsRoute =
-  AuthenticatedFinanceTransactionsRouteImport.update({
-    id: '/transactions',
-    path: '/transactions',
     getParentRoute: () => AuthenticatedFinanceRoute,
   } as any)
 const AuthenticatedLibraryIndexRoute =
@@ -204,10 +133,10 @@ const AuthenticatedLibraryIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedLibraryRoute,
   } as any)
-const AuthenticatedLibraryPromptsRoute =
-  AuthenticatedLibraryPromptsRouteImport.update({
-    id: '/prompts',
-    path: '/prompts',
+const AuthenticatedLibraryAuditRoute =
+  AuthenticatedLibraryAuditRouteImport.update({
+    id: '/audit',
+    path: '/audit',
     getParentRoute: () => AuthenticatedLibraryRoute,
   } as any)
 const AuthenticatedLibrarySkillsRoute =
@@ -216,42 +145,24 @@ const AuthenticatedLibrarySkillsRoute =
     path: '/skills',
     getParentRoute: () => AuthenticatedLibraryRoute,
   } as any)
-const AuthenticatedLibraryThemesRoute =
-  AuthenticatedLibraryThemesRouteImport.update({
-    id: '/themes',
-    path: '/themes',
-    getParentRoute: () => AuthenticatedLibraryRoute,
-  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/auth': typeof AuthRoute
-  '/reset-password': typeof ResetPasswordRoute
-  '/analytics': typeof AuthenticatedAnalyticsRoute
   '/apps': typeof AuthenticatedAppsRouteWithChildren
   '/billing': typeof AuthenticatedBillingRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
-  '/expenses': typeof AuthenticatedExpensesRoute
   '/finance': typeof AuthenticatedFinanceRouteWithChildren
   '/library': typeof AuthenticatedLibraryRouteWithChildren
-  '/notifications': typeof AuthenticatedNotificationsRoute
-  '/profile': typeof AuthenticatedProfileRoute
   '/prospects': typeof AuthenticatedProspectsRoute
-  '/team': typeof AuthenticatedTeamRoute
-  '/admin/access': typeof AuthenticatedAdminAccessRoute
-  '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/apps/emails': typeof AuthenticatedAppsEmailsRoute
   '/apps/projects': typeof AuthenticatedAppsProjectsRoute
   '/clients/$id': typeof AuthenticatedClientsIdRoute
-  '/finance/analytics': typeof AuthenticatedFinanceAnalyticsRoute
   '/finance/expenses': typeof AuthenticatedFinanceExpensesRoute
+  '/finance/insights': typeof AuthenticatedFinanceInsightsRoute
   '/finance/payouts': typeof AuthenticatedFinancePayoutsRoute
-  '/finance/reports': typeof AuthenticatedFinanceReportsRoute
   '/finance/team': typeof AuthenticatedFinanceTeamRoute
-  '/finance/transactions': typeof AuthenticatedFinanceTransactionsRoute
-  '/library/prompts': typeof AuthenticatedLibraryPromptsRoute
+  '/library/audit': typeof AuthenticatedLibraryAuditRoute
   '/library/skills': typeof AuthenticatedLibrarySkillsRoute
-  '/library/themes': typeof AuthenticatedLibraryThemesRoute
   '/apps/': typeof AuthenticatedAppsIndexRoute
   '/clients/': typeof AuthenticatedClientsIndexRoute
   '/finance/': typeof AuthenticatedFinanceIndexRoute
@@ -259,30 +170,18 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/auth': typeof AuthRoute
-  '/reset-password': typeof ResetPasswordRoute
-  '/analytics': typeof AuthenticatedAnalyticsRoute
   '/billing': typeof AuthenticatedBillingRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
-  '/expenses': typeof AuthenticatedExpensesRoute
-  '/notifications': typeof AuthenticatedNotificationsRoute
-  '/profile': typeof AuthenticatedProfileRoute
   '/prospects': typeof AuthenticatedProspectsRoute
-  '/team': typeof AuthenticatedTeamRoute
-  '/admin/access': typeof AuthenticatedAdminAccessRoute
-  '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/apps/emails': typeof AuthenticatedAppsEmailsRoute
   '/apps/projects': typeof AuthenticatedAppsProjectsRoute
   '/clients/$id': typeof AuthenticatedClientsIdRoute
-  '/finance/analytics': typeof AuthenticatedFinanceAnalyticsRoute
   '/finance/expenses': typeof AuthenticatedFinanceExpensesRoute
+  '/finance/insights': typeof AuthenticatedFinanceInsightsRoute
   '/finance/payouts': typeof AuthenticatedFinancePayoutsRoute
-  '/finance/reports': typeof AuthenticatedFinanceReportsRoute
   '/finance/team': typeof AuthenticatedFinanceTeamRoute
-  '/finance/transactions': typeof AuthenticatedFinanceTransactionsRoute
-  '/library/prompts': typeof AuthenticatedLibraryPromptsRoute
+  '/library/audit': typeof AuthenticatedLibraryAuditRoute
   '/library/skills': typeof AuthenticatedLibrarySkillsRoute
-  '/library/themes': typeof AuthenticatedLibraryThemesRoute
   '/apps': typeof AuthenticatedAppsIndexRoute
   '/clients': typeof AuthenticatedClientsIndexRoute
   '/finance': typeof AuthenticatedFinanceIndexRoute
@@ -292,33 +191,21 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
-  '/auth': typeof AuthRoute
-  '/reset-password': typeof ResetPasswordRoute
-  '/_authenticated/analytics': typeof AuthenticatedAnalyticsRoute
   '/_authenticated/apps': typeof AuthenticatedAppsRouteWithChildren
   '/_authenticated/billing': typeof AuthenticatedBillingRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
-  '/_authenticated/expenses': typeof AuthenticatedExpensesRoute
   '/_authenticated/finance': typeof AuthenticatedFinanceRouteWithChildren
   '/_authenticated/library': typeof AuthenticatedLibraryRouteWithChildren
-  '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
-  '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/prospects': typeof AuthenticatedProspectsRoute
-  '/_authenticated/team': typeof AuthenticatedTeamRoute
-  '/_authenticated/admin/access': typeof AuthenticatedAdminAccessRoute
-  '/_authenticated/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/_authenticated/apps/emails': typeof AuthenticatedAppsEmailsRoute
   '/_authenticated/apps/projects': typeof AuthenticatedAppsProjectsRoute
   '/_authenticated/clients/$id': typeof AuthenticatedClientsIdRoute
-  '/_authenticated/finance/analytics': typeof AuthenticatedFinanceAnalyticsRoute
   '/_authenticated/finance/expenses': typeof AuthenticatedFinanceExpensesRoute
+  '/_authenticated/finance/insights': typeof AuthenticatedFinanceInsightsRoute
   '/_authenticated/finance/payouts': typeof AuthenticatedFinancePayoutsRoute
-  '/_authenticated/finance/reports': typeof AuthenticatedFinanceReportsRoute
   '/_authenticated/finance/team': typeof AuthenticatedFinanceTeamRoute
-  '/_authenticated/finance/transactions': typeof AuthenticatedFinanceTransactionsRoute
-  '/_authenticated/library/prompts': typeof AuthenticatedLibraryPromptsRoute
+  '/_authenticated/library/audit': typeof AuthenticatedLibraryAuditRoute
   '/_authenticated/library/skills': typeof AuthenticatedLibrarySkillsRoute
-  '/_authenticated/library/themes': typeof AuthenticatedLibraryThemesRoute
   '/_authenticated/apps/': typeof AuthenticatedAppsIndexRoute
   '/_authenticated/clients/': typeof AuthenticatedClientsIndexRoute
   '/_authenticated/finance/': typeof AuthenticatedFinanceIndexRoute
@@ -328,33 +215,21 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/auth'
-    | '/reset-password'
-    | '/analytics'
     | '/apps'
     | '/billing'
     | '/dashboard'
-    | '/expenses'
     | '/finance'
     | '/library'
-    | '/notifications'
-    | '/profile'
     | '/prospects'
-    | '/team'
-    | '/admin/access'
-    | '/admin/audit'
     | '/apps/emails'
     | '/apps/projects'
     | '/clients/$id'
-    | '/finance/analytics'
     | '/finance/expenses'
+    | '/finance/insights'
     | '/finance/payouts'
-    | '/finance/reports'
     | '/finance/team'
-    | '/finance/transactions'
-    | '/library/prompts'
+    | '/library/audit'
     | '/library/skills'
-    | '/library/themes'
     | '/apps/'
     | '/clients/'
     | '/finance/'
@@ -362,30 +237,18 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/auth'
-    | '/reset-password'
-    | '/analytics'
     | '/billing'
     | '/dashboard'
-    | '/expenses'
-    | '/notifications'
-    | '/profile'
     | '/prospects'
-    | '/team'
-    | '/admin/access'
-    | '/admin/audit'
     | '/apps/emails'
     | '/apps/projects'
     | '/clients/$id'
-    | '/finance/analytics'
     | '/finance/expenses'
+    | '/finance/insights'
     | '/finance/payouts'
-    | '/finance/reports'
     | '/finance/team'
-    | '/finance/transactions'
-    | '/library/prompts'
+    | '/library/audit'
     | '/library/skills'
-    | '/library/themes'
     | '/apps'
     | '/clients'
     | '/finance'
@@ -394,33 +257,21 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_authenticated'
-    | '/auth'
-    | '/reset-password'
-    | '/_authenticated/analytics'
     | '/_authenticated/apps'
     | '/_authenticated/billing'
     | '/_authenticated/dashboard'
-    | '/_authenticated/expenses'
     | '/_authenticated/finance'
     | '/_authenticated/library'
-    | '/_authenticated/notifications'
-    | '/_authenticated/profile'
     | '/_authenticated/prospects'
-    | '/_authenticated/team'
-    | '/_authenticated/admin/access'
-    | '/_authenticated/admin/audit'
     | '/_authenticated/apps/emails'
     | '/_authenticated/apps/projects'
     | '/_authenticated/clients/$id'
-    | '/_authenticated/finance/analytics'
     | '/_authenticated/finance/expenses'
+    | '/_authenticated/finance/insights'
     | '/_authenticated/finance/payouts'
-    | '/_authenticated/finance/reports'
     | '/_authenticated/finance/team'
-    | '/_authenticated/finance/transactions'
-    | '/_authenticated/library/prompts'
+    | '/_authenticated/library/audit'
     | '/_authenticated/library/skills'
-    | '/_authenticated/library/themes'
     | '/_authenticated/apps/'
     | '/_authenticated/clients/'
     | '/_authenticated/finance/'
@@ -430,8 +281,6 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
-  AuthRoute: typeof AuthRoute
-  ResetPasswordRoute: typeof ResetPasswordRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -449,27 +298,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof AuthenticatedRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/auth': {
-      id: '/auth'
-      path: '/auth'
-      fullPath: '/auth'
-      preLoaderRoute: typeof AuthRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/reset-password': {
-      id: '/reset-password'
-      path: '/reset-password'
-      fullPath: '/reset-password'
-      preLoaderRoute: typeof ResetPasswordRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated/analytics': {
-      id: '/_authenticated/analytics'
-      path: '/analytics'
-      fullPath: '/analytics'
-      preLoaderRoute: typeof AuthenticatedAnalyticsRouteImport
-      parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/apps': {
       id: '/_authenticated/apps'
@@ -492,13 +320,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/expenses': {
-      id: '/_authenticated/expenses'
-      path: '/expenses'
-      fullPath: '/expenses'
-      preLoaderRoute: typeof AuthenticatedExpensesRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
     '/_authenticated/finance': {
       id: '/_authenticated/finance'
       path: '/finance'
@@ -513,46 +334,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLibraryRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/notifications': {
-      id: '/_authenticated/notifications'
-      path: '/notifications'
-      fullPath: '/notifications'
-      preLoaderRoute: typeof AuthenticatedNotificationsRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/profile': {
-      id: '/_authenticated/profile'
-      path: '/profile'
-      fullPath: '/profile'
-      preLoaderRoute: typeof AuthenticatedProfileRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
     '/_authenticated/prospects': {
       id: '/_authenticated/prospects'
       path: '/prospects'
       fullPath: '/prospects'
       preLoaderRoute: typeof AuthenticatedProspectsRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/team': {
-      id: '/_authenticated/team'
-      path: '/team'
-      fullPath: '/team'
-      preLoaderRoute: typeof AuthenticatedTeamRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/admin/access': {
-      id: '/_authenticated/admin/access'
-      path: '/admin/access'
-      fullPath: '/admin/access'
-      preLoaderRoute: typeof AuthenticatedAdminAccessRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/admin/audit': {
-      id: '/_authenticated/admin/audit'
-      path: '/admin/audit'
-      fullPath: '/admin/audit'
-      preLoaderRoute: typeof AuthenticatedAdminAuditRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/apps/': {
@@ -597,18 +383,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedFinanceIndexRouteImport
       parentRoute: typeof AuthenticatedFinanceRoute
     }
-    '/_authenticated/finance/analytics': {
-      id: '/_authenticated/finance/analytics'
-      path: '/analytics'
-      fullPath: '/finance/analytics'
-      preLoaderRoute: typeof AuthenticatedFinanceAnalyticsRouteImport
-      parentRoute: typeof AuthenticatedFinanceRoute
-    }
     '/_authenticated/finance/expenses': {
       id: '/_authenticated/finance/expenses'
       path: '/expenses'
       fullPath: '/finance/expenses'
       preLoaderRoute: typeof AuthenticatedFinanceExpensesRouteImport
+      parentRoute: typeof AuthenticatedFinanceRoute
+    }
+    '/_authenticated/finance/insights': {
+      id: '/_authenticated/finance/insights'
+      path: '/insights'
+      fullPath: '/finance/insights'
+      preLoaderRoute: typeof AuthenticatedFinanceInsightsRouteImport
       parentRoute: typeof AuthenticatedFinanceRoute
     }
     '/_authenticated/finance/payouts': {
@@ -618,25 +404,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedFinancePayoutsRouteImport
       parentRoute: typeof AuthenticatedFinanceRoute
     }
-    '/_authenticated/finance/reports': {
-      id: '/_authenticated/finance/reports'
-      path: '/reports'
-      fullPath: '/finance/reports'
-      preLoaderRoute: typeof AuthenticatedFinanceReportsRouteImport
-      parentRoute: typeof AuthenticatedFinanceRoute
-    }
     '/_authenticated/finance/team': {
       id: '/_authenticated/finance/team'
       path: '/team'
       fullPath: '/finance/team'
       preLoaderRoute: typeof AuthenticatedFinanceTeamRouteImport
-      parentRoute: typeof AuthenticatedFinanceRoute
-    }
-    '/_authenticated/finance/transactions': {
-      id: '/_authenticated/finance/transactions'
-      path: '/transactions'
-      fullPath: '/finance/transactions'
-      preLoaderRoute: typeof AuthenticatedFinanceTransactionsRouteImport
       parentRoute: typeof AuthenticatedFinanceRoute
     }
     '/_authenticated/library/': {
@@ -646,11 +418,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLibraryIndexRouteImport
       parentRoute: typeof AuthenticatedLibraryRoute
     }
-    '/_authenticated/library/prompts': {
-      id: '/_authenticated/library/prompts'
-      path: '/prompts'
-      fullPath: '/library/prompts'
-      preLoaderRoute: typeof AuthenticatedLibraryPromptsRouteImport
+    '/_authenticated/library/audit': {
+      id: '/_authenticated/library/audit'
+      path: '/audit'
+      fullPath: '/library/audit'
+      preLoaderRoute: typeof AuthenticatedLibraryAuditRouteImport
       parentRoute: typeof AuthenticatedLibraryRoute
     }
     '/_authenticated/library/skills': {
@@ -658,13 +430,6 @@ declare module '@tanstack/react-router' {
       path: '/skills'
       fullPath: '/library/skills'
       preLoaderRoute: typeof AuthenticatedLibrarySkillsRouteImport
-      parentRoute: typeof AuthenticatedLibraryRoute
-    }
-    '/_authenticated/library/themes': {
-      id: '/_authenticated/library/themes'
-      path: '/themes'
-      fullPath: '/library/themes'
-      preLoaderRoute: typeof AuthenticatedLibraryThemesRouteImport
       parentRoute: typeof AuthenticatedLibraryRoute
     }
   }
@@ -686,22 +451,18 @@ const AuthenticatedAppsRouteWithChildren =
   AuthenticatedAppsRoute._addFileChildren(AuthenticatedAppsRouteChildren)
 
 interface AuthenticatedFinanceRouteChildren {
-  AuthenticatedFinanceAnalyticsRoute: typeof AuthenticatedFinanceAnalyticsRoute
   AuthenticatedFinanceExpensesRoute: typeof AuthenticatedFinanceExpensesRoute
+  AuthenticatedFinanceInsightsRoute: typeof AuthenticatedFinanceInsightsRoute
   AuthenticatedFinancePayoutsRoute: typeof AuthenticatedFinancePayoutsRoute
-  AuthenticatedFinanceReportsRoute: typeof AuthenticatedFinanceReportsRoute
   AuthenticatedFinanceTeamRoute: typeof AuthenticatedFinanceTeamRoute
-  AuthenticatedFinanceTransactionsRoute: typeof AuthenticatedFinanceTransactionsRoute
   AuthenticatedFinanceIndexRoute: typeof AuthenticatedFinanceIndexRoute
 }
 
 const AuthenticatedFinanceRouteChildren: AuthenticatedFinanceRouteChildren = {
-  AuthenticatedFinanceAnalyticsRoute: AuthenticatedFinanceAnalyticsRoute,
   AuthenticatedFinanceExpensesRoute: AuthenticatedFinanceExpensesRoute,
+  AuthenticatedFinanceInsightsRoute: AuthenticatedFinanceInsightsRoute,
   AuthenticatedFinancePayoutsRoute: AuthenticatedFinancePayoutsRoute,
-  AuthenticatedFinanceReportsRoute: AuthenticatedFinanceReportsRoute,
   AuthenticatedFinanceTeamRoute: AuthenticatedFinanceTeamRoute,
-  AuthenticatedFinanceTransactionsRoute: AuthenticatedFinanceTransactionsRoute,
   AuthenticatedFinanceIndexRoute: AuthenticatedFinanceIndexRoute,
 }
 
@@ -709,16 +470,14 @@ const AuthenticatedFinanceRouteWithChildren =
   AuthenticatedFinanceRoute._addFileChildren(AuthenticatedFinanceRouteChildren)
 
 interface AuthenticatedLibraryRouteChildren {
-  AuthenticatedLibraryPromptsRoute: typeof AuthenticatedLibraryPromptsRoute
+  AuthenticatedLibraryAuditRoute: typeof AuthenticatedLibraryAuditRoute
   AuthenticatedLibrarySkillsRoute: typeof AuthenticatedLibrarySkillsRoute
-  AuthenticatedLibraryThemesRoute: typeof AuthenticatedLibraryThemesRoute
   AuthenticatedLibraryIndexRoute: typeof AuthenticatedLibraryIndexRoute
 }
 
 const AuthenticatedLibraryRouteChildren: AuthenticatedLibraryRouteChildren = {
-  AuthenticatedLibraryPromptsRoute: AuthenticatedLibraryPromptsRoute,
+  AuthenticatedLibraryAuditRoute: AuthenticatedLibraryAuditRoute,
   AuthenticatedLibrarySkillsRoute: AuthenticatedLibrarySkillsRoute,
-  AuthenticatedLibraryThemesRoute: AuthenticatedLibraryThemesRoute,
   AuthenticatedLibraryIndexRoute: AuthenticatedLibraryIndexRoute,
 }
 
@@ -726,37 +485,23 @@ const AuthenticatedLibraryRouteWithChildren =
   AuthenticatedLibraryRoute._addFileChildren(AuthenticatedLibraryRouteChildren)
 
 interface AuthenticatedRouteChildren {
-  AuthenticatedAnalyticsRoute: typeof AuthenticatedAnalyticsRoute
   AuthenticatedAppsRoute: typeof AuthenticatedAppsRouteWithChildren
   AuthenticatedBillingRoute: typeof AuthenticatedBillingRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
-  AuthenticatedExpensesRoute: typeof AuthenticatedExpensesRoute
   AuthenticatedFinanceRoute: typeof AuthenticatedFinanceRouteWithChildren
   AuthenticatedLibraryRoute: typeof AuthenticatedLibraryRouteWithChildren
-  AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
-  AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedProspectsRoute: typeof AuthenticatedProspectsRoute
-  AuthenticatedTeamRoute: typeof AuthenticatedTeamRoute
-  AuthenticatedAdminAccessRoute: typeof AuthenticatedAdminAccessRoute
-  AuthenticatedAdminAuditRoute: typeof AuthenticatedAdminAuditRoute
   AuthenticatedClientsIdRoute: typeof AuthenticatedClientsIdRoute
   AuthenticatedClientsIndexRoute: typeof AuthenticatedClientsIndexRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
-  AuthenticatedAnalyticsRoute: AuthenticatedAnalyticsRoute,
   AuthenticatedAppsRoute: AuthenticatedAppsRouteWithChildren,
   AuthenticatedBillingRoute: AuthenticatedBillingRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
-  AuthenticatedExpensesRoute: AuthenticatedExpensesRoute,
   AuthenticatedFinanceRoute: AuthenticatedFinanceRouteWithChildren,
   AuthenticatedLibraryRoute: AuthenticatedLibraryRouteWithChildren,
-  AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
-  AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedProspectsRoute: AuthenticatedProspectsRoute,
-  AuthenticatedTeamRoute: AuthenticatedTeamRoute,
-  AuthenticatedAdminAccessRoute: AuthenticatedAdminAccessRoute,
-  AuthenticatedAdminAuditRoute: AuthenticatedAdminAuditRoute,
   AuthenticatedClientsIdRoute: AuthenticatedClientsIdRoute,
   AuthenticatedClientsIndexRoute: AuthenticatedClientsIndexRoute,
 }
@@ -768,19 +513,7 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
-  AuthRoute: AuthRoute,
-  ResetPasswordRoute: ResetPasswordRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

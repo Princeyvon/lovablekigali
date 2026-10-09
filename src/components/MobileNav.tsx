@@ -20,10 +20,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { dueState, paidThrough } from "@/lib/agency";
 import { cn } from "@/lib/utils";
 
-
 const TABS = [
   { to: "/dashboard", label: "Dashboard", icon: Gauge, match: ["/dashboard"] },
-  { to: "/prospects", label: "Sales", icon: UserSquare2, match: ["/prospects", "/clients", "/billing"] },
+  {
+    to: "/prospects",
+    label: "Sales",
+    icon: UserSquare2,
+    match: ["/prospects", "/clients", "/billing"],
+  },
   { to: "/apps", label: "Apps", icon: ShieldAlert, match: ["/apps"] },
   { to: "/library/skills", label: "Library", icon: BookMarked, match: ["/library"] },
   { to: "/finance/team", label: "Finance", icon: Wallet, match: ["/finance"] },
@@ -38,7 +42,9 @@ export const SALES_TABS = [
 export function useIsSalesSection() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   return (
-    pathname.startsWith("/prospects") || pathname.startsWith("/clients") || pathname.startsWith("/billing")
+    pathname.startsWith("/prospects") ||
+    pathname.startsWith("/clients") ||
+    pathname.startsWith("/billing")
   );
 }
 
@@ -90,7 +96,8 @@ function useTheme() {
 function useAlerts() {
   const { data: clients = [] } = useQuery({
     queryKey: ["clients"],
-    queryFn: async () => (await supabase.from("clients").select("*").order("business_name")).data ?? [],
+    queryFn: async () =>
+      (await supabase.from("clients").select("*").order("business_name")).data ?? [],
   });
   const { data: payments = [] } = useQuery({
     queryKey: ["payments"],
@@ -157,7 +164,11 @@ export function ProfileBadge({ variant = "fixed" }: { variant?: "fixed" | "inlin
           style={{ touchAction: "manipulation" }}
           className="flex size-9 items-center justify-center rounded-xl text-muted-foreground transition-colors active:scale-95 hover:bg-secondary hover:text-foreground"
         >
-          {dark ? <Sun className="size-[18px]" strokeWidth={1.8} /> : <Moon className="size-[18px]" strokeWidth={1.8} />}
+          {dark ? (
+            <Sun className="size-[18px]" strokeWidth={1.8} />
+          ) : (
+            <Moon className="size-[18px]" strokeWidth={1.8} />
+          )}
         </button>
 
         <button
@@ -177,7 +188,9 @@ export function ProfileBadge({ variant = "fixed" }: { variant?: "fixed" | "inlin
           <div className="border-b border-border px-4 py-3">
             <p className="text-sm font-semibold">Notifications</p>
             <p className="mt-0.5 text-xs text-muted-foreground">
-              {alerts.length ? `${alerts.length} client${alerts.length > 1 ? "s" : ""} overdue` : "Nothing needs you"}
+              {alerts.length
+                ? `${alerts.length} client${alerts.length > 1 ? "s" : ""} overdue`
+                : "Nothing needs you"}
             </p>
           </div>
           <div className="p-1">
@@ -199,7 +212,9 @@ export function ProfileBadge({ variant = "fixed" }: { variant?: "fixed" | "inlin
                 </span>
               </Link>
             ))}
-            {!alerts.length ? <p className="px-3 py-4 text-sm text-muted-foreground">All clients are current.</p> : null}
+            {!alerts.length ? (
+              <p className="px-3 py-4 text-sm text-muted-foreground">All clients are current.</p>
+            ) : null}
           </div>
           <div className="border-t border-border p-1">
             <Link
@@ -216,7 +231,9 @@ export function ProfileBadge({ variant = "fixed" }: { variant?: "fixed" | "inlin
       {menu === "profile" ? (
         <div className="surface-card absolute right-0 mt-2 w-60 overflow-hidden p-0">
           <div className="border-b border-border px-4 py-3">
-            <p className="truncate text-sm font-semibold">{user?.email?.split("@")[0] ?? "Signed in"}</p>
+            <p className="truncate text-sm font-semibold">
+              {user?.email?.split("@")[0] ?? "Signed in"}
+            </p>
             <p className="mt-0.5 text-xs capitalize text-muted-foreground">{role ?? "…"} access</p>
           </div>
           <div className="p-1">
@@ -261,7 +278,6 @@ export function ProfileBadge({ variant = "fixed" }: { variant?: "fixed" | "inlin
   );
 }
 
-
 export function BottomNav() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
@@ -270,7 +286,7 @@ export function BottomNav() {
       className="fixed inset-x-0 bottom-0 z-40 lg:hidden"
       style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}
     >
-      <div className="mx-3 flex max-w-lg items-stretch gap-0.5 rounded-2xl border border-white/10 bg-[var(--nav)]/95 p-1 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_16px_36px_-24px_rgba(0,0,0,0.35)] backdrop-blur-xl sm:mx-auto">
+      <div className="mx-3 flex max-w-lg items-stretch gap-0.5 rounded-2xl border border-white/10 bg-nav/95 p-1 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_16px_36px_-24px_rgba(0,0,0,0.35)] backdrop-blur-xl sm:mx-auto">
         {TABS.map((t) => {
           const active = t.match.some((m) => pathname === m || pathname.startsWith(m + "/"));
           return (
@@ -282,12 +298,12 @@ export function BottomNav() {
               className={cn(
                 "flex flex-1 flex-col items-center gap-1 rounded-lg px-1 py-2 text-[10px] font-medium transition-colors duration-200 active:scale-[0.97]",
                 active
-                  ? "bg-white/10 text-[var(--nav-foreground)]"
-                  : "text-[var(--nav-foreground)]/60 hover:text-[var(--nav-foreground)]",
+                  ? "bg-white/10 text-nav-foreground"
+                  : "text-nav-foreground/60 hover:text-nav-foreground",
               )}
             >
               <t.icon
-                className={cn("size-[18px]", active && "text-[var(--nav-active)]")}
+                className={cn("size-[18px]", active && "text-nav-active")}
                 strokeWidth={active ? 2.2 : 1.7}
               />
               <span className="truncate">{t.label}</span>
@@ -298,4 +314,3 @@ export function BottomNav() {
     </nav>
   );
 }
-

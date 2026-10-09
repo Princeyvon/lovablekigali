@@ -32,17 +32,16 @@ export function Panel({
 }
 
 /**
- * Pastel stat card — LuckyJob-style tinted surface with a hairline border.
- * Legacy tones (leaf / mist / deep) map onto the pastel palette so every
- * existing screen inherits the new look without touching each route.
+ * Agency OS stat cards — clean, high-contrast surfaces matching the original theme.
  */
 const TINTS = {
-  leaf: "bg-[var(--tint-mint)]",
-  mist: "bg-[var(--tint-peach)]",
-  deep: "bg-[var(--tint-lilac)]",
-  sky: "bg-[var(--tint-sky)]",
-  blush: "bg-[var(--tint-blush)]",
-  plain: "bg-card",
+  leaf: "bg-primary/10 border-primary/25",
+  mist: "bg-secondary/60 border-border/80",
+  deep: "bg-card border-border/80",
+  warn: "bg-destructive/10 border-destructive/25 text-destructive dark:text-red-400",
+  sky: "bg-sky-500/10 border-sky-500/25",
+  blush: "bg-rose-500/10 border-rose-500/25",
+  plain: "bg-card border-border/80",
 } as const;
 
 export type StatTone = keyof typeof TINTS;
@@ -68,19 +67,22 @@ export function Stat({
       )}
     >
       <div className="flex items-start justify-between gap-2">
-        <p className="min-w-0 text-[11px] font-medium uppercase tracking-[0.1em] text-muted-foreground">{label}</p>
+        <p className="min-w-0 text-[11px] font-medium uppercase tracking-[0.1em] text-muted-foreground">
+          {label}
+        </p>
         {icon ? (
           <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-card/70 text-foreground">
             {icon}
           </span>
         ) : null}
       </div>
-      <p className="numeric mt-2 break-words font-display text-xl font-semibold leading-tight sm:text-2xl">{value}</p>
+      <p className="numeric mt-2 break-words font-display text-xl font-semibold leading-tight sm:text-2xl">
+        {value}
+      </p>
       {hint ? <p className="mt-1 text-xs leading-snug text-muted-foreground">{hint}</p> : null}
     </div>
   );
 }
-
 
 export function Bars({ data }: { data: { label: string; a: number; b: number }[] }) {
   const max = Math.max(1, ...data.map((d) => d.a + d.b));
@@ -94,7 +96,7 @@ export function Bars({ data }: { data: { label: string; a: number; b: number }[]
               style={{ height: `${(d.a / max) * 100}%`, minHeight: d.a ? 6 : 0 }}
             />
             <div
-              className="w-full rounded-full bg-[var(--leaf-deep)]"
+              className="w-full rounded-full bg-leaf-deep"
               style={{ height: `${(d.b / max) * 100}%`, minHeight: d.b ? 6 : 0 }}
             />
           </div>
@@ -105,7 +107,15 @@ export function Bars({ data }: { data: { label: string; a: number; b: number }[]
   );
 }
 
-export function Donut({ value, total, caption }: { value: number; total: number; caption: string }) {
+export function Donut({
+  value,
+  total,
+  caption,
+}: {
+  value: number;
+  total: number;
+  caption: string;
+}) {
   const pct = total > 0 ? Math.min(100, Math.round((value / total) * 100)) : 0;
   return (
     <div className="flex flex-col items-center">
@@ -124,7 +134,13 @@ export function Donut({ value, total, caption }: { value: number; total: number;
   );
 }
 
-export function Pill({ children, tone = "leaf" }: { children: ReactNode; tone?: "leaf" | "mist" | "warn" | "muted" }) {
+export function Pill({
+  children,
+  tone = "leaf",
+}: {
+  children: ReactNode;
+  tone?: "leaf" | "mist" | "warn" | "muted";
+}) {
   return (
     <span
       className={cn(
@@ -155,7 +171,13 @@ export function TH({ children, className }: { children?: ReactNode; className?: 
 
 export function TD({ children, className }: { children: ReactNode; className?: string }) {
   return (
-    <td className={cn("px-2 py-3 align-top text-sm leading-snug [overflow-wrap:anywhere]", "sm:px-4", className)}>
+    <td
+      className={cn(
+        "px-2 py-3 align-top text-sm leading-snug [overflow-wrap:anywhere]",
+        "sm:px-4",
+        className,
+      )}
+    >
       {children}
     </td>
   );

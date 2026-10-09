@@ -1,146 +1,141 @@
-export const CURRENCY = "RWF";
-
-export const money = (n: number | null | undefined) =>
-  `${CURRENCY} ${Math.round(Number(n ?? 0)).toLocaleString("en-US")}`;
-
-export const shortMoney = (n: number | null | undefined) => {
-  const v = Number(n ?? 0);
-  if (Math.abs(v) >= 1_000_000) return `${CURRENCY} ${(v / 1_000_000).toFixed(1)}M`;
-  if (Math.abs(v) >= 1000) return `${CURRENCY} ${(v / 1000).toFixed(0)}k`;
-  return `${CURRENCY} ${v.toFixed(0)}`;
-};
-
-export const fmtDate = (d: string | null | undefined) =>
-  d ? new Date(d).toLocaleDateString("en-US", { day: "2-digit", month: "short", year: "numeric" }) : "—";
-
-export function daysUntil(date: string | null | undefined) {
-  if (!date) return null;
-  const ms = new Date(date).getTime() - new Date().setHours(0, 0, 0, 0);
-  return Math.round(ms / 86400000);
-}
-
-export type PaymentRow = {
-  client_id: string;
-  amount: number;
-  payment_date: string;
-  months_covered: number;
-  covers_period_start: string;
-  covers_period_end: string;
-};
-
-/** Paid-through = latest covered period end, not "last payment + 30 days". */
-export function paidThrough(payments: Pick<PaymentRow, "covers_period_end">[]) {
-  if (!payments.length) return null;
-  return payments
-    .map((p) => p.covers_period_end)
-    .sort()
-    .at(-1)!;
-}
-
-export function startOfWeek(d: Date) {
-  const c = new Date(d);
-  const day = (c.getDay() + 6) % 7;
-  c.setDate(c.getDate() - day);
-  c.setHours(0, 0, 0, 0);
-  return c;
-}
-
-export const REMINDER_WINDOW_DAYS = 5;
-export const ROTATION_STALE_DAYS = 365;
-
-/** An app may only be switched off 14 days after the due date. */
-export const GRACE_DAYS = 14;
-/** Reminders go out every 2 days while inside the grace window. */
-export const REMINDER_EVERY_DAYS = 2;
-
-export const todayISO = () => new Date().toISOString().slice(0, 10);
-
-/** Add whole months to an ISO date (YYYY-MM-DD), clamping to end of month. */
-export function addMonths(iso: string, months: number) {
-  const d = new Date(iso + "T00:00:00");
-  const day = d.getDate();
-  d.setDate(1);
-  d.setMonth(d.getMonth() + months);
-  const last = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
-  d.setDate(Math.min(day, last));
-  return d.toISOString().slice(0, 10);
-}
-
-export const PAYMENT_METHODS = ["MOMO", "Bank", "Cash"] as const;
-export type PaymentMethod = (typeof PAYMENT_METHODS)[number];
-
-export const MONTH_OPTIONS = Array.from({ length: 12 }, (_, i) => i + 1);
+export const SECTORS = [
+  "Technology",
+  "Healthcare",
+  "Finance",
+  "Food & Beverage",
+  "Legal",
+  "Retail",
+  "Real Estate",
+  "Hospitality",
+  "Tourism",
+  "Education",
+  "Logistics",
+  "Construction",
+  "Manufacturing",
+  "Other",
+] as const;
 
 export const REMINDER_CHANNELS = [
-  { value: "sms", label: "SMS" },
-  { value: "whatsapp", label: "WhatsApp" },
   { value: "email", label: "Email" },
+  { value: "whatsapp", label: "WhatsApp" },
+  { value: "sms", label: "SMS" },
 ] as const;
 
-export const SECTORS = [
-  "Agriculture",
-  "Automotive",
-  "Aviation",
-  "Beauty & Wellness",
-  "Construction",
-  "Consulting",
-  "Education",
-  "Energy",
-  "Environmental",
-  "Events",
-  "Fashion",
-  "Finance",
-  "Fitness & Sports",
-  "Food & Beverage",
-  "Government",
-  "Healthcare",
-  "Hospitality",
-  "Insurance",
-  "Legal",
-  "Logistics",
-  "Manufacturing",
-  "Media & Entertainment",
-  "Mining",
-  "Non-profit",
-  "Pharmaceuticals",
-  "Printing",
-  "Professional Services",
-  "Real Estate",
-  "Religious Organisations",
-  "Retail",
-  "Security",
-  "Technology",
-  "Telecommunications",
-  "Textiles",
-  "Tourism",
-  "Transport",
-  "Veterinary",
-  "Wholesale",
-] as const;
+export const GRACE_DAYS = 14;
 
-export type DueState = {
-  through: string | null;
-  daysOverdue: number;
-  overdue: boolean;
-  suspendable: boolean;
-  reminderDue: boolean;
-};
+export function todayISO(): string {
+  return new Date().toISOString().slice(0, 10);
+}
 
-/** Billing state derived from the latest covered period end. */
-export function dueState(through: string | null, lastReminderAt?: string | null): DueState {
-  if (!through) {
-    return { through, daysOverdue: 0, overdue: true, suspendable: false, reminderDue: true };
+export function fmtDate(d?: string | Date | null): string {
+  if (!d) return "—";
+  const date = typeof d === "string" ? new Date(d) : d;
+  if (isNaN(date.getTime())) return "—";
+  return date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
+export function daysUntil(targetISO: string): number {
+  if (!targetISO) return 0;
+  const now = new Date();
+  const target = new Date(targetISO);
+  const diffMs = target.getTime() - now.getTime();
+  return Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+}
+
+export function money(n?: number | string | null): string {
+  if (n === null || n === undefined || n === "") return "$0";
+  const num = typeof n === "string" ? Number(n) : n;
+  if (isNaN(num)) return "$0";
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 0,
+  }).format(num);
+}
+
+export function shortMoney(n?: number | string | null): string {
+  if (n === null || n === undefined || n === "") return "$0";
+  const num = typeof n === "string" ? Number(n) : n;
+  if (isNaN(num)) return "$0";
+  if (Math.abs(num) >= 1_000_000) {
+    return `$${(num / 1_000_000).toFixed(1)}M`;
   }
-  const days = -(daysUntil(through) ?? 0);
-  const overdue = days > 0;
-  const sinceReminder = lastReminderAt
-    ? Math.floor((Date.now() - new Date(lastReminderAt).getTime()) / 86400000)
-    : Infinity;
+  if (Math.abs(num) >= 1_000) {
+    return `$${(num / 1_000).toFixed(0)}k`;
+  }
+  return `$${num.toLocaleString("en-US")}`;
+}
+
+export function paidThrough(
+  payments?: Array<{ covers_period_end?: string | null } | null> | null,
+): string | null {
+  if (!payments || payments.length === 0) return null;
+  const validDates = payments
+    .map((p) => p?.covers_period_end)
+    .filter((d): d is string => typeof d === "string" && d.length > 0)
+    .sort();
+  return validDates.length > 0 ? (validDates[validDates.length - 1] ?? null) : null;
+}
+
+export interface DueStateResult {
+  through: string | null;
+  overdue: boolean;
+  daysOverdue: number;
+  inGrace: boolean;
+  suspendable: boolean;
+  state: "current" | "due-soon" | "grace" | "overdue";
+  canRemind: boolean;
+}
+
+export function dueState(
+  through?: string | null,
+  lastReminderSentAt?: string | null,
+  graceDays = GRACE_DAYS,
+): DueStateResult {
+  if (!through) {
+    return {
+      through: null,
+      overdue: true,
+      daysOverdue: 30,
+      inGrace: false,
+      suspendable: true,
+      state: "overdue",
+      canRemind: true,
+    };
+  }
+
+  const daysLeft = daysUntil(through);
+  const overdue = daysLeft < 0;
+  const daysOverdue = overdue ? -daysLeft : 0;
+  const inGrace = overdue && daysOverdue <= graceDays;
+  const suspendable = overdue && daysOverdue > graceDays;
+
+  let state: "current" | "due-soon" | "grace" | "overdue" = "current";
+  if (suspendable) {
+    state = "overdue";
+  } else if (inGrace) {
+    state = "grace";
+  } else if (daysLeft <= 5) {
+    state = "due-soon";
+  }
+
+  let canRemind = overdue;
+  if (overdue && lastReminderSentAt) {
+    const daysSinceReminder = -daysUntil(lastReminderSentAt);
+    canRemind = daysSinceReminder >= 2;
+  }
+
   return {
     through,
-    daysOverdue: Math.max(0, days),
     overdue,
-    suspendable: days >= GRACE_DAYS,
-    reminderDue: overdue && days < GRACE_DAYS && sinceReminder >= REMINDER_EVERY_DAYS,
+    daysOverdue,
+    inGrace,
+    suspendable,
+    state,
+    canRemind,
   };
 }

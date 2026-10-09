@@ -1,33 +1,12 @@
-import { Outlet, createFileRoute, useRouterState } from "@tanstack/react-router";
-import { AppShell } from "@/components/AppShell";
-import { SubTabs } from "@/components/SubTabs";
+import { createFileRoute, Outlet } from "@tanstack/react-router";
 
 export const LIBRARY_TABS = [
-  { to: "/library/skills", label: "Skills" },
-  { to: "/library/themes", label: "UI Themes" },
-  { to: "/library/prompts", label: "Prompts" },
+  { to: "/library/skills", label: "Skills & System Specs" },
+  { to: "/library/inspo", label: "Dashboard Inspo" },
+  { to: "/library/prompts", label: "Text Prompts" },
+  { to: "/library/audit", label: "Audit & Event Log" },
 ] as const;
 
 export const Route = createFileRoute("/_authenticated/library")({
-  head: () => ({
-    meta: [
-      { title: "Library — Lovable Solutions" },
-      { name: "description", content: "Reusable skills, UI theme references and prompts kept in one place." },
-      { property: "og:title", content: "Library — Lovable Solutions" },
-      { property: "og:description", content: "The stuff you reach for on every build: skills, themes, prompts." },
-    ],
-  }),
-  component: LibraryLayout,
+  component: () => <Outlet />,
 });
-
-function LibraryLayout() {
-  const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const current = LIBRARY_TABS.find((t) => pathname.startsWith(t.to));
-
-  return (
-    <AppShell title="Library" subtitle={`${current?.label ?? "Saved"} · things you reuse on every build`}>
-      <SubTabs tabs={LIBRARY_TABS} />
-      <Outlet />
-    </AppShell>
-  );
-}

@@ -15,7 +15,9 @@ export function SubTabs({ tabs, className }: { tabs: readonly SubTab[]; classNam
       )}
     >
       {tabs.map((t) => {
-        const active = t.exact ? pathname === t.to : pathname === t.to || pathname.startsWith(t.to + "/");
+        const active = t.exact
+          ? pathname === t.to
+          : pathname === t.to || pathname.startsWith(t.to + "/");
         return (
           <Link
             key={t.to}

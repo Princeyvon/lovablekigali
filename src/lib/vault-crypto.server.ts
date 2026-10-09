@@ -1,33 +1,50 @@
-const enc = new TextEncoder();
-const dec = new TextDecoder();
+import crypto from "node:crypto";
 
-async function getKey() {
-  const raw = process.env["VAULT_ENCRYPTION_KEY"];
-  if (!raw) throw new Error("VAULT_ENCRYPTION_KEY is not configured");
-  const digest = await crypto.subtle.digest("SHA-256", enc.encode(raw));
-  return crypto.subtle.importKey("raw", digest, "AES-GCM", false, ["encrypt", "decrypt"]);
+const ALGO = "aes-256-gcm";
+const DEFAULT_KEY_SOURCE = process.env.SUPABASE_PROJECT_ID || "agency-os-vault-secret-key-32b";
+
+function getMasterKey(): Buffer {
+  const secret = process.env.VAULT_ENCRYPTION_KEY || DEFAULT_KEY_SOURCE;
+  return crypto.createHash("sha256").update(secret).digest();
 }
 
-const b64 = (buf: ArrayBuffer | Uint8Array) =>
-  btoa(String.fromCharCode(...new Uint8Array(buf as ArrayBuffer)));
-
-const unb64 = (s: string) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
-
-export async function encryptSecret(plain: string) {
-  const key = await getKey();
-  const iv = crypto.getRandomValues(new Uint8Array(12));
-  const ct = await crypto.subtle.encrypt({ name: "AES-GCM", iv }, key, enc.encode(plain));
-  return `v1.${b64(iv)}.${b64(ct)}`;
+/**
+ * Encrypts a plaintext secret.
+ * Returns formatted ciphertext: v1:iv:tag:ciphertext (base64)
+ */
+export async function encryptSecret(plainText: string): Promise<string> {
+  if (!plainText) return "";
+  const iv = crypto.randomBytes(12);
+  const cipher = crypto.createCipheriv(ALGO, getMasterKey(), iv);
+  let encrypted = cipher.update(plainText, "utf8", "base64");
+  encrypted += cipher.final("base64");
+  const tag = cipher.getAuthTag();
+  return `v1:${iv.toString("base64")}:${tag.toString("base64")}:${encrypted}`;
 }
 
-export async function decryptSecret(payload: string) {
-  if (!payload.startsWith("v1.")) return "";
-  const [, ivPart, ctPart] = payload.split(".");
-  const key = await getKey();
-  const pt = await crypto.subtle.decrypt(
-    { name: "AES-GCM", iv: unb64(ivPart!) },
-    key,
-    unb64(ctPart!),
-  );
-  return dec.decode(pt);
+/**
+ * Decrypts a ciphertext string.
+ * Gracefully returns original string if not encrypted with v1 prefix.
+ */
+export async function decryptSecret(cipherText: string): Promise<string> {
+  if (!cipherText) return "";
+  if (!cipherText.startsWith("v1:")) {
+    return cipherText;
+  }
+  try {
+    const parts = cipherText.split(":");
+    if (parts.length !== 4) return cipherText;
+    const [, ivB64, tagB64, encB64] = parts;
+    if (!ivB64 || !tagB64 || !encB64) return cipherText;
+    const iv = Buffer.from(ivB64, "base64");
+    const tag = Buffer.from(tagB64, "base64");
+    const decipher = crypto.createDecipheriv(ALGO, getMasterKey(), iv);
+    decipher.setAuthTag(tag);
+    let decrypted = decipher.update(encB64, "base64", "utf8");
+    decrypted += decipher.final("utf8");
+    return decrypted;
+  } catch (err) {
+    console.error("Failed to decrypt secret:", err);
+    return cipherText;
+  }
 }

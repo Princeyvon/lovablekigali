@@ -1,16 +1,11 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import {
-  BookMarked,
-  Gauge,
-  LogOut,
-  ShieldAlert,
-  UserSquare2,
-  Wallet,
-} from "lucide-react";
-import type { ReactNode } from "react";
+import { BookMarked, Gauge, LogOut, ShieldAlert, UserSquare2, Wallet } from "lucide-react";
+import { useEffect, type ReactNode } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
 import { BottomNav, ProfileBadge, SalesSubTabs, useIsSalesSection } from "@/components/MobileNav";
 import { cn } from "@/lib/utils";
+import { warmDatabaseCache, onDbSync } from "@/lib/database-interconnect";
 
 const manage = [
   { to: "/dashboard", label: "Dashboard", icon: Gauge },
@@ -23,7 +18,15 @@ const operate = [
   { to: "/library/skills", label: "Library", icon: BookMarked },
 ] as const;
 
-function NavGroup({ label, items, pathname }: { label: string; items: readonly { to: string; label: string; icon: typeof Gauge }[]; pathname: string }) {
+function NavGroup({
+  label,
+  items,
+  pathname,
+}: {
+  label: string;
+  items: readonly { to: string; label: string; icon: typeof Gauge }[];
+  pathname: string;
+}) {
   return (
     <div className="mt-3" data-group={label}>
       <nav className="space-y-1">
@@ -80,6 +83,30 @@ export function AppShell({
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { user, role, signOut } = useAuth();
   const isSales = useIsSalesSection();
+  const qc = useQueryClient();
+
+  useEffect(() => {
+    // Pre-warm database cache in background for <50ms load times
+    void warmDatabaseCache();
+
+    // Listen to cross-component and cross-tab database sync events
+    const unsub = onDbSync((evt) => {
+      if (evt.type === "project_stage_changed" || evt.type === "bulk_sync_completed") {
+        void qc.invalidateQueries({ queryKey: ["projects"] });
+        void qc.invalidateQueries({ queryKey: ["clients"] });
+      }
+      if (evt.type === "account_password_updated" || evt.type === "account_created_or_updated") {
+        void qc.invalidateQueries({ queryKey: ["lovable-accounts"] });
+        void qc.invalidateQueries({ queryKey: ["lovable-accounts-mini"] });
+      }
+      if (evt.type === "project_environments_updated") {
+        void qc.invalidateQueries({ queryKey: ["all-project-accounts"] });
+        void qc.invalidateQueries({ queryKey: ["projects"] });
+      }
+    });
+
+    return unsub;
+  }, [qc]);
 
   return (
     <div className="gradient-page min-h-screen px-4 pb-4 pt-5 md:p-6">
@@ -89,7 +116,9 @@ export function AppShell({
             <span className="gradient-leaf flex size-9 items-center justify-center rounded-xl text-primary-foreground">
               <Wallet className="size-4" />
             </span>
-            <span className="font-display text-lg font-semibold text-sidebar-foreground">Lovable Solutions</span>
+            <span className="font-display text-lg font-semibold text-sidebar-foreground">
+              Lovable Solutions
+            </span>
           </div>
           <div className="mx-5 mt-5 h-px bg-sidebar-border" />
           <div className="flex-1 overflow-y-auto">
@@ -100,7 +129,9 @@ export function AppShell({
             <p className="text-sm font-semibold text-sidebar-foreground">
               {user?.email?.split("@")[0] ?? "Signed in"}
             </p>
-            <p className="mt-0.5 text-xs capitalize text-sidebar-foreground/60">{role ?? "…"} access</p>
+            <p className="mt-0.5 text-xs capitalize text-sidebar-foreground/60">
+              {role ?? "…"} access
+            </p>
             <button
               onClick={() => void signOut()}
               className="mt-3 inline-flex items-center gap-2 rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground transition hover:opacity-90"
@@ -113,12 +144,18 @@ export function AppShell({
         <main className="min-w-0 flex-1">
           <header className="mb-5 lg:surface-card lg:mb-6 lg:px-6 lg:py-5">
             <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-4">
-              <div className="min-w-0 pr-36 lg:pr-0">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground lg:hidden">
+              <div className="min-w-0 pr-24 sm:pr-32 lg:pr-0">
+                <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-primary lg:hidden">
                   Lovable Solutions
                 </p>
-                <h1 className="truncate font-display text-[22px] font-semibold tracking-tight lg:text-2xl">{title}</h1>
-                {subtitle ? <p className="mt-1 text-sm leading-snug text-muted-foreground">{subtitle}</p> : null}
+                <h1 className="truncate font-display text-[22px] font-bold tracking-tight text-foreground lg:text-2xl">
+                  {title}
+                </h1>
+                {subtitle ? (
+                  <p className="mt-1 text-xs leading-snug text-muted-foreground sm:text-sm">
+                    {subtitle}
+                  </p>
+                ) : null}
               </div>
               <div className="flex shrink-0 items-center gap-3">
                 <div className="hidden lg:block">
@@ -128,7 +165,9 @@ export function AppShell({
               </div>
             </div>
             {actions ? (
-              <div className="mt-4 flex w-full min-w-0 flex-wrap items-center gap-2 lg:justify-end">{actions}</div>
+              <div className="mt-4 flex w-full min-w-0 flex-wrap items-center gap-2 lg:justify-end">
+                {actions}
+              </div>
             ) : null}
           </header>
 
@@ -140,4 +179,3 @@ export function AppShell({
     </div>
   );
 }
-

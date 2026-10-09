@@ -42,7 +42,7 @@ Same stack as your client builds — no reason to introduce a new one:
 
 | `service_logs` | Every change/service performed for a client after signing — `date`, `category` (Bug Fix/Feature/Maintenance/Support Call), `description`, `logged_by`. This is your build history per client, auditable on its own |
 
-| `client_system_users` | Metadata about the *client's own* deployed system — `user_count`, `admin_name`, `admin_contact`, `roles_breakdown` (free text or structured), `last_verified_date`. Not live-synced from their app; a snapshot you update when you know it's changed |
+| `client_system_users` | Metadata about the _client's own_ deployed system — `user_count`, `admin_name`, `admin_contact`, `roles_breakdown` (free text or structured), `last_verified_date`. Not live-synced from their app; a snapshot you update when you know it's changed |
 
 | `client_credentials` | The vault — `client_id`, `service_name` (Gmail/Hosting/Domain Registrar/DB/etc.), `username`, `encrypted_password`, `last_rotated`, `notes`. See Section 5 for how this is actually secured |
 

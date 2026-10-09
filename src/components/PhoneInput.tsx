@@ -90,7 +90,8 @@ export function PhoneInput({
     return COUNTRIES.filter((c) => `${c.name} ${c.dial} ${c.code}`.toLowerCase().includes(s));
   }, [q]);
 
-  const emit = (dial: string, number: string) => onChange(number ? `${dial} ${number}`.trim() : dial);
+  const emit = (dial: string, number: string) =>
+    onChange(number ? `${dial} ${number}`.trim() : dial);
 
   return (
     <div ref={ref} className={cn("relative flex", className)}>
@@ -146,7 +147,9 @@ export function PhoneInput({
                 {c.code === country.code ? <Check className="size-3.5 text-primary" /> : null}
               </button>
             ))}
-            {list.length === 0 ? <p className="px-3 py-4 text-sm text-muted-foreground">No match</p> : null}
+            {list.length === 0 ? (
+              <p className="px-3 py-4 text-sm text-muted-foreground">No match</p>
+            ) : null}
           </div>
         </div>
       ) : null}

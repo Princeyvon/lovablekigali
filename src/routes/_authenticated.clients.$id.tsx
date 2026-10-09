@@ -3,7 +3,18 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { toast } from "sonner";
-import { AlertTriangle, ArrowLeft, CalendarClock, Eye, KeyRound } from "lucide-react";
+import {
+  AlertTriangle,
+  ArrowLeft,
+  CalendarClock,
+  Eye,
+  KeyRound,
+  Github,
+  Cpu,
+  Sparkles,
+  Layers,
+  ExternalLink,
+} from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { Empty, Panel, Pill, TD, TH, Table } from "@/components/dash";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,14 +22,28 @@ import { useAuth } from "@/hooks/useAuth";
 import { GRACE_DAYS, daysUntil, fmtDate, money, paidThrough } from "@/lib/agency";
 import { revealCredential, saveCredential } from "@/lib/vault.functions";
 import { ProjectAccounts } from "@/components/ProjectAccounts";
+import { fetchMergedProjects } from "@/lib/pipeline-store";
+import { extractProjectEnvironments } from "@/lib/project-environments";
+import { fetchMergedAccounts } from "@/lib/lovable-accounts-store";
 
-const TABS = ["Overview", "Notes", "Service Log", "System Users", "Credentials", "Billing"] as const;
+const TABS = [
+  "Overview",
+  "Notes",
+  "Service Log",
+  "System Users",
+  "Credentials",
+  "Billing",
+] as const;
 
 export const Route = createFileRoute("/_authenticated/clients/$id")({
   head: () => ({
     meta: [
       { title: "Client detail — Lovable Solutions" },
-      { name: "description", content: "Overview, notes, service log, system users, credentials and billing for a client." },
+      {
+        name: "description",
+        content:
+          "Overview, notes, service log, system users, credentials and billing for a client.",
+      },
       { property: "og:title", content: "Client detail — Lovable Solutions" },
       { property: "og:description", content: "Everything known about one client relationship." },
     ],
@@ -34,47 +59,94 @@ function ClientDetail() {
 
   const { data: client } = useQuery({
     queryKey: ["client", id],
-    queryFn: async () => (await supabase.from("clients").select("*").eq("id", id).maybeSingle()).data,
+    queryFn: async () =>
+      (await supabase.from("clients").select("*").eq("id", id).maybeSingle()).data,
   });
   const { data: notes = [] } = useQuery({
     queryKey: ["notes", id],
     queryFn: async () =>
-      (await supabase.from("client_notes").select("*").eq("client_id", id).order("created_at", { ascending: false }))
-        .data ?? [],
+      (
+        await supabase
+          .from("client_notes")
+          .select("*")
+          .eq("client_id", id)
+          .order("created_at", { ascending: false })
+      ).data ?? [],
   });
   const { data: logs = [] } = useQuery({
     queryKey: ["logs", id],
     queryFn: async () =>
-      (await supabase.from("service_logs").select("*").eq("client_id", id).order("date", { ascending: false })).data ??
-      [],
+      (
+        await supabase
+          .from("service_logs")
+          .select("*")
+          .eq("client_id", id)
+          .order("date", { ascending: false })
+      ).data ?? [],
   });
   const { data: sysUsers = [] } = useQuery({
     queryKey: ["sysusers", id],
-    queryFn: async () => (await supabase.from("client_system_users").select("*").eq("client_id", id)).data ?? [],
+    queryFn: async () =>
+      (await supabase.from("client_system_users").select("*").eq("client_id", id)).data ?? [],
   });
   const { data: creds = [] } = useQuery({
     queryKey: ["creds", id],
     queryFn: async () =>
-      (await supabase.from("client_credentials").select("id, service_name, username, last_rotated, notes").eq("client_id", id))
-        .data ?? [],
+      (
+        await supabase
+          .from("client_credentials")
+          .select("id, service_name, username, last_rotated, notes")
+          .eq("client_id", id)
+      ).data ?? [],
   });
   const { data: payments = [] } = useQuery({
     queryKey: ["client-payments", id],
     queryFn: async () =>
-      (await supabase.from("payments").select("*").eq("client_id", id).order("payment_date", { ascending: false }))
-        .data ?? [],
+      (
+        await supabase
+          .from("payments")
+          .select("*")
+          .eq("client_id", id)
+          .order("payment_date", { ascending: false })
+      ).data ?? [],
   });
   const { data: sub } = useQuery({
     queryKey: ["client-sub", id],
-    queryFn: async () => (await supabase.from("subscriptions").select("*").eq("client_id", id).maybeSingle()).data,
+    queryFn: async () =>
+      (await supabase.from("subscriptions").select("*").eq("client_id", id).maybeSingle()).data,
   });
+
+  const { data: allProjects = [] } = useQuery({
+    queryKey: ["projects"],
+    queryFn: fetchMergedProjects,
+  });
+  const { data: projectAccounts = [] } = useQuery({
+    queryKey: ["all-project-accounts"],
+    queryFn: async () =>
+      (
+        await supabase
+          .from("project_accounts")
+          .select("*")
+          .order("created_at", { ascending: false })
+      ).data ?? [],
+  });
+  const { data: lovableAccounts = [] } = useQuery({
+    queryKey: ["lovable-accounts"],
+    queryFn: fetchMergedAccounts,
+  });
+
+  const clientProjects = allProjects.filter((p) => p.client_id === id);
 
   const [note, setNote] = useState({ content: "", note_type: "General" as const, is_draft: false });
   const addNote = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase
-        .from("client_notes")
-        .insert({ client_id: id, content: note.content, note_type: note.note_type, is_draft: note.is_draft, created_by: memberId });
+      const { error } = await supabase.from("client_notes").insert({
+        client_id: id,
+        content: note.content,
+        note_type: note.note_type,
+        is_draft: note.is_draft,
+        created_by: memberId,
+      });
       if (error) throw error;
     },
     onSuccess: () => {
@@ -87,9 +159,12 @@ function ClientDetail() {
   const [log, setLog] = useState({ description: "", category: "Feature" as const });
   const addLog = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase
-        .from("service_logs")
-        .insert({ client_id: id, description: log.description, category: log.category, logged_by: memberId });
+      const { error } = await supabase.from("service_logs").insert({
+        client_id: id,
+        description: log.description,
+        category: log.category,
+        logged_by: memberId,
+      });
       if (error) throw error;
     },
     onSuccess: () => {
@@ -101,7 +176,12 @@ function ClientDetail() {
 
   const save = useServerFn(saveCredential);
   const reveal = useServerFn(revealCredential);
-  const [cred, setCred] = useState({ service_name: "", username: "", password: "", change_reason: "" });
+  const [cred, setCred] = useState({
+    service_name: "",
+    username: "",
+    password: "",
+    change_reason: "",
+  });
   const [revealed, setRevealed] = useState<Record<string, string>>({});
 
   const addCred = useMutation({
@@ -119,15 +199,24 @@ function ClientDetail() {
   const overdue = through === null || (daysLeft !== null && daysLeft < 0);
   const daysOverdue = daysLeft !== null && daysLeft < 0 ? Math.abs(daysLeft) : 0;
   const lastPayment = payments[0] ?? null;
-  const daysSinceLastPayment = lastPayment ? Math.abs(daysUntil(lastPayment.payment_date) ?? 0) : null;
+  const daysSinceLastPayment = lastPayment
+    ? Math.abs(daysUntil(lastPayment.payment_date) ?? 0)
+    : null;
   const graceLeft = Math.max(0, GRACE_DAYS - daysOverdue);
 
   return (
     <AppShell
       title={client?.business_name ?? "Client"}
-      subtitle={client ? `${client.industry || "—"} · signed ${fmtDate(client.signed_date)}` : "Loading client…"}
+      subtitle={
+        client
+          ? `${client.industry || "—"} · signed ${fmtDate(client.signed_date)}`
+          : "Loading client…"
+      }
       actions={
-        <Link to="/clients" className="inline-flex items-center gap-1.5 rounded-xl border border-border px-3 py-2 text-sm">
+        <Link
+          to="/clients"
+          className="inline-flex items-center gap-1.5 rounded-xl border border-border px-3 py-2 text-sm"
+        >
           <ArrowLeft className="size-4" /> All clients
         </Link>
       }
@@ -137,13 +226,17 @@ function ClientDetail() {
       >
         <div
           className={`absolute -right-16 -top-16 size-48 rounded-full opacity-60 blur-3xl ${
-            overdue ? "bg-[var(--leaf-deep)]" : "gradient-leaf"
+            overdue ? "bg-leaf-deep" : "gradient-leaf"
           }`}
         />
         <div className="relative flex flex-wrap items-center justify-between gap-6">
           <div>
             <p className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-              {overdue ? <AlertTriangle className="size-3.5" /> : <CalendarClock className="size-3.5" />}
+              {overdue ? (
+                <AlertTriangle className="size-3.5" />
+              ) : (
+                <CalendarClock className="size-3.5" />
+              )}
               {overdue ? "Overdue since due date" : "Time until next payment is due"}
             </p>
             <p className="mt-2 font-display text-3xl font-semibold">
@@ -154,14 +247,20 @@ function ClientDetail() {
                   : `${daysLeft} day${daysLeft === 1 ? "" : "s"} left`}
             </p>
             <p className="mt-1 text-sm text-muted-foreground">
-              {through ? `Paid through ${fmtDate(through)}` : "This client has never been billed through."}
-              {overdue && through ? ` · ${graceLeft} day${graceLeft === 1 ? "" : "s"} of grace remaining` : ""}
+              {through
+                ? `Paid through ${fmtDate(through)}`
+                : "This client has never been billed through."}
+              {overdue && through
+                ? ` · ${graceLeft} day${graceLeft === 1 ? "" : "s"} of grace remaining`
+                : ""}
             </p>
           </div>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
             <div className="rounded-2xl border border-border bg-card/70 p-3">
               <p className="text-xs text-muted-foreground">Last payment</p>
-              <p className="mt-1 font-display text-base font-semibold">{fmtDate(lastPayment?.payment_date)}</p>
+              <p className="mt-1 font-display text-base font-semibold">
+                {fmtDate(lastPayment?.payment_date)}
+              </p>
             </div>
             <div className="rounded-2xl border border-border bg-card/70 p-3">
               <p className="text-xs text-muted-foreground">Days since last payment</p>
@@ -171,7 +270,9 @@ function ClientDetail() {
             </div>
             <div className="rounded-2xl border border-border bg-card/70 p-3">
               <p className="text-xs text-muted-foreground">Monthly rate</p>
-              <p className="mt-1 font-display text-base font-semibold">{money(sub?.monthly_rate)}</p>
+              <p className="mt-1 font-display text-base font-semibold">
+                {money(sub?.monthly_rate)}
+              </p>
             </div>
           </div>
         </div>
@@ -219,7 +320,9 @@ function ClientDetail() {
               </div>
               <div className="gradient-mist rounded-2xl border border-border p-4">
                 <p className="text-xs text-muted-foreground">Monthly rate</p>
-                <p className="mt-1 font-display text-lg font-semibold">{money(sub?.monthly_rate)}</p>
+                <p className="mt-1 font-display text-lg font-semibold">
+                  {money(sub?.monthly_rate)}
+                </p>
               </div>
               <div className="gradient-mist rounded-2xl border border-border p-4">
                 <p className="text-xs text-muted-foreground">Service entries</p>
@@ -231,6 +334,140 @@ function ClientDetail() {
               </div>
             </div>
           </Panel>
+
+          {/* Client Projects & Assigned Environments */}
+          <div className="lg:col-span-2">
+            <Panel
+              title={
+                <div className="flex items-center gap-2">
+                  <Layers className="size-4 text-primary" />
+                  <span>Client Projects & Assigned Environments</span>
+                </div>
+              }
+              right={<Pill tone="mist">{clientProjects.length} builds</Pill>}
+            >
+              {clientProjects.length === 0 ? (
+                <Empty>No projects linked to this client yet.</Empty>
+              ) : (
+                <div className="space-y-3">
+                  {clientProjects.map((p) => {
+                    const envs = extractProjectEnvironments(p, projectAccounts, lovableAccounts);
+                    return (
+                      <div
+                        key={p.id}
+                        className="rounded-2xl border border-border bg-card p-4 transition hover:border-border"
+                      >
+                        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border/60 pb-3">
+                          <div className="flex items-center gap-2">
+                            <h4 className="font-display text-base font-bold text-foreground">
+                              {p.project_name}
+                            </h4>
+                            <Pill tone={p.build_stage === "Shipped" ? "leaf" : "mist"}>
+                              {p.build_stage}
+                            </Pill>
+                          </div>
+                          <Link
+                            to="/apps/projects"
+                            search={{ projectId: p.id }}
+                            className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline"
+                          >
+                            <span>Open in Project Hub</span>
+                            <ExternalLink className="size-3" />
+                          </Link>
+                        </div>
+
+                        {/* 3 Assigned Environments */}
+                        <div className="mt-3 grid gap-2.5 sm:grid-cols-3 text-xs">
+                          {/* GitHub */}
+                          <div className="rounded-xl border border-border/80 bg-secondary/30 p-2.5">
+                            <div className="flex items-center gap-1.5 font-bold text-foreground">
+                              <Github className="size-3.5" />
+                              <span>GitHub Main Repo</span>
+                            </div>
+                            <div className="mt-1.5 space-y-1 text-[11px]">
+                              <a
+                                href={envs.github.repo_url}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="block truncate font-mono text-foreground hover:text-primary hover:underline"
+                                title={envs.github.repo_url}
+                              >
+                                {envs.github.repo_url.replace(/^https?:\/\/github\.com\//, "") ||
+                                  "repo link"}
+                              </a>
+                              <p
+                                className="truncate text-muted-foreground"
+                                title={envs.github.email}
+                              >
+                                Email: {envs.github.email || "dev@lovablesolutions.com"}
+                              </p>
+                            </div>
+                          </div>
+
+                          {/* Google AI Studio */}
+                          <div className="rounded-xl border border-border/80 bg-secondary/30 p-2.5">
+                            <div className="flex items-center gap-1.5 font-bold text-foreground">
+                              <Cpu className="size-3.5 text-blue-500" />
+                              <span>Google AI Studio</span>
+                            </div>
+                            <div className="mt-1.5 space-y-1 text-[11px]">
+                              <p
+                                className="truncate font-medium text-foreground"
+                                title={envs.googleAiStudio.email}
+                              >
+                                {envs.googleAiStudio.email}
+                              </p>
+                              <a
+                                href={envs.googleAiStudio.url || "https://aistudio.google.com"}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="inline-block text-[10px] font-semibold text-blue-600 dark:text-blue-400 hover:underline"
+                              >
+                                Open Studio →
+                              </a>
+                            </div>
+                          </div>
+
+                          {/* Lovable */}
+                          <div className="rounded-xl border border-border/80 bg-secondary/30 p-2.5">
+                            <div className="flex items-center gap-1.5 font-bold text-foreground">
+                              <Sparkles className="size-3.5 text-primary" />
+                              <span>Lovable Builder</span>
+                            </div>
+                            <div className="mt-1.5 space-y-1 text-[11px]">
+                              <div className="flex items-center justify-between gap-1">
+                                <p
+                                  className="truncate font-medium text-foreground"
+                                  title={envs.lovable.email}
+                                >
+                                  {envs.lovable.email}
+                                </p>
+                                {envs.lovable.credits != null && (
+                                  <span className="rounded bg-primary/10 px-1 py-0.2 text-[9px] font-bold text-primary">
+                                    {envs.lovable.credits}cr
+                                  </span>
+                                )}
+                              </div>
+                              {envs.lovable.url ? (
+                                <a
+                                  href={envs.lovable.url}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="inline-block text-[10px] font-semibold text-primary hover:underline"
+                                >
+                                  Open App →
+                                </a>
+                              ) : null}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </Panel>
+          </div>
         </div>
       )}
 
@@ -245,7 +482,9 @@ function ClientDetail() {
             />
             <select
               value={note.note_type}
-              onChange={(e) => setNote({ ...note, note_type: e.target.value as typeof note.note_type })}
+              onChange={(e) =>
+                setNote({ ...note, note_type: e.target.value as typeof note.note_type })
+              }
               className="rounded-xl border border-input bg-background px-3 py-2 text-sm"
             >
               {["General", "Prompt Draft", "Spec"].map((t) => (
@@ -275,7 +514,9 @@ function ClientDetail() {
                 <div className="flex items-center gap-2">
                   <Pill tone="mist">{n.note_type}</Pill>
                   {n.is_draft && <Pill tone="muted">draft</Pill>}
-                  <span className="ml-auto text-xs text-muted-foreground">{fmtDate(n.created_at)}</span>
+                  <span className="ml-auto text-xs text-muted-foreground">
+                    {fmtDate(n.created_at)}
+                  </span>
                 </div>
                 <p className="mt-2 whitespace-pre-wrap text-sm">{n.content}</p>
               </div>
@@ -368,82 +609,89 @@ function ClientDetail() {
         </Panel>
       )}
 
-      {tab === "Credentials" && role !== "sales" && (
-        <Panel title="Project accounts" right={<Pill tone="mist">Lovable · AI Studio · Manus · GitHub</Pill>}>
-          <ProjectAccounts clientId={id} />
-        </Panel>
-      )}
-
       {tab === "Credentials" && (
-        <Panel
-          title="Credential vault"
-          right={<Pill tone="warn">Every reveal is logged</Pill>}
-        >
-          {role === "sales" ? (
-            <Empty>Sales reps don't have vault access.</Empty>
-          ) : (
-            <>
-              <div className="grid gap-3 md:grid-cols-5">
-                {(["service_name", "username", "password", "change_reason"] as const).map((k) => (
-                  <input
-                    key={k}
-                    type={k === "password" ? "password" : "text"}
-                    value={cred[k]}
-                    onChange={(e) => setCred({ ...cred, [k]: e.target.value })}
-                    placeholder={k.replace("_", " ")}
-                    className="rounded-xl border border-input bg-background px-3 py-2 text-sm capitalize"
-                  />
-                ))}
-                <button
-                  onClick={() => addCred.mutate()}
-                  disabled={!cred.service_name || !cred.password || !cred.change_reason}
-                  className="gradient-leaf rounded-xl px-4 py-2 text-sm font-semibold text-primary-foreground disabled:opacity-50"
-                >
-                  <KeyRound className="mr-1 inline size-4" /> Store
-                </button>
-              </div>
-              <div className="mt-5">
-                {creds.length === 0 ? (
-                  <Empty>No credentials stored.</Empty>
-                ) : (
-                  <Table
-                    head={
-                      <>
-                        <TH>Service</TH>
-                        <TH>Username</TH>
-                        <TH>Password</TH>
-                        <TH>Last rotated</TH>
-                      </>
-                    }
+        <div className="space-y-6">
+          <Panel
+            title="Platform Accounts & Footprint"
+            right={
+              <Pill tone="mist">Lovable · AI Studio · Manus · GitHub · Supabase · Vercel</Pill>
+            }
+          >
+            <ProjectAccounts clientId={id} />
+          </Panel>
+
+          <Panel
+            title="Direct Credential Vault"
+            right={<Pill tone="warn">Every reveal is logged</Pill>}
+          >
+            {role === "sales" ? (
+              <Empty>Sales reps don't have vault access to reveal direct passwords.</Empty>
+            ) : (
+              <>
+                <div className="grid gap-3 md:grid-cols-5">
+                  {(["service_name", "username", "password", "change_reason"] as const).map((k) => (
+                    <input
+                      key={k}
+                      type={k === "password" ? "password" : "text"}
+                      value={cred[k]}
+                      onChange={(e) => setCred({ ...cred, [k]: e.target.value })}
+                      placeholder={k.replace("_", " ")}
+                      className="rounded-xl border border-input bg-background px-3 py-2 text-sm capitalize"
+                    />
+                  ))}
+                  <button
+                    onClick={() => addCred.mutate()}
+                    disabled={!cred.service_name || !cred.password || !cred.change_reason}
+                    className="gradient-leaf rounded-xl px-4 py-2 text-sm font-semibold text-primary-foreground disabled:opacity-50"
                   >
-                    {creds.map((c) => (
-                      <tr key={c.id}>
-                        <TD className="font-medium">{c.service_name}</TD>
-                        <TD>{c.username}</TD>
-                        <TD>
-                          {revealed[c.id] ? (
-                            <code className="rounded bg-secondary px-2 py-1 text-xs">{revealed[c.id]}</code>
-                          ) : (
-                            <button
-                              onClick={async () => {
-                                const res = await reveal({ data: { id: c.id } });
-                                setRevealed((r) => ({ ...r, [c.id]: res.password }));
-                              }}
-                              className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline"
-                            >
-                              <Eye className="size-3.5" /> Reveal
-                            </button>
-                          )}
-                        </TD>
-                        <TD>{fmtDate(c.last_rotated)}</TD>
-                      </tr>
-                    ))}
-                  </Table>
-                )}
-              </div>
-            </>
-          )}
-        </Panel>
+                    <KeyRound className="mr-1 inline size-4" /> Store
+                  </button>
+                </div>
+                <div className="mt-5">
+                  {creds.length === 0 ? (
+                    <Empty>No credentials stored.</Empty>
+                  ) : (
+                    <Table
+                      head={
+                        <>
+                          <TH>Service</TH>
+                          <TH>Username</TH>
+                          <TH>Password</TH>
+                          <TH>Last rotated</TH>
+                        </>
+                      }
+                    >
+                      {creds.map((c) => (
+                        <tr key={c.id}>
+                          <TD className="font-medium">{c.service_name}</TD>
+                          <TD>{c.username}</TD>
+                          <TD>
+                            {revealed[c.id] ? (
+                              <code className="rounded bg-secondary px-2 py-1 text-xs">
+                                {revealed[c.id]}
+                              </code>
+                            ) : (
+                              <button
+                                onClick={async () => {
+                                  const res = await reveal({ data: { id: c.id } });
+                                  setRevealed((r) => ({ ...r, [c.id]: res.password }));
+                                }}
+                                className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline"
+                              >
+                                <Eye className="size-3.5" /> Reveal
+                              </button>
+                            )}
+                          </TD>
+                          <TD>{fmtDate(c.last_rotated)}</TD>
+                        </tr>
+                      ))}
+                    </Table>
+                  )}
+                </div>
+              </>
+            )}
+          </Panel>
+        </div>
       )}
 
       {tab === "Billing" && (

@@ -1,0 +1,6 @@
+{
+  "name": "Agency Hub",
+  "description": "Internal operations platform for managing clients, credentials vault, billing, commissions, payouts, and performance insights.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

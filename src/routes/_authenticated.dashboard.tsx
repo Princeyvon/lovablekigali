@@ -1,293 +1,324 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { AlertTriangle, KeyRound, TrendingDown, TrendingUp, Wallet } from "lucide-react";
 import {
-  Area,
-  AreaChart,
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Legend,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
+  Users,
+  ShieldAlert,
+  ArrowRight,
+  TrendingUp,
+  FolderGit2,
+  KeyRound,
+  CheckCircle2,
+  Clock,
+  Sparkles,
+  Bot,
+  Github,
+  Cpu,
+  Layers,
+  ExternalLink,
+} from "lucide-react";
 import { AppShell } from "@/components/AppShell";
-import { Donut, Empty, Panel, Pill, Stat, TD, TH, Table } from "@/components/dash";
+import { Stat, Panel, Pill } from "@/components/dash";
 import { supabase } from "@/integrations/supabase/client";
-import { REMINDER_WINDOW_DAYS, ROTATION_STALE_DAYS, daysUntil, fmtDate, money, paidThrough, shortMoney, startOfWeek } from "@/lib/agency";
-
-function Trend({ current, previous, unit = "" }: { current: number; previous: number; unit?: string }) {
-  const delta = previous === 0 ? (current === 0 ? 0 : 100) : ((current - previous) / previous) * 100;
-  const up = delta >= 0;
-  return (
-    <span
-      className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold ${
-        up ? "bg-secondary text-primary" : "bg-muted text-muted-foreground"
-      }`}
-    >
-      {up ? <TrendingUp className="size-3" /> : <TrendingDown className="size-3" />}
-      {up ? "+" : ""}
-      {Math.round(delta)}% {unit}
-    </span>
-  );
-}
+import { fetchMergedClients, fetchMergedProjects } from "@/lib/pipeline-store";
+import { fetchMergedProspects } from "@/lib/prospects-store";
+import { extractProjectEnvironments } from "@/lib/project-environments";
+import { fetchMergedAccounts } from "@/lib/lovable-accounts-store";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
     meta: [
       { title: "Dashboard — Lovable Solutions" },
-      { name: "description", content: "Payments due, overdue accounts, weekly velocity and credential rotation alerts." },
-      { property: "og:title", content: "Dashboard — Lovable Solutions" },
-      { property: "og:description", content: "The daily operating view of the agency." },
+      {
+        name: "description",
+        content: "Operations, client pipeline, projects and builder accounts.",
+      },
     ],
   }),
   component: Dashboard,
 });
 
 function Dashboard() {
-  const { data, isLoading } = useQuery({
-    queryKey: ["dashboard"],
-    queryFn: async () => {
-      const [clients, payments, subs, creds, prospects] = await Promise.all([
-        supabase.from("clients").select("id, business_name, status, signed_date"),
-        supabase.from("payments").select("client_id, amount, payment_date, covers_period_end, months_covered"),
-        supabase.from("subscriptions").select("client_id, monthly_rate, status"),
-        supabase.from("client_credentials").select("id, service_name, client_id, last_rotated"),
-        supabase.from("prospects").select("id, stage, created_at"),
-      ]);
-      return {
-        clients: clients.data ?? [],
-        payments: payments.data ?? [],
-        subs: subs.data ?? [],
-        creds: creds.data ?? [],
-        prospects: prospects.data ?? [],
-      };
-    },
+  const { data: clients = [] } = useQuery({
+    queryKey: ["clients"],
+    queryFn: fetchMergedClients,
   });
 
-  const clients = data?.clients ?? [];
-  const payments = data?.payments ?? [];
-
-  const byClient = clients.map((c) => {
-    const paid = payments.filter((p) => p.client_id === c.id);
-    const through = paidThrough(paid);
-    return { ...c, paidThrough: through, days: daysUntil(through) };
+  const { data: projects = [] } = useQuery({
+    queryKey: ["projects"],
+    queryFn: fetchMergedProjects,
   });
 
-  const dueSoon = byClient.filter((c) => c.days !== null && c.days >= 0 && c.days <= REMINDER_WINDOW_DAYS);
-  const overdue = byClient.filter((c) => c.days !== null && c.days < 0);
-  const mrr = (data?.subs ?? []).filter((s) => s.status === "Active").reduce((a, s) => a + Number(s.monthly_rate), 0);
-
-  const weeks = Array.from({ length: 8 }, (_, i) => {
-    const start = startOfWeek(new Date());
-    start.setDate(start.getDate() - (7 - i) * 7);
-    const end = new Date(start);
-    end.setDate(end.getDate() + 7);
-    const revenue = payments
-      .filter((p) => new Date(p.payment_date) >= start && new Date(p.payment_date) < end)
-      .reduce((a, p) => a + Number(p.amount), 0);
-    const leads = (data?.prospects ?? []).filter(
-      (p) => new Date(p.created_at) >= start && new Date(p.created_at) < end,
-    ).length;
-    return {
-      label: `${start.getDate()}/${start.getMonth() + 1}`,
-      revenue,
-      leads,
-    };
+  const { data: prospects = [] } = useQuery({
+    queryKey: ["prospects"],
+    queryFn: fetchMergedProspects,
   });
 
-  const thisWeek = weeks[weeks.length - 1] ?? { revenue: 0, leads: 0 };
-  const lastWeek = weeks[weeks.length - 2] ?? { revenue: 0, leads: 0 };
-
-  const staleCreds = (data?.creds ?? []).filter((c) => {
-    const d = daysUntil(c.last_rotated);
-    return d !== null && Math.abs(d) > ROTATION_STALE_DAYS;
+  const { data: accounts = [] } = useQuery({
+    queryKey: ["lovable-accounts"],
+    queryFn: fetchMergedAccounts,
   });
 
-  const active = clients.filter((c) => c.status === "Active").length;
+  const { data: projectAccounts = [] } = useQuery({
+    queryKey: ["all-project-accounts"],
+    queryFn: async () =>
+      (
+        await supabase
+          .from("project_accounts")
+          .select("*")
+          .order("created_at", { ascending: false })
+      ).data ?? [],
+  });
+
+  const activeProspects = prospects.filter((p) =>
+    ["Contacted", "Demo", "Negotiating"].includes(p.stage),
+  );
+  const shippedProjects = projects.filter((p) => p.build_stage === "Shipped");
+  const inProgressProjects = projects.filter(
+    (p) => p.build_stage === "Building" || p.build_stage === "Testing",
+  );
 
   return (
-    <AppShell title="Dashboard" subtitle="Everything that needs your attention this week.">
-      <div className="grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <Stat label="Monthly recurring" value={money(mrr)} hint={`${active} active clients`} icon={<Wallet className="size-4" />} />
-        <Stat label="Due within 5 days" value={String(dueSoon.length)} hint="Reminders queued" tone="mist" />
-        <Stat label="Overdue accounts" value={String(overdue.length)} hint="Past paid-through date" tone="deep" />
+    <AppShell
+      title="Operations Dashboard"
+      subtitle="Complete bird's-eye view of agency clients, pipeline progression, active builds, and platform credentials."
+      actions={
+        <div className="flex flex-wrap items-center gap-2">
+          <Link
+            to="/prospects"
+            className="gradient-leaf inline-flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-sm font-semibold text-primary-foreground shadow-xs transition hover:opacity-90"
+          >
+            <TrendingUp className="size-4" /> Go to Pipeline
+          </Link>
+          <Link
+            to="/apps/emails"
+            className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-card px-3.5 py-2 text-sm font-medium hover:bg-secondary"
+          >
+            <KeyRound className="size-4" /> Builder Accounts
+          </Link>
+        </div>
+      }
+    >
+      {/* High-level stats */}
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <Stat
-          label="Rotation alerts"
-          value={String(staleCreds.length)}
-          hint="Credentials older than 12 months"
-          icon={<KeyRound className="size-4" />}
+          label="Active Clients"
+          value={String(clients.length)}
+          hint="Signed & serviced organizations"
+          tone="leaf"
+          icon={<Users className="size-4 text-emerald-600 dark:text-emerald-400" />}
+        />
+        <Stat
+          label="Active Builds"
+          value={String(inProgressProjects.length)}
+          hint={`${projects.length} total projects tracked`}
+          tone="mist"
+          icon={<FolderGit2 className="size-4 text-amber-600 dark:text-amber-400" />}
+        />
+        <Stat
+          label="Active Leads"
+          value={String(activeProspects.length)}
+          hint={`${prospects.length} total in pipeline`}
+          tone="deep"
+          icon={<TrendingUp className="size-4 text-purple-600 dark:text-purple-400" />}
+        />
+        <Stat
+          label="Builder Accounts"
+          value={String(accounts.length)}
+          hint="Google & platform login emails"
+          tone="plain"
+          icon={<KeyRound className="size-4 text-sky-600 dark:text-sky-400" />}
         />
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-[1.6fr_1fr]">
-        <div className="space-y-6">
+      <div className="grid gap-6 lg:grid-cols-3">
+        {/* Active Projects Column */}
+        <div className="space-y-4 lg:col-span-2">
           <Panel
-            title="Revenue collected per week"
+            title="Current Build Projects"
             right={
-              <div className="flex items-center gap-2">
-                <span className="font-display text-sm font-semibold">{money(thisWeek.revenue)} this week</span>
-                <Trend current={thisWeek.revenue} previous={lastWeek.revenue} unit="vs last week" />
-              </div>
+              <Link
+                to="/apps/projects"
+                className="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline"
+              >
+                View all projects <ArrowRight className="size-3" />
+              </Link>
             }
           >
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={weeks} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="revFill" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="var(--leaf)" stopOpacity={0.55} />
-                      <stop offset="100%" stopColor="var(--leaf)" stopOpacity={0.04} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
-                  <XAxis dataKey="label" tickLine={false} axisLine={false} fontSize={12} stroke="var(--muted-foreground)" />
-                  <YAxis
-                    tickFormatter={(v: number) => shortMoney(v)}
-                    tickLine={false}
-                    axisLine={false}
-                    width={70}
-                    fontSize={12}
-                    stroke="var(--muted-foreground)"
-                  />
-                  <Tooltip
-                    formatter={(v: number) => [money(v), "Revenue"]}
-                    labelFormatter={(l: string) => `Week of ${l}`}
-                    contentStyle={{ borderRadius: 12, border: "1px solid var(--border)", background: "var(--card)" }}
-                  />
-                  <Legend verticalAlign="top" height={24} />
-                  <Area
-                    name="Revenue (RWF)"
-                    type="monotone"
-                    dataKey="revenue"
-                    stroke="var(--leaf)"
-                    strokeWidth={2.5}
-                    fill="url(#revFill)"
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
+            {projects.length === 0 ? (
+              <p className="py-6 text-center text-xs text-muted-foreground">No projects found.</p>
+            ) : (
+              <div className="space-y-2.5">
+                {projects.slice(0, 5).map((p) => {
+                  const envs = extractProjectEnvironments(p, projectAccounts, accounts);
+                  return (
+                    <div
+                      key={p.id}
+                      className="flex flex-col gap-2 rounded-xl border border-border/70 bg-card p-3 shadow-xs hover:border-border sm:flex-row sm:items-center sm:justify-between"
+                    >
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                          <p className="truncate font-display text-sm font-semibold text-foreground">
+                            {p.project_name}
+                          </p>
+                          <Pill
+                            tone={
+                              p.build_stage === "Shipped"
+                                ? "leaf"
+                                : p.build_stage === "Building"
+                                  ? "mist"
+                                  : "plain"
+                            }
+                          >
+                            {p.build_stage}
+                          </Pill>
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                          Client: {p.onboarded_by_name || "Internal"}
+                        </p>
+
+                        {/* Environments mini-badges */}
+                        <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                          <span
+                            className="inline-flex items-center gap-1 rounded-md bg-neutral-900/10 px-1.5 py-0.5 font-mono text-[10px] text-foreground dark:bg-neutral-800"
+                            title={`GitHub repo: ${envs.github.repo_url} (${envs.github.email})`}
+                          >
+                            <Github className="size-3" />
+                            <span className="truncate max-w-[80px]">
+                              {envs.github.repo_url.split("/").pop() || "repo"}
+                            </span>
+                          </span>
+
+                          <span
+                            className="inline-flex items-center gap-1 rounded-md bg-blue-500/10 px-1.5 py-0.5 text-[10px] font-medium text-blue-700 dark:text-blue-300"
+                            title={`Google AI Studio: ${envs.googleAiStudio.email}`}
+                          >
+                            <Cpu className="size-3" />
+                            <span className="truncate max-w-[90px]">
+                              {envs.googleAiStudio.email.split("@")[0]}
+                            </span>
+                          </span>
+
+                          <span
+                            className="inline-flex items-center gap-1 rounded-md bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium text-primary"
+                            title={`Lovable: ${envs.lovable.email}`}
+                          >
+                            <Sparkles className="size-3" />
+                            <span className="truncate max-w-[90px]">
+                              {envs.lovable.email.split("@")[0]}
+                            </span>
+                            {envs.lovable.credits != null && (
+                              <span className="font-bold">({envs.lovable.credits}cr)</span>
+                            )}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-end gap-1.5">
+                        <Link
+                          to="/apps/projects"
+                          search={{ projectId: p.id }}
+                          className="inline-flex items-center gap-1 rounded-lg border border-border px-2.5 py-1 text-xs font-semibold text-muted-foreground hover:bg-secondary hover:text-foreground"
+                        >
+                          <span>Manage</span>
+                          <ArrowRight className="size-3" />
+                        </Link>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </Panel>
 
-          <Panel
-            title="New prospects per week"
-            right={
-              <div className="flex items-center gap-2">
-                <span className="font-display text-sm font-semibold">{thisWeek.leads} this week</span>
-                <Trend current={thisWeek.leads} previous={lastWeek.leads} unit="vs last week" />
+          {/* Quick Operations Matrix */}
+          <div className="grid gap-3 sm:grid-cols-3">
+            <Link
+              to="/prospects"
+              className="flex flex-col justify-between rounded-2xl border border-border/80 bg-card p-4 transition hover:-translate-y-0.5 hover:shadow-md"
+            >
+              <div className="flex items-center justify-between">
+                <span className="flex size-8 items-center justify-center rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400">
+                  <TrendingUp className="size-4" />
+                </span>
+                <Pill tone="mist">{activeProspects.length} leads</Pill>
               </div>
-            }
-          >
-            <div className="h-52">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={weeks} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
-                  <XAxis dataKey="label" tickLine={false} axisLine={false} fontSize={12} stroke="var(--muted-foreground)" />
-                  <YAxis allowDecimals={false} tickLine={false} axisLine={false} width={32} fontSize={12} stroke="var(--muted-foreground)" />
-                  <Tooltip
-                    labelFormatter={(l: string) => `Week of ${l}`}
-                    contentStyle={{ borderRadius: 12, border: "1px solid var(--border)", background: "var(--card)" }}
-                  />
-                  <Legend verticalAlign="top" height={24} />
-                  <Bar name="New prospects" dataKey="leads" fill="var(--leaf-deep)" radius={[6, 6, 0, 0]} maxBarSize={26} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </Panel>
+              <div className="mt-3">
+                <p className="font-semibold text-foreground">Sales Pipeline</p>
+                <p className="text-xs text-muted-foreground">
+                  Advance leads and convert to clients
+                </p>
+              </div>
+            </Link>
+
+            <Link
+              to="/apps/projects"
+              className="flex flex-col justify-between rounded-2xl border border-border/80 bg-card p-4 transition hover:-translate-y-0.5 hover:shadow-md"
+            >
+              <div className="flex items-center justify-between">
+                <span className="flex size-8 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                  <CheckCircle2 className="size-4" />
+                </span>
+                <Pill tone="leaf">{shippedProjects.length} shipped</Pill>
+              </div>
+              <div className="mt-3">
+                <p className="font-semibold text-foreground">Project Vaults</p>
+                <p className="text-xs text-muted-foreground">
+                  Manage credentials and connected tools
+                </p>
+              </div>
+            </Link>
+
+            <Link
+              to="/apps/emails"
+              className="flex flex-col justify-between rounded-2xl border border-border/80 bg-card p-4 transition hover:-translate-y-0.5 hover:shadow-md"
+            >
+              <div className="flex items-center justify-between">
+                <span className="flex size-8 items-center justify-center rounded-xl bg-sky-500/10 text-sky-600 dark:text-sky-400">
+                  <KeyRound className="size-4" />
+                </span>
+                <Pill tone="plain">{accounts.length} emails</Pill>
+              </div>
+              <div className="mt-3">
+                <p className="font-semibold text-foreground">Builder Accounts</p>
+                <p className="text-xs text-muted-foreground">Google logins, credits & passwords</p>
+              </div>
+            </Link>
+          </div>
         </div>
 
-
-        <Panel title="Collection health">
-          <Donut
-            value={clients.length - overdue.length}
-            total={Math.max(clients.length, 1)}
-            caption="paid through"
-          />
-          <div className="mt-5 space-y-2 text-sm">
-            <div className="flex items-center justify-between rounded-xl bg-secondary px-3 py-2">
-              <span className="text-secondary-foreground">Collected all-time</span>
-              <span className="font-semibold">{money(payments.reduce((a, p) => a + Number(p.amount), 0))}</span>
-            </div>
-            <div className="flex items-center justify-between rounded-xl bg-muted px-3 py-2">
-              <span className="text-muted-foreground">Payments logged</span>
-              <span className="font-semibold">{payments.length}</span>
-            </div>
-          </div>
-        </Panel>
+        {/* Sidebar: Pipeline Highlights */}
+        <div className="space-y-4">
+          <Panel
+            title="Recent Pipeline Leads"
+            right={
+              <Link to="/prospects" className="text-xs font-semibold text-primary hover:underline">
+                View CRM
+              </Link>
+            }
+          >
+            {prospects.length === 0 ? (
+              <p className="py-6 text-center text-xs text-muted-foreground">No leads recorded.</p>
+            ) : (
+              <div className="space-y-3">
+                {prospects.slice(0, 4).map((p) => (
+                  <div
+                    key={p.id}
+                    className="rounded-xl border border-border/60 bg-secondary/20 p-3 text-xs"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold text-foreground">{p.business_name}</span>
+                      <Pill tone={p.stage === "Signed" ? "leaf" : "mist"}>{p.stage}</Pill>
+                    </div>
+                    <p className="mt-1 text-[11px] text-muted-foreground">
+                      {p.industry || "General"} · {p.contact_name || "No contact"}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </Panel>
+        </div>
       </div>
-
-      <Panel
-        title="Billing attention"
-        right={
-          <Link to="/billing" className="text-xs font-semibold text-primary hover:underline">
-            Open billing
-          </Link>
-        }
-      >
-        {isLoading ? (
-          <Empty>Loading…</Empty>
-        ) : [...overdue, ...dueSoon].length === 0 ? (
-          <Empty>Nothing due — every client is paid through.</Empty>
-        ) : (
-          <Table
-            head={
-              <>
-                <TH>Client</TH>
-                <TH>Paid through</TH>
-                <TH>Status</TH>
-                <TH className="text-right">Action</TH>
-              </>
-            }
-          >
-            {[...overdue, ...dueSoon].map((c) => (
-              <tr key={c.id}>
-                <TD className="font-medium">{c.business_name}</TD>
-                <TD>{fmtDate(c.paidThrough)}</TD>
-                <TD>
-                  {c.days! < 0 ? (
-                    <Pill tone="warn">
-                      <AlertTriangle className="mr-1 size-3" /> {Math.abs(c.days!)}d overdue
-                    </Pill>
-                  ) : (
-                    <Pill tone="leaf">due in {c.days}d</Pill>
-                  )}
-                </TD>
-                <TD className="text-right">
-                  <Link to="/clients/$id" params={{ id: c.id }} className="text-xs font-semibold text-primary hover:underline">
-                    View client
-                  </Link>
-                </TD>
-              </tr>
-            ))}
-          </Table>
-        )}
-      </Panel>
-
-      <Panel title="Credential rotation alerts" right={<TrendingUp className="size-4 text-muted-foreground" />}>
-        {staleCreds.length === 0 ? (
-          <Empty>All credentials rotated within the last 12 months.</Empty>
-        ) : (
-          <Table
-            head={
-              <>
-                <TH>Service</TH>
-                <TH>Client</TH>
-                <TH>Last rotated</TH>
-              </>
-            }
-          >
-            {staleCreds.map((c) => (
-              <tr key={c.id}>
-                <TD className="font-medium">{c.service_name}</TD>
-                <TD>{clients.find((cl) => cl.id === c.client_id)?.business_name ?? "—"}</TD>
-                <TD>{fmtDate(c.last_rotated)}</TD>
-              </tr>
-            ))}
-          </Table>
-        )}
-      </Panel>
     </AppShell>
   );
 }
