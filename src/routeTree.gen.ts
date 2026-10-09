@@ -16,7 +16,11 @@ import { Route as AuthenticatedBillingRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated.dashboard'
 import { Route as AuthenticatedFinanceRouteImport } from './routes/_authenticated.finance'
 import { Route as AuthenticatedLibraryRouteImport } from './routes/_authenticated.library'
+import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated.notifications'
+import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated.profile'
 import { Route as AuthenticatedProspectsRouteImport } from './routes/_authenticated.prospects'
+import { Route as AuthenticatedAdminAccessRouteImport } from './routes/_authenticated.admin.access'
+import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authenticated.admin.audit'
 import { Route as AuthenticatedAppsIndexRouteImport } from './routes/_authenticated.apps.index'
 import { Route as AuthenticatedAppsEmailsRouteImport } from './routes/_authenticated.apps.emails'
 import { Route as AuthenticatedAppsProjectsRouteImport } from './routes/_authenticated.apps.projects'
@@ -29,6 +33,8 @@ import { Route as AuthenticatedFinancePayoutsRouteImport } from './routes/_authe
 import { Route as AuthenticatedFinanceTeamRouteImport } from './routes/_authenticated.finance.team'
 import { Route as AuthenticatedLibraryIndexRouteImport } from './routes/_authenticated.library.index'
 import { Route as AuthenticatedLibraryAuditRouteImport } from './routes/_authenticated.library.audit'
+import { Route as AuthenticatedLibraryInspoRouteImport } from './routes/_authenticated.library.inspo'
+import { Route as AuthenticatedLibraryPromptsRouteImport } from './routes/_authenticated.library.prompts'
 import { Route as AuthenticatedLibrarySkillsRouteImport } from './routes/_authenticated.library.skills'
 
 const IndexRoute = IndexRouteImport.update({
@@ -65,9 +71,31 @@ const AuthenticatedLibraryRoute = AuthenticatedLibraryRouteImport.update({
   path: '/library',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedNotificationsRoute =
+  AuthenticatedNotificationsRouteImport.update({
+    id: '/notifications',
+    path: '/notifications',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedProspectsRoute = AuthenticatedProspectsRouteImport.update({
   id: '/prospects',
   path: '/prospects',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedAdminAccessRoute =
+  AuthenticatedAdminAccessRouteImport.update({
+    id: '/admin/access',
+    path: '/admin/access',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedAdminAuditRoute = AuthenticatedAdminAuditRouteImport.update({
+  id: '/admin/audit',
+  path: '/admin/audit',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedAppsIndexRoute = AuthenticatedAppsIndexRouteImport.update({
@@ -139,6 +167,18 @@ const AuthenticatedLibraryAuditRoute =
     path: '/audit',
     getParentRoute: () => AuthenticatedLibraryRoute,
   } as any)
+const AuthenticatedLibraryInspoRoute =
+  AuthenticatedLibraryInspoRouteImport.update({
+    id: '/inspo',
+    path: '/inspo',
+    getParentRoute: () => AuthenticatedLibraryRoute,
+  } as any)
+const AuthenticatedLibraryPromptsRoute =
+  AuthenticatedLibraryPromptsRouteImport.update({
+    id: '/prompts',
+    path: '/prompts',
+    getParentRoute: () => AuthenticatedLibraryRoute,
+  } as any)
 const AuthenticatedLibrarySkillsRoute =
   AuthenticatedLibrarySkillsRouteImport.update({
     id: '/skills',
@@ -153,7 +193,11 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/finance': typeof AuthenticatedFinanceRouteWithChildren
   '/library': typeof AuthenticatedLibraryRouteWithChildren
+  '/notifications': typeof AuthenticatedNotificationsRoute
+  '/profile': typeof AuthenticatedProfileRoute
   '/prospects': typeof AuthenticatedProspectsRoute
+  '/admin/access': typeof AuthenticatedAdminAccessRoute
+  '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/apps/emails': typeof AuthenticatedAppsEmailsRoute
   '/apps/projects': typeof AuthenticatedAppsProjectsRoute
   '/clients/$id': typeof AuthenticatedClientsIdRoute
@@ -162,6 +206,8 @@ export interface FileRoutesByFullPath {
   '/finance/payouts': typeof AuthenticatedFinancePayoutsRoute
   '/finance/team': typeof AuthenticatedFinanceTeamRoute
   '/library/audit': typeof AuthenticatedLibraryAuditRoute
+  '/library/inspo': typeof AuthenticatedLibraryInspoRoute
+  '/library/prompts': typeof AuthenticatedLibraryPromptsRoute
   '/library/skills': typeof AuthenticatedLibrarySkillsRoute
   '/apps/': typeof AuthenticatedAppsIndexRoute
   '/clients/': typeof AuthenticatedClientsIndexRoute
@@ -172,7 +218,11 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/billing': typeof AuthenticatedBillingRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/notifications': typeof AuthenticatedNotificationsRoute
+  '/profile': typeof AuthenticatedProfileRoute
   '/prospects': typeof AuthenticatedProspectsRoute
+  '/admin/access': typeof AuthenticatedAdminAccessRoute
+  '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/apps/emails': typeof AuthenticatedAppsEmailsRoute
   '/apps/projects': typeof AuthenticatedAppsProjectsRoute
   '/clients/$id': typeof AuthenticatedClientsIdRoute
@@ -181,6 +231,8 @@ export interface FileRoutesByTo {
   '/finance/payouts': typeof AuthenticatedFinancePayoutsRoute
   '/finance/team': typeof AuthenticatedFinanceTeamRoute
   '/library/audit': typeof AuthenticatedLibraryAuditRoute
+  '/library/inspo': typeof AuthenticatedLibraryInspoRoute
+  '/library/prompts': typeof AuthenticatedLibraryPromptsRoute
   '/library/skills': typeof AuthenticatedLibrarySkillsRoute
   '/apps': typeof AuthenticatedAppsIndexRoute
   '/clients': typeof AuthenticatedClientsIndexRoute
@@ -196,7 +248,11 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/finance': typeof AuthenticatedFinanceRouteWithChildren
   '/_authenticated/library': typeof AuthenticatedLibraryRouteWithChildren
+  '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
+  '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/prospects': typeof AuthenticatedProspectsRoute
+  '/_authenticated/admin/access': typeof AuthenticatedAdminAccessRoute
+  '/_authenticated/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/_authenticated/apps/emails': typeof AuthenticatedAppsEmailsRoute
   '/_authenticated/apps/projects': typeof AuthenticatedAppsProjectsRoute
   '/_authenticated/clients/$id': typeof AuthenticatedClientsIdRoute
@@ -205,6 +261,8 @@ export interface FileRoutesById {
   '/_authenticated/finance/payouts': typeof AuthenticatedFinancePayoutsRoute
   '/_authenticated/finance/team': typeof AuthenticatedFinanceTeamRoute
   '/_authenticated/library/audit': typeof AuthenticatedLibraryAuditRoute
+  '/_authenticated/library/inspo': typeof AuthenticatedLibraryInspoRoute
+  '/_authenticated/library/prompts': typeof AuthenticatedLibraryPromptsRoute
   '/_authenticated/library/skills': typeof AuthenticatedLibrarySkillsRoute
   '/_authenticated/apps/': typeof AuthenticatedAppsIndexRoute
   '/_authenticated/clients/': typeof AuthenticatedClientsIndexRoute
@@ -220,7 +278,11 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/finance'
     | '/library'
+    | '/notifications'
+    | '/profile'
     | '/prospects'
+    | '/admin/access'
+    | '/admin/audit'
     | '/apps/emails'
     | '/apps/projects'
     | '/clients/$id'
@@ -229,6 +291,8 @@ export interface FileRouteTypes {
     | '/finance/payouts'
     | '/finance/team'
     | '/library/audit'
+    | '/library/inspo'
+    | '/library/prompts'
     | '/library/skills'
     | '/apps/'
     | '/clients/'
@@ -239,7 +303,11 @@ export interface FileRouteTypes {
     | '/'
     | '/billing'
     | '/dashboard'
+    | '/notifications'
+    | '/profile'
     | '/prospects'
+    | '/admin/access'
+    | '/admin/audit'
     | '/apps/emails'
     | '/apps/projects'
     | '/clients/$id'
@@ -248,6 +316,8 @@ export interface FileRouteTypes {
     | '/finance/payouts'
     | '/finance/team'
     | '/library/audit'
+    | '/library/inspo'
+    | '/library/prompts'
     | '/library/skills'
     | '/apps'
     | '/clients'
@@ -262,7 +332,11 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/finance'
     | '/_authenticated/library'
+    | '/_authenticated/notifications'
+    | '/_authenticated/profile'
     | '/_authenticated/prospects'
+    | '/_authenticated/admin/access'
+    | '/_authenticated/admin/audit'
     | '/_authenticated/apps/emails'
     | '/_authenticated/apps/projects'
     | '/_authenticated/clients/$id'
@@ -271,6 +345,8 @@ export interface FileRouteTypes {
     | '/_authenticated/finance/payouts'
     | '/_authenticated/finance/team'
     | '/_authenticated/library/audit'
+    | '/_authenticated/library/inspo'
+    | '/_authenticated/library/prompts'
     | '/_authenticated/library/skills'
     | '/_authenticated/apps/'
     | '/_authenticated/clients/'
@@ -334,11 +410,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLibraryRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/notifications': {
+      id: '/_authenticated/notifications'
+      path: '/notifications'
+      fullPath: '/notifications'
+      preLoaderRoute: typeof AuthenticatedNotificationsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/profile': {
+      id: '/_authenticated/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AuthenticatedProfileRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/prospects': {
       id: '/_authenticated/prospects'
       path: '/prospects'
       fullPath: '/prospects'
       preLoaderRoute: typeof AuthenticatedProspectsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/admin/access': {
+      id: '/_authenticated/admin/access'
+      path: '/admin/access'
+      fullPath: '/admin/access'
+      preLoaderRoute: typeof AuthenticatedAdminAccessRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/admin/audit': {
+      id: '/_authenticated/admin/audit'
+      path: '/admin/audit'
+      fullPath: '/admin/audit'
+      preLoaderRoute: typeof AuthenticatedAdminAuditRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/apps/': {
@@ -425,6 +529,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLibraryAuditRouteImport
       parentRoute: typeof AuthenticatedLibraryRoute
     }
+    '/_authenticated/library/inspo': {
+      id: '/_authenticated/library/inspo'
+      path: '/inspo'
+      fullPath: '/library/inspo'
+      preLoaderRoute: typeof AuthenticatedLibraryInspoRouteImport
+      parentRoute: typeof AuthenticatedLibraryRoute
+    }
+    '/_authenticated/library/prompts': {
+      id: '/_authenticated/library/prompts'
+      path: '/prompts'
+      fullPath: '/library/prompts'
+      preLoaderRoute: typeof AuthenticatedLibraryPromptsRouteImport
+      parentRoute: typeof AuthenticatedLibraryRoute
+    }
     '/_authenticated/library/skills': {
       id: '/_authenticated/library/skills'
       path: '/skills'
@@ -471,12 +589,16 @@ const AuthenticatedFinanceRouteWithChildren =
 
 interface AuthenticatedLibraryRouteChildren {
   AuthenticatedLibraryAuditRoute: typeof AuthenticatedLibraryAuditRoute
+  AuthenticatedLibraryInspoRoute: typeof AuthenticatedLibraryInspoRoute
+  AuthenticatedLibraryPromptsRoute: typeof AuthenticatedLibraryPromptsRoute
   AuthenticatedLibrarySkillsRoute: typeof AuthenticatedLibrarySkillsRoute
   AuthenticatedLibraryIndexRoute: typeof AuthenticatedLibraryIndexRoute
 }
 
 const AuthenticatedLibraryRouteChildren: AuthenticatedLibraryRouteChildren = {
   AuthenticatedLibraryAuditRoute: AuthenticatedLibraryAuditRoute,
+  AuthenticatedLibraryInspoRoute: AuthenticatedLibraryInspoRoute,
+  AuthenticatedLibraryPromptsRoute: AuthenticatedLibraryPromptsRoute,
   AuthenticatedLibrarySkillsRoute: AuthenticatedLibrarySkillsRoute,
   AuthenticatedLibraryIndexRoute: AuthenticatedLibraryIndexRoute,
 }
@@ -490,7 +612,11 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedFinanceRoute: typeof AuthenticatedFinanceRouteWithChildren
   AuthenticatedLibraryRoute: typeof AuthenticatedLibraryRouteWithChildren
+  AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
+  AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedProspectsRoute: typeof AuthenticatedProspectsRoute
+  AuthenticatedAdminAccessRoute: typeof AuthenticatedAdminAccessRoute
+  AuthenticatedAdminAuditRoute: typeof AuthenticatedAdminAuditRoute
   AuthenticatedClientsIdRoute: typeof AuthenticatedClientsIdRoute
   AuthenticatedClientsIndexRoute: typeof AuthenticatedClientsIndexRoute
 }
@@ -501,7 +627,11 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedFinanceRoute: AuthenticatedFinanceRouteWithChildren,
   AuthenticatedLibraryRoute: AuthenticatedLibraryRouteWithChildren,
+  AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
+  AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedProspectsRoute: AuthenticatedProspectsRoute,
+  AuthenticatedAdminAccessRoute: AuthenticatedAdminAccessRoute,
+  AuthenticatedAdminAuditRoute: AuthenticatedAdminAuditRoute,
   AuthenticatedClientsIdRoute: AuthenticatedClientsIdRoute,
   AuthenticatedClientsIndexRoute: AuthenticatedClientsIndexRoute,
 }
@@ -517,3 +647,12 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}

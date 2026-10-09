@@ -45,7 +45,7 @@ export const BUILD_STAGES = ["Planning", "Building", "Testing", "Shipped"] as co
 export const PAYMENT_STATES = ["Unpaid", "Deposit", "Awaiting payment", "Paid"] as const;
 
 export const Route = createFileRoute("/_authenticated/apps/projects")({
-  validateSearch: (search: Record<string, unknown>) => ({
+  validateSearch: (search: Record<string, unknown>): { projectId?: string; tab?: string } => ({
     projectId: typeof search.projectId === "string" ? search.projectId : undefined,
     tab: typeof search.tab === "string" ? search.tab : undefined,
   }),

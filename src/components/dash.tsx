@@ -7,7 +7,7 @@ export function Panel({
   className,
   children,
 }: {
-  title?: string;
+  title?: ReactNode;
   right?: ReactNode;
   className?: string;
   children: ReactNode;
@@ -139,7 +139,7 @@ export function Pill({
   tone = "leaf",
 }: {
   children: ReactNode;
-  tone?: "leaf" | "mist" | "warn" | "muted";
+  tone?: "leaf" | "mist" | "warn" | "muted" | "plain" | "deep";
 }) {
   return (
     <span
@@ -149,6 +149,8 @@ export function Pill({
         tone === "mist" && "bg-secondary text-secondary-foreground",
         tone === "warn" && "bg-destructive/10 text-destructive",
         tone === "muted" && "bg-muted text-muted-foreground",
+        tone === "plain" && "bg-card text-foreground ring-1 ring-border",
+        tone === "deep" && "bg-primary text-primary-foreground",
       )}
     >
       {children}
