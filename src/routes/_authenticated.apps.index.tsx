@@ -127,6 +127,9 @@ export function Apps() {
           lastReminder: last,
           remindersSent: sent,
           accountEmail: assignedAccount?.email || null,
+          suspended_at: (c as { suspended_at?: string | null }).suspended_at ?? null,
+          suspension_reason:
+            (c as { suspension_reason?: string | null }).suspension_reason ?? null,
         };
       })
       .sort((a, b) => b.daysOverdue - a.daysOverdue);

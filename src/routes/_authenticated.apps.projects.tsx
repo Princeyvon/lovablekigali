@@ -809,7 +809,7 @@ function Projects() {
                       value={current.build_stage}
                       onChange={(e) =>
                         update.mutate({
-                          build_stage: e.target.value,
+                          build_stage: e.target.value as typeof current.build_stage,
                           shipped_at:
                             e.target.value === "Shipped"
                               ? (current.shipped_at ?? new Date().toISOString().slice(0, 10))

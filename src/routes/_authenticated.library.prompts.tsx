@@ -262,7 +262,7 @@ export function TextPromptsPage() {
       description: formDesc.trim() || `AI Prompt for ${formCategory}.`,
       promptText: formPromptText.trim(),
       targetEngine: formEngine,
-      variables: combinedVars.length > 0 ? combinedVars : undefined,
+      variables: combinedVars.filter((v): v is string => Boolean(v)),
       tags: formTags
         ? formTags
             .split(",")
