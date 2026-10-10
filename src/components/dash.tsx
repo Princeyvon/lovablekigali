@@ -216,6 +216,19 @@ export function ScrollTable({ head, children }: { head: ReactNode; children: Rea
   );
 }
 
-export function Empty({ children }: { children: ReactNode }) {
-  return <p className="py-10 text-center text-sm text-muted-foreground">{children}</p>;
+export function Empty({
+  children,
+  icon: Icon,
+  text,
+}: {
+  children?: ReactNode;
+  icon?: LucideIcon;
+  text?: string;
+}) {
+  return (
+    <div className="flex flex-col items-center gap-2 py-10 text-center text-sm text-muted-foreground">
+      {Icon ? <Icon className="size-5 text-muted-foreground/60" /> : null}
+      <p>{text ?? children}</p>
+    </div>
+  );
 }
