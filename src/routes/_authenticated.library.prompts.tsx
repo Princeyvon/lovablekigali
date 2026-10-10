@@ -262,7 +262,7 @@ export function TextPromptsPage() {
       description: formDesc.trim() || `AI Prompt for ${formCategory}.`,
       promptText: formPromptText.trim(),
       targetEngine: formEngine,
-      variables: combinedVars.length > 0 ? combinedVars : undefined,
+      variables: combinedVars.filter((v): v is string => Boolean(v)),
       tags: formTags
         ? formTags
             .split(",")
@@ -298,15 +298,15 @@ export function TextPromptsPage() {
 
     setVariableInputs((prev) => ({
       ...prev,
-      client_name: proj.client_business_name || proj.name,
-      project_name: proj.name,
+      client_name: proj.project_name,
+      project_name: proj.project_name,
       primary_kpis: "MRR, Pipeline Velocity, Shipped Apps, Active Builders",
       theme_accent: "emerald (#10b981)",
       brand_color: "#10b981",
       font_display: "Plus Jakarta Sans",
       stages: "Planning, Building, Testing, Shipped",
       platforms: "GitHub Repository, Lovable Workspace, Google AI Studio",
-      action_name: `update_${proj.name.toLowerCase().replace(/[^a-z0-9]+/g, "_")}`,
+      action_name: `update_${proj.project_name.toLowerCase().replace(/[^a-z0-9]+/g, "_")}`,
       table_name: "projects",
       input_schema: "{ projectId: string, stage: string, notes?: string }",
       total_amount: "$15,000",
@@ -315,7 +315,7 @@ export function TextPromptsPage() {
       affected_components: "BuildPipelineSection.tsx, ProjectEnvironmentsHub.tsx",
     }));
 
-    toast.success(`Autofilled variables from project "${proj.name}"!`);
+    toast.success(`Autofilled variables from project "${proj.project_name}"!`);
   };
 
   const filtered = useMemo(() => {
@@ -771,7 +771,7 @@ export function TextPromptsPage() {
                   </option>
                   {projects.map((proj) => (
                     <option key={proj.id} value={proj.id}>
-                      {proj.name} ({proj.client_business_name || "Client"})
+                      {proj.project_name} ({(proj as { client_business_name?: string }).client_business_name || "Client"})
                     </option>
                   ))}
                 </select>

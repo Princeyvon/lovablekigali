@@ -305,7 +305,7 @@ export function ProjectAccounts({ projectId, clientId, onSelectProject }: Projec
     if (clientId) {
       const clientProjIdSet = new Set(targetProjectIds);
       return processedAccounts.filter((a) =>
-        a.allLinkedProjectIds.some((pId) => clientProjIdSet.has(pId)),
+        a.allLinkedProjectIds.some((pId: string) => clientProjIdSet.has(pId)),
       );
     }
     return processedAccounts;
@@ -341,7 +341,7 @@ export function ProjectAccounts({ projectId, clientId, onSelectProject }: Projec
         const matchPlat = acc.displayPlatform.toLowerCase().includes(q);
         const matchUrl = acc.url?.toLowerCase().includes(q);
         const matchNotes = acc.meta.notes?.toLowerCase().includes(q);
-        const matchProjects = acc.linkedProjects.some((p) =>
+        const matchProjects = acc.linkedProjects.some((p: { project_name: string }) =>
           p.project_name.toLowerCase().includes(q),
         );
         if (!matchIdent && !matchUser && !matchPlat && !matchUrl && !matchNotes && !matchProjects) {
@@ -919,7 +919,7 @@ export function ProjectAccounts({ projectId, clientId, onSelectProject }: Projec
                             {/* Project Link Chips (jumping between projects) */}
                             <div className="pt-1 flex flex-wrap items-center gap-1.5">
                               <span className="text-[11px] text-muted-foreground">Projects:</span>
-                              {account.linkedProjects.map((p) => {
+                              {account.linkedProjects.map((p: { id: string; project_name: string }) => {
                                 const isCurrent = p.id === projectId;
                                 return (
                                   <Link
@@ -1408,7 +1408,7 @@ export function ProjectAccounts({ projectId, clientId, onSelectProject }: Projec
                             </div>
                             <p className="text-xs text-muted-foreground truncate">
                               Used in{" "}
-                              {acc.linkedProjects.map((p) => p.project_name).join(", ") ||
+                              {acc.linkedProjects.map((p: { project_name: string }) => p.project_name).join(", ") ||
                                 "Other project"}
                             </p>
                           </div>

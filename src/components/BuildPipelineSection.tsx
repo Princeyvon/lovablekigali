@@ -58,6 +58,7 @@ interface HostingAccount {
   email: string;
   label?: string | null;
   credits_remaining?: number | null;
+  [key: string]: unknown;
 }
 
 interface BuildPipelineSectionProps {
@@ -385,10 +386,10 @@ export function BuildPipelineSection({
       const ghEmail = form.githubEmail.trim() || "dev@lovablesolutions.com";
       const aiEmail =
         form.aiStudioEmail.trim() ||
-        (accounts.length > 0 ? accounts[0].email : "ai-builder@lovablesolutions.com");
+        (accounts[0]?.email ?? "ai-builder@lovablesolutions.com");
       const lovEmail =
         form.lovableEmail.trim() ||
-        (accounts.length > 0 ? accounts[0].email : "princeyvon30@gmail.com");
+        (accounts[0]?.email ?? "princeyvon30@gmail.com");
 
       const targetLovableAcc = accounts.find(
         (a) => a.email.toLowerCase() === lovEmail.toLowerCase(),
@@ -505,7 +506,7 @@ export function BuildPipelineSection({
     if (nextIndex >= 0 && nextIndex < stageOrder.length) {
       moveStageMutation.mutate({
         id,
-        stage: stageOrder[nextIndex],
+        stage: stageOrder[nextIndex]!,
         clientId,
       });
     }
@@ -1408,7 +1409,7 @@ export function BuildPipelineSection({
                       <datalist id="pipeline-github-accounts-list">
                         {accounts.map((acc) => (
                           <option key={acc.id} value={acc.email}>
-                            {acc.label || acc.email} ({acc.plan || "Pro"})
+                            {acc.label || acc.email} ({(acc as { plan?: string }).plan || "Pro"})
                           </option>
                         ))}
                       </datalist>
@@ -1666,7 +1667,7 @@ export function BuildPipelineSection({
                   <datalist id="manage-github-accounts-list">
                     {accounts.map((acc) => (
                       <option key={acc.id} value={acc.email}>
-                        {acc.label || acc.email} ({acc.plan || "Pro"})
+                        {acc.label || acc.email} ({(acc as { plan?: string }).plan || "Pro"})
                       </option>
                     ))}
                   </datalist>

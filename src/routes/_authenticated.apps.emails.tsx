@@ -681,7 +681,7 @@ function Emails() {
           <button
             onClick={() => {
               if (projects.length > 0) {
-                const firstProj = projects[0];
+                const firstProj = projects[0]!;
                 const destAcc = accounts.find((a) => a.id !== firstProj.hosting_account_id);
                 setMoveModal({
                   open: true,
@@ -903,7 +903,7 @@ function Emails() {
                             <button
                               type="button"
                               onClick={() => {
-                                const firstProj = connectedProjects[0];
+                                const firstProj = connectedProjects[0]!;
                                 openQuickMove(
                                   firstProj.projectId,
                                   firstProj.projectName,
@@ -1289,7 +1289,7 @@ function Emails() {
                       {connectedProjects.length > 0 && (
                         <button
                           onClick={() => {
-                            const first = connectedProjects[0];
+                            const first = connectedProjects[0]!;
                             openQuickMove(
                               first.projectId,
                               first.projectName,
@@ -1335,7 +1335,7 @@ function Emails() {
                               <div className="mt-1 flex flex-wrap items-center gap-1.5">
                                 {cp.platforms.map((plat) => {
                                   const style =
-                                    PLATFORM_BADGE_STYLES[plat] || PLATFORM_BADGE_STYLES.Hosting;
+                                    (PLATFORM_BADGE_STYLES[plat] || PLATFORM_BADGE_STYLES.Hosting)!;
                                   const Icon = style.icon;
                                   return (
                                     <span

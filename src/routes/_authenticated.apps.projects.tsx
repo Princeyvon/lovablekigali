@@ -809,7 +809,7 @@ function Projects() {
                       value={current.build_stage}
                       onChange={(e) =>
                         update.mutate({
-                          build_stage: e.target.value,
+                          build_stage: e.target.value as typeof current.build_stage,
                           shipped_at:
                             e.target.value === "Shipped"
                               ? (current.shipped_at ?? new Date().toISOString().slice(0, 10))
@@ -1015,15 +1015,15 @@ function Projects() {
                       className="mt-0.5 w-full rounded-lg border border-input bg-background px-2.5 py-1.5 text-xs outline-none focus:ring-1 focus:ring-primary"
                     />
                     <datalist id="projects-github-accounts-list">
-                      {lovableAccounts.map((acc) => (
+                      {accounts.map((acc) => (
                         <option key={acc.id} value={acc.email}>
                           {acc.label || acc.email} ({acc.plan || "Pro"})
                         </option>
                       ))}
                     </datalist>
-                    {lovableAccounts.length > 0 && (
+                    {accounts.length > 0 && (
                       <div className="mt-1 flex flex-wrap gap-1">
-                        {lovableAccounts.slice(0, 4).map((acc) => (
+                        {accounts.slice(0, 4).map((acc) => (
                           <button
                             key={acc.id}
                             type="button"

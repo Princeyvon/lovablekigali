@@ -122,9 +122,8 @@ export function extractProjectEnvironments(
     googleAccFromId?.email ||
     googlePa?.email ||
     project.google_ai_studio_email ||
-    (effectiveLovableAccounts.length > 0
-      ? effectiveLovableAccounts[0]?.email
-      : "ai-builder@lovablesolutions.com");
+    effectiveLovableAccounts[0]?.email ||
+    "ai-builder@lovablesolutions.com";
 
   const googleAiUrl =
     googlePa?.url || project.google_ai_studio_url || "https://aistudio.google.com";
@@ -147,9 +146,8 @@ export function extractProjectEnvironments(
     lovableAccFromId?.email ||
     lovablePa?.email ||
     project.lovable_email ||
-    (effectiveLovableAccounts.length > 0
-      ? effectiveLovableAccounts[0]?.email
-      : "princeyvon30@gmail.com");
+    effectiveLovableAccounts[0]?.email ||
+    "princeyvon30@gmail.com";
 
   const lovableCredits =
     lovableAccFromId?.credits_remaining ??
@@ -248,7 +246,7 @@ export async function saveProjectEnvironments({
     const item = {
       id:
         idx >= 0
-          ? localAccounts[idx].id
+          ? localAccounts[idx]!.id
           : `pa-${platform.toLowerCase().replace(/\s+/g, "-")}-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
       project_id: projectId,
       platform,

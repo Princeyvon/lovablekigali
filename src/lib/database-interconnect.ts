@@ -362,12 +362,11 @@ export async function persistWorkflowChange({
   const updatedProject: PipelineProject = {
     ...existing,
     build_stage: stage ?? existing.build_stage,
-    shipped_at:
-      stage === "Shipped"
-        ? (existing.shipped_at ?? now.slice(0, 10))
-        : stage && stage !== "Shipped"
-          ? null
-          : existing.shipped_at,
+    shipped_at: !stage
+        ? existing.shipped_at
+        : stage === "Shipped"
+          ? (existing.shipped_at ?? now.slice(0, 10))
+          : null,
     hosting_account_id:
       hostingAccountId !== undefined ? hostingAccountId : existing.hosting_account_id,
     app_url: appUrl !== undefined ? appUrl : existing.app_url,
@@ -391,12 +390,11 @@ export async function persistWorkflowChange({
           app_url: appUrl ?? c.app_url,
           hosting_account_id:
             hostingAccountId !== undefined ? hostingAccountId : c.hosting_account_id,
-          shipped_at:
-            stage === "Shipped"
-              ? (c.shipped_at ?? now.slice(0, 10))
-              : stage && stage !== "Shipped"
-                ? null
-                : c.shipped_at,
+          shipped_at: !stage
+              ? c.shipped_at
+              : stage === "Shipped"
+                ? (c.shipped_at ?? now.slice(0, 10))
+                : null,
         };
       }
       return c;
