@@ -122,9 +122,8 @@ export function extractProjectEnvironments(
     googleAccFromId?.email ||
     googlePa?.email ||
     project.google_ai_studio_email ||
-    (effectiveLovableAccounts.length > 0
-      ? effectiveLovableAccounts[0]?.email
-      : "ai-builder@lovablesolutions.com");
+    effectiveLovableAccounts[0]?.email ||
+    "ai-builder@lovablesolutions.com";
 
   const googleAiUrl =
     googlePa?.url || project.google_ai_studio_url || "https://aistudio.google.com";
