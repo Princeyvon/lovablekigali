@@ -147,7 +147,8 @@ export function extractProjectEnvironments(
     lovableAccFromId?.email ||
     lovablePa?.email ||
     project.lovable_email ||
-    effectiveLovableAccounts[0]?.email ?? "princeyvon30.com";
+    effectiveLovableAccounts[0]?.email ||
+    "princeyvon30@gmail.com";
 
   const lovableCredits =
     lovableAccFromId?.credits_remaining ??

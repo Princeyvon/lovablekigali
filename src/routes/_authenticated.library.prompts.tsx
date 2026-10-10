@@ -771,7 +771,7 @@ export function TextPromptsPage() {
                   </option>
                   {projects.map((proj) => (
                     <option key={proj.id} value={proj.id}>
-                      {proj.project_name} ({proj.client_business_name || "Client"})
+                      {proj.project_name} ({(proj as { client_business_name?: string }).client_business_name || "Client"})
                     </option>
                   ))}
                 </select>
