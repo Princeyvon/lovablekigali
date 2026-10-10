@@ -87,5 +87,8 @@
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.56.1",
     "vite": "^8.3.0"
+  },
+  "overrides": {
+    "h3-v2": "npm:h3@2.0.1-rc.21"
   }
 }
