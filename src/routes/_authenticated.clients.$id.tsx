@@ -195,7 +195,7 @@ function ClientDetail() {
   });
 
   const through = paidThrough(payments);
-  const daysLeft = daysUntil(through);
+  const daysLeft = through ? daysUntil(through) : null;
   const overdue = through === null || (daysLeft !== null && daysLeft < 0);
   const daysOverdue = daysLeft !== null && daysLeft < 0 ? Math.abs(daysLeft) : 0;
   const lastPayment = payments[0] ?? null;

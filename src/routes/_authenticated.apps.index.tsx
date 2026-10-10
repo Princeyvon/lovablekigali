@@ -575,9 +575,9 @@ export function Apps() {
                             <button
                               type="button"
                               onClick={() => remind.mutate(r)}
-                              disabled={!r.reminderDue || remind.isPending}
+                              disabled={!r.canRemind || remind.isPending}
                               title={
-                                r.reminderDue
+                                r.canRemind
                                   ? `Send reminder via ${channel}`
                                   : "Reminder sent within the last 48 hours"
                               }
@@ -794,7 +794,7 @@ export function Apps() {
                           <button
                             type="button"
                             onClick={() => remind.mutate(r)}
-                            disabled={!r.reminderDue || remind.isPending}
+                            disabled={!r.canRemind || remind.isPending}
                             className="inline-flex items-center gap-1 rounded-lg border border-border bg-card px-2.5 py-1 text-xs font-semibold text-foreground transition hover:bg-secondary disabled:opacity-40"
                           >
                             <Send className="size-3 text-primary" />
@@ -944,9 +944,9 @@ export function Apps() {
                           <button
                             type="button"
                             onClick={() => remind.mutate(r)}
-                            disabled={!r.reminderDue || remind.isPending}
+                            disabled={!r.canRemind || remind.isPending}
                             title={
-                              r.reminderDue
+                              r.canRemind
                                 ? `Send reminder via ${channel}`
                                 : "A reminder was sent in the last 48 hours"
                             }
