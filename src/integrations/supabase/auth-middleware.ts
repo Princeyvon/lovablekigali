@@ -1,7 +1,6 @@
 import { createMiddleware } from "@tanstack/react-start";
 import { getRequestHeader } from "@tanstack/react-start/server";
 import { createClient } from "@supabase/supabase-js";
-import type { Database } from "./types";
 
 // Verifies the caller's bearer token and returns a Supabase client that acts as that user (RLS applies).
 export const requireSupabaseAuth = createMiddleware({ type: "function" }).server(
@@ -14,7 +13,7 @@ export const requireSupabaseAuth = createMiddleware({ type: "function" }).server
     const token = auth.startsWith("Bearer ") ? auth.slice(7) : "";
     if (!token) throw new Error("Unauthorized");
 
-    const supabase = createClient<Database>(url, key, {
+    const supabase = createClient(url, key, {
       global: { headers: { Authorization: `Bearer ${token}` } },
       auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
     });
