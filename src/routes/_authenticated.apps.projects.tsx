@@ -209,8 +209,8 @@ function Projects() {
 
       upsertLocalProject(newProj);
 
-      try {
-        await supabase.from("projects").insert({
+      {
+        const { error: insErr } = await supabase.from("projects").insert({
           id: newId,
           project_name: newProj.project_name,
           client_id: newProj.client_id,
@@ -286,6 +286,8 @@ function Projects() {
         hostingAccountId: patch.hosting_account_id,
         appUrl: patch.app_url,
         notes: patch.notes,
+        projectName: patch.project_name,
+        paymentState: patch.payment_state,
         clientId: current.client_id,
       });
     },

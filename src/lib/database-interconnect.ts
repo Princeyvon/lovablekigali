@@ -343,6 +343,8 @@ export async function persistWorkflowChange({
   hostingAccountId,
   appUrl,
   notes,
+  projectName,
+  paymentState,
   actor = "authenticated-user",
 }: {
   projectId: string;
@@ -351,6 +353,8 @@ export async function persistWorkflowChange({
   hostingAccountId?: string | null;
   appUrl?: string | null;
   notes?: string | null;
+  projectName?: string;
+  paymentState?: string;
   actor?: string;
 }): Promise<PipelineProject | null> {
   const now = new Date().toISOString();
@@ -371,6 +375,8 @@ export async function persistWorkflowChange({
       hostingAccountId !== undefined ? hostingAccountId : existing.hosting_account_id,
     app_url: appUrl !== undefined ? appUrl : existing.app_url,
     notes: notes !== undefined ? notes : existing.notes,
+    project_name: projectName ?? existing.project_name,
+    payment_state: paymentState ?? existing.payment_state,
     updated_at: now,
   };
 
@@ -427,38 +433,31 @@ export async function persistWorkflowChange({
   if (notes !== undefined) {
     projectDbPayload.notes = notes;
   }
+  if (projectName !== undefined) projectDbPayload.project_name = projectName;
+  if (paymentState !== undefined) projectDbPayload.payment_state = paymentState;
 
-  // 4. Asynchronously persist to Supabase in background
-  try {
-    await supabase.from("projects").update(projectDbPayload).eq("id", projectId);
+  // 4. Persist to the database — errors surface to the caller
+  const { error: projErr } = await supabase
+    .from("projects")
+    .update(projectDbPayload)
+    .eq("id", projectId);
+  if (projErr) throw new Error(projErr.message);
 
-    if (targetClientId) {
-      const clientDbPayload: Record<string, string | null> = {};
-      if (stage) clientDbPayload.build_stage = stage;
-      if (appUrl !== undefined) clientDbPayload.app_url = appUrl;
-      if (hostingAccountId !== undefined) clientDbPayload.hosting_account_id = hostingAccountId;
-
-      if (Object.keys(clientDbPayload).length > 0) {
-        await supabase.from("clients").update(clientDbPayload).eq("id", targetClientId);
-      }
+  if (targetClientId) {
+    const clientDbPayload: Record<string, string | null> = {};
+    if (stage) clientDbPayload.build_stage = stage;
+    if (appUrl !== undefined) clientDbPayload.app_url = appUrl;
+    if (hostingAccountId !== undefined) clientDbPayload.hosting_account_id = hostingAccountId;
+    if (projectName !== undefined) clientDbPayload.project_name = projectName;
+    if (Object.keys(clientDbPayload).length > 0) {
+      const { error: cErr } = await supabase
+        .from("clients")
+        .update(clientDbPayload)
+        .eq("id", targetClientId);
+      if (cErr) throw new Error(cErr.message);
     }
-
-    // Write audit event
-    await supabase.from("entity_events").insert({
-      entity_table: "projects",
-      entity_id: projectId,
-      action: "update",
-      actor,
-      change_reason: `Workflow update: Stage=${stage || existing.build_stage}, hosting=${hostingAccountId || "unchanged"}`,
-    });
-  } catch (err) {
-    console.warn("Supabase workflow sync warning (queuing for auto-retry):", err);
-    // Enqueue for resilient retry
-    enqueueDbMutation({
-      type: "project_update",
-      payload: { projectId, ...projectDbPayload },
-    });
   }
+  void actor;
 
   return updatedProject;
 }
