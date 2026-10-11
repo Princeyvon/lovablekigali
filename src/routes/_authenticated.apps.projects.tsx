@@ -221,8 +221,7 @@ function Projects() {
           started_at: todayISO(),
           payment_state: "Awaiting payment",
         });
-      } catch (err) {
-        console.warn("DB project insert skipped/fallback:", err);
+        if (insErr) throw new Error(insErr.message);
       }
 
       await saveProjectEnvironments({
