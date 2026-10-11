@@ -1297,6 +1297,7 @@ export type Database = {
       }
       is_admin: { Args: never; Returns: boolean }
       is_staff: { Args: never; Returns: boolean }
+      is_team_member: { Args: never; Returns: boolean }
       my_member_id: { Args: never; Returns: string }
       owns_client: { Args: { _client_id: string }; Returns: boolean }
     }
