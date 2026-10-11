@@ -204,7 +204,7 @@ function ProspectsPage() {
       const assignedRepObj = members.find((m) => m.id === form.assigned_rep);
 
       const newProspect: ProspectItem = {
-        id: `lead-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`,
+        id: crypto.randomUUID(),
         business_name: form.business_name.trim(),
         industry: form.industry || null,
         contact_name: form.contact_name || null,

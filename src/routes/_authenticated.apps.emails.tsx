@@ -523,7 +523,7 @@ function Emails() {
   // Save Account Mutation
   const saveAccount = useMutation({
     mutationFn: async (d: Draft) => {
-      const accountId = d.id || `la-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
+      const accountId = d.id || crypto.randomUUID();
       const row = {
         id: accountId,
         email: d.email.trim().toLowerCase(),

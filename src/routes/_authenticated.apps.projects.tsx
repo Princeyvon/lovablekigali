@@ -170,7 +170,7 @@ function Projects() {
         throw new Error("Project name is required");
       }
       const now = new Date().toISOString();
-      const newId = `p-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+      const newId = crypto.randomUUID();
       const slug = newProjectForm.projectName.toLowerCase().replace(/[^a-z0-9]+/g, "-");
 
       const targetLovableAcc = accounts.find((a) => a.email === newProjectForm.lovableEmail);
@@ -189,7 +189,7 @@ function Projects() {
         shipped_at: newProjectForm.stage === "Shipped" ? todayISO() : null,
         due_at: null,
         notes: `Created with GitHub, Google AI Studio, and Lovable environments`,
-        payment_state: "Open",
+        payment_state: "Awaiting payment",
         created_at: now,
         updated_at: now,
         prospect_id: null,
@@ -219,7 +219,7 @@ function Projects() {
           build_stage: newProj.build_stage,
           app_url: newProj.app_url,
           started_at: todayISO(),
-          payment_state: "Open",
+          payment_state: "Awaiting payment",
         });
       } catch (err) {
         console.warn("DB project insert skipped/fallback:", err);
