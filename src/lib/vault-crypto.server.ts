@@ -1,10 +1,10 @@
 import crypto from "node:crypto";
 
 const ALGO = "aes-256-gcm";
-const DEFAULT_KEY_SOURCE = process.env.SUPABASE_PROJECT_ID || "agency-os-vault-secret-key-32b";
 
 function getMasterKey(): Buffer {
-  const secret = process.env.VAULT_ENCRYPTION_KEY || DEFAULT_KEY_SOURCE;
+  const secret = process.env.VAULT_ENCRYPTION_KEY;
+  if (!secret) throw new Error("Vault encryption key is not configured");
   return crypto.createHash("sha256").update(secret).digest();
 }
 

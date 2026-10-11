@@ -2,51 +2,13 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { encryptSecret, decryptSecret } from "./vault-crypto.server";
 
-// In-memory server cache for account passwords (id or lowercase email -> encrypted password)
-const serverAccountPasswordCache = new Map<string, string>();
-
-// Pre-seed default passwords for known builder accounts
-const INITIAL_ACCOUNT_SEEDS: Array<{ id: string; email: string; defaultPlain: string }> = [
-  {
-    id: "la-1000000-0000-4000-8000-000000000001",
-    email: "princeyvon30@gmail.com",
-    defaultPlain: "Lovable2026!Studio",
-  },
-  {
-    id: "la-1000000-0000-4000-8000-000000000002",
-    email: "ai-builder@lovablesolutions.com",
-    defaultPlain: "GoogleAI#2026!Key",
-  },
-  {
-    id: "la-1000000-0000-4000-8000-000000000003",
-    email: "dev@lovablesolutions.com",
-    defaultPlain: "DevGitHub#2026!Token",
-  },
-  {
-    id: "la-1000000-0000-4000-8000-000000000004",
-    email: "ev.lovable@gmail.com",
-    defaultPlain: "LovableAdmin#2026!",
-  },
-];
-
-// Initialize seed passwords asynchronously
-void (async () => {
-  for (const item of INITIAL_ACCOUNT_SEEDS) {
-    try {
-      const enc = await encryptSecret(item.defaultPlain);
-      serverAccountPasswordCache.set(item.id, enc);
-      serverAccountPasswordCache.set(item.email.toLowerCase(), enc);
-    } catch {
-      // non-fatal
-    }
-  }
-})();
-
 export const revealAccountPassword = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { id: string; email?: string }) => input)
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
+    const { data: staff } = await supabase.rpc("is_staff");
+    if (!staff) throw new Error("Forbidden");
     const targetId = data.id?.trim() || "";
     const rawEmail = data.email || (targetId.includes("@") ? targetId : "");
     const targetEmail = rawEmail.trim().toLowerCase();
@@ -93,13 +55,6 @@ export const revealAccountPassword = createServerFn({ method: "POST" })
       }
     }
 
-    // 3. If still no encrypted password, check server cache by ID or email
-    if (!encryptedPassword) {
-      encryptedPassword =
-        serverAccountPasswordCache.get(targetId) ||
-        (targetEmail ? serverAccountPasswordCache.get(targetEmail) : null) ||
-        null;
-    }
 
     // 4. If no encrypted password found at all, return empty password gracefully without crashing
     if (!encryptedPassword) {
@@ -129,6 +84,8 @@ export const saveAccountPassword = createServerFn({ method: "POST" })
   .inputValidator((input: { id: string; password: string; email?: string }) => input)
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
+    const { data: staff } = await supabase.rpc("is_staff");
+    if (!staff) throw new Error("Forbidden");
 
     if (!data.id && !data.email) {
       throw new Error("Account ID or email is required to save password");
@@ -139,13 +96,6 @@ export const saveAccountPassword = createServerFn({ method: "POST" })
     const rawEmail = data.email?.trim() || (targetId.includes("@") ? targetId : "");
     const targetEmail = rawEmail.toLowerCase();
 
-    // Store in server cache immediately so reveal will ALWAYS work
-    if (targetId) {
-      serverAccountPasswordCache.set(targetId, encrypted);
-    }
-    if (targetEmail) {
-      serverAccountPasswordCache.set(targetEmail, encrypted);
-    }
 
     // Attempt to persist to Supabase lovable_accounts table
     try {

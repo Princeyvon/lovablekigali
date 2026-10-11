@@ -1,23 +1,27 @@
 import { createMiddleware } from "@tanstack/react-start";
-import { supabase } from "./client";
+import { getRequestHeader } from "@tanstack/react-start/server";
+import { createClient } from "@supabase/supabase-js";
+import type { Database } from "./types";
 
-export const requireSupabaseAuth = createMiddleware().server(async ({ next }) => {
-  let userId = "authenticated-user";
-  try {
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
-    if (session?.user?.id) {
-      userId = session.user.id;
-    }
-  } catch (e) {
-    console.warn("Auth session check warning:", e);
-  }
+// Verifies the caller's bearer token and returns a Supabase client that acts as that user (RLS applies).
+export const requireSupabaseAuth = createMiddleware({ type: "function" }).server(
+  async ({ next }) => {
+    const url = process.env.SUPABASE_URL;
+    const key = process.env.SUPABASE_PUBLISHABLE_KEY;
+    if (!url || !key) throw new Error("Server is not configured");
 
-  return next({
-    context: {
-      supabase,
-      userId,
-    },
-  });
-});
+    const auth = getRequestHeader("authorization") ?? "";
+    const token = auth.startsWith("Bearer ") ? auth.slice(7) : "";
+    if (!token) throw new Error("Unauthorized");
+
+    const supabase = createClient<Database>(url, key, {
+      global: { headers: { Authorization: `Bearer ${token}` } },
+      auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
+    });
+    const { data, error } = await supabase.auth.getClaims(token);
+    const userId = data?.claims?.sub;
+    if (error || !userId) throw new Error("Unauthorized");
+
+    return next({ context: { supabase, userId, claims: data.claims } });
+  },
+);
