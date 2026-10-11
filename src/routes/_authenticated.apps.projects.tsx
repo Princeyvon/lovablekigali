@@ -15,6 +15,7 @@ import {
   ExternalLink,
   ShieldCheck,
   BookMarked,
+  Pencil,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { SubTabs } from "@/components/SubTabs";
@@ -550,6 +551,18 @@ function Projects() {
                     <h2 className="font-display text-xl sm:text-2xl font-bold tracking-tight text-foreground truncate">
                       {current.project_name}
                     </h2>
+                    <button
+                      type="button"
+                      title="Rename project"
+                      onClick={() => {
+                        const name = window.prompt("Project name", current.project_name)?.trim();
+                        if (name && name !== current.project_name)
+                          update.mutate({ project_name: name });
+                      }}
+                      className="rounded-md p-1 text-muted-foreground transition hover:bg-secondary hover:text-foreground"
+                    >
+                      <Pencil className="size-3.5" />
+                    </button>
                     <Pill
                       tone={
                         current.build_stage === "Shipped"

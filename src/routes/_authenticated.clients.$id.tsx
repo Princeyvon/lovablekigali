@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
@@ -14,6 +14,7 @@ import {
   Sparkles,
   Layers,
   ExternalLink,
+  Trash2,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { Empty, Panel, Pill, TD, TH, Table } from "@/components/dash";
@@ -194,6 +195,21 @@ function ClientDetail() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const navigate = useNavigate();
+  const deleteClient = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase.from("clients").delete().eq("id", id);
+      if (error) throw new Error(error.message);
+    },
+    onSuccess: () => {
+      toast.success("Client deleted");
+      qc.invalidateQueries({ queryKey: ["clients"] });
+      qc.invalidateQueries({ queryKey: ["projects"] });
+      void navigate({ to: "/clients" });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   const through = paidThrough(payments);
   const daysLeft = through ? daysUntil(through) : null;
   const overdue = through === null || (daysLeft !== null && daysLeft < 0);
@@ -213,12 +229,31 @@ function ClientDetail() {
           : "Loading client…"
       }
       actions={
-        <Link
-          to="/clients"
-          className="inline-flex items-center gap-1.5 rounded-xl border border-border px-3 py-2 text-sm"
-        >
-          <ArrowLeft className="size-4" /> All clients
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link
+            to="/clients"
+            className="inline-flex items-center gap-1.5 rounded-xl border border-border px-3 py-2 text-sm"
+          >
+            <ArrowLeft className="size-4" /> All clients
+          </Link>
+          {role === "admin" && client && (
+            <button
+              type="button"
+              disabled={deleteClient.isPending}
+              onClick={() => {
+                if (
+                  window.confirm(
+                    `Delete ${client.business_name}? This also removes their projects, payments and notes.`,
+                  )
+                )
+                  deleteClient.mutate();
+              }}
+              className="inline-flex items-center gap-1.5 rounded-xl border border-destructive/40 px-3 py-2 text-sm text-destructive hover:bg-destructive/10"
+            >
+              <Trash2 className="size-4" /> Delete
+            </button>
+          )}
+        </div>
       }
     >
       <section
