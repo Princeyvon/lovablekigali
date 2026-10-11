@@ -332,7 +332,7 @@ export function BuildPipelineSection({
 
       // If creating new client inline
       if (form.isNewClient || !assignedClientId) {
-        const newClientId = `c-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
+        const newClientId = crypto.randomUUID();
         const newClient: PipelineClient = {
           id: newClientId,
           business_name: form.businessName || form.projectName,
@@ -376,7 +376,7 @@ export function BuildPipelineSection({
       }
 
       // Create new project with assigned environments: GitHub, Google AI Studio, Lovable
-      const newProjectId = `p-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
+      const newProjectId = crypto.randomUUID();
       const defaultSlug = form.projectName
         .toLowerCase()
         .trim()
@@ -408,7 +408,7 @@ export function BuildPipelineSection({
         shipped_at: form.initialStage === "Shipped" ? todayISO() : null,
         due_at: form.dueAt || null,
         notes: `Onboarded by ${form.onboardedBy || PRINCE_MEMBER_NAME}`,
-        payment_state: "Open",
+        payment_state: "Awaiting payment",
         created_at: now,
         updated_at: now,
         prospect_id: null,
@@ -436,7 +436,7 @@ export function BuildPipelineSection({
           build_stage: newProject.build_stage,
           app_url: newProject.app_url,
           started_at: todayISO(),
-          payment_state: "Open",
+          payment_state: "Awaiting payment",
           due_at: newProject.due_at,
         });
       } catch {

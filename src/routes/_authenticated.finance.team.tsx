@@ -425,7 +425,7 @@ function TeamFinancePage() {
               <div>
                 <label className="text-xs font-semibold text-muted-foreground">Sales Rep</label>
                 <select
-                  value={commForm.rep_id}
+                  value={commForm.rep_id ?? ""}
                   onChange={(e) => setCommForm({ ...commForm, rep_id: e.target.value })}
                   className="mt-1 w-full rounded-xl border border-input bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
                 >

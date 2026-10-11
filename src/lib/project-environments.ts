@@ -247,7 +247,7 @@ export async function saveProjectEnvironments({
       id:
         idx >= 0
           ? localAccounts[idx]!.id
-          : `pa-${platform.toLowerCase().replace(/\s+/g, "-")}-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+          : crypto.randomUUID(),
       project_id: projectId,
       platform,
       email: email || null,

@@ -228,7 +228,7 @@ export function SkillsPage() {
     }
 
     const isEditing = Boolean(editingSkillId);
-    const targetId = editingSkillId || `sk-custom-${Date.now()}`;
+    const targetId = editingSkillId || crypto.randomUUID();
 
     const skillPayload: LibrarySkill = {
       id: targetId,

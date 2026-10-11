@@ -253,7 +253,7 @@ export function TextPromptsPage() {
     const combinedVars = Array.from(new Set([...manualVars, ...detectedVars]));
 
     const isEditing = Boolean(editingPromptId);
-    const targetId = editingPromptId || `prompt-custom-${Date.now()}`;
+    const targetId = editingPromptId || crypto.randomUUID();
 
     const promptPayload: LibraryTextPrompt = {
       id: targetId,

@@ -267,7 +267,7 @@ function PayoutsPage() {
               <div>
                 <label className="text-xs font-semibold text-muted-foreground">Recipient *</label>
                 <select
-                  value={form.team_member_id}
+                  value={form.team_member_id ?? ""}
                   onChange={(e) => setForm({ ...form, team_member_id: e.target.value })}
                   className="mt-1 w-full rounded-xl border border-input bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
                 >

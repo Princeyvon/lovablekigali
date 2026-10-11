@@ -51,7 +51,8 @@ export interface PipelineClient {
   created_at: string;
 }
 
-export const PRINCE_MEMBER_ID = "m1000000-0000-4000-8000-000000000030";
+// No hard-coded member: real team members come from the database.
+export const PRINCE_MEMBER_ID: string | null = null;
 export const PRINCE_MEMBER_NAME = "princeyvon30";
 
 export const INITIAL_PIPELINE_ITEMS: Array<{
@@ -177,8 +178,8 @@ export const INITIAL_PIPELINE_ITEMS: Array<{
   },
 ];
 
-const STORAGE_KEY_PROJECTS = "agency_pipeline_projects_v2";
-const STORAGE_KEY_CLIENTS = "agency_pipeline_clients_v2";
+const STORAGE_KEY_PROJECTS = "agency_pipeline_projects_v3";
+const STORAGE_KEY_CLIENTS = "agency_pipeline_clients_v3";
 
 export function getSeedProjects(): PipelineProject[] {
   const now = new Date().toISOString();
@@ -240,31 +241,12 @@ export function getSeedClients(): PipelineClient[] {
  * Load persisted projects from localStorage merged with seed projects
  */
 export function getLocalStoredProjects(): PipelineProject[] {
-  if (typeof window === "undefined") return getSeedProjects();
+  if (typeof window === "undefined") return [];
   try {
     const raw = window.localStorage?.getItem(STORAGE_KEY_PROJECTS);
-    if (!raw) {
-      const initial = getSeedProjects();
-      saveLocalProjects(initial);
-      return initial;
-    }
-    const parsed: PipelineProject[] = JSON.parse(raw);
-    const existingIds = new Set(parsed.map((p) => p.id));
-    const seeds = getSeedProjects();
-    let modified = false;
-    for (const seed of seeds) {
-      if (!existingIds.has(seed.id)) {
-        parsed.push(seed);
-        modified = true;
-      }
-    }
-    if (modified) {
-      saveLocalProjects(parsed);
-    }
-    return parsed;
-  } catch (err) {
-    console.error("Error loading local projects:", err);
-    return getSeedProjects();
+    return raw ? (JSON.parse(raw) as PipelineProject[]) : [];
+  } catch {
+    return [];
   }
 }
 
@@ -284,31 +266,12 @@ export function saveLocalProjects(projects: PipelineProject[]) {
  * Load persisted clients from localStorage merged with seed clients
  */
 export function getLocalStoredClients(): PipelineClient[] {
-  if (typeof window === "undefined") return getSeedClients();
+  if (typeof window === "undefined") return [];
   try {
     const raw = window.localStorage?.getItem(STORAGE_KEY_CLIENTS);
-    if (!raw) {
-      const initial = getSeedClients();
-      saveLocalClients(initial);
-      return initial;
-    }
-    const parsed: PipelineClient[] = JSON.parse(raw);
-    const existingIds = new Set(parsed.map((c) => c.id));
-    const seeds = getSeedClients();
-    let modified = false;
-    for (const seed of seeds) {
-      if (!existingIds.has(seed.id)) {
-        parsed.push(seed);
-        modified = true;
-      }
-    }
-    if (modified) {
-      saveLocalClients(parsed);
-    }
-    return parsed;
-  } catch (err) {
-    console.error("Error loading local clients:", err);
-    return getSeedClients();
+    return raw ? (JSON.parse(raw) as PipelineClient[]) : [];
+  } catch {
+    return [];
   }
 }
 
@@ -407,7 +370,7 @@ export async function fetchMergedProjects(): Promise<PipelineProject[]> {
       .select("*")
       .order("created_at", { ascending: false });
 
-    if (error || !dbProjects || dbProjects.length === 0) {
+    if (error || !dbProjects) {
       return local;
     }
 
@@ -421,7 +384,6 @@ export async function fetchMergedProjects(): Promise<PipelineProject[]> {
       const locP = local.find((l) => l.id === dbP.id);
       const dbProj = dbP as unknown as Partial<PipelineProject>;
       merged.push({
-        ...locP,
         ...dbP,
         github_repo_url: locP?.github_repo_url || dbProj.github_repo_url || null,
         github_email: locP?.github_email || dbProj.github_email || null,
@@ -435,12 +397,7 @@ export async function fetchMergedProjects(): Promise<PipelineProject[]> {
       } as PipelineProject);
     }
 
-    // Add any local ones missing in DB (like our newly seeded projects)
-    for (const locP of local) {
-      if (!dbMap.has(locP.id)) {
-        merged.push(locP);
-      }
-    }
+    void dbMap;
 
     // Update local cache with merged
     saveLocalProjects(merged);
@@ -462,7 +419,7 @@ export async function fetchMergedClients(): Promise<PipelineClient[]> {
       .select("*")
       .order("business_name");
 
-    if (error || !dbClients || dbClients.length === 0) {
+    if (error || !dbClients) {
       return local;
     }
 
@@ -477,11 +434,7 @@ export async function fetchMergedClients(): Promise<PipelineClient[]> {
       } as PipelineClient);
     }
 
-    for (const locC of local) {
-      if (!dbMap.has(locC.id)) {
-        merged.push(locC);
-      }
-    }
+    void dbMap;
 
     saveLocalClients(merged);
     return merged;

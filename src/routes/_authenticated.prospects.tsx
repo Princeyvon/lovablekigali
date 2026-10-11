@@ -204,7 +204,7 @@ function ProspectsPage() {
       const assignedRepObj = members.find((m) => m.id === form.assigned_rep);
 
       const newProspect: ProspectItem = {
-        id: `lead-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`,
+        id: crypto.randomUUID(),
         business_name: form.business_name.trim(),
         industry: form.industry || null,
         contact_name: form.contact_name || null,
@@ -1326,7 +1326,7 @@ function ProspectsPage() {
                     Assigned Sales Rep
                   </label>
                   <select
-                    value={form.assigned_rep}
+                    value={form.assigned_rep ?? ""}
                     onChange={(e) => setForm({ ...form, assigned_rep: e.target.value })}
                     className="w-full rounded-xl border border-input bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
                   >

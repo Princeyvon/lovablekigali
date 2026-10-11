@@ -182,7 +182,7 @@ export function DashboardInspoPage() {
     }
 
     const isEditing = Boolean(editingInspoId);
-    const targetId = editingInspoId || `inspo-custom-${Date.now()}`;
+    const targetId = editingInspoId || crypto.randomUUID();
 
     const itemPayload: DashboardInspo = {
       id: targetId,

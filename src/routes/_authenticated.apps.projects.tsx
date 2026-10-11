@@ -15,6 +15,7 @@ import {
   ExternalLink,
   ShieldCheck,
   BookMarked,
+  Pencil,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { SubTabs } from "@/components/SubTabs";
@@ -170,7 +171,7 @@ function Projects() {
         throw new Error("Project name is required");
       }
       const now = new Date().toISOString();
-      const newId = `p-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+      const newId = crypto.randomUUID();
       const slug = newProjectForm.projectName.toLowerCase().replace(/[^a-z0-9]+/g, "-");
 
       const targetLovableAcc = accounts.find((a) => a.email === newProjectForm.lovableEmail);
@@ -189,7 +190,7 @@ function Projects() {
         shipped_at: newProjectForm.stage === "Shipped" ? todayISO() : null,
         due_at: null,
         notes: `Created with GitHub, Google AI Studio, and Lovable environments`,
-        payment_state: "Open",
+        payment_state: "Awaiting payment",
         created_at: now,
         updated_at: now,
         prospect_id: null,
@@ -209,8 +210,8 @@ function Projects() {
 
       upsertLocalProject(newProj);
 
-      try {
-        await supabase.from("projects").insert({
+      {
+        const { error: insErr } = await supabase.from("projects").insert({
           id: newId,
           project_name: newProj.project_name,
           client_id: newProj.client_id,
@@ -219,10 +220,9 @@ function Projects() {
           build_stage: newProj.build_stage,
           app_url: newProj.app_url,
           started_at: todayISO(),
-          payment_state: "Open",
+          payment_state: "Awaiting payment",
         });
-      } catch (err) {
-        console.warn("DB project insert skipped/fallback:", err);
+        if (insErr) throw new Error(insErr.message);
       }
 
       await saveProjectEnvironments({
@@ -286,6 +286,8 @@ function Projects() {
         hostingAccountId: patch.hosting_account_id,
         appUrl: patch.app_url,
         notes: patch.notes,
+        projectName: patch.project_name,
+        paymentState: patch.payment_state,
         clientId: current.client_id,
       });
     },
@@ -549,6 +551,18 @@ function Projects() {
                     <h2 className="font-display text-xl sm:text-2xl font-bold tracking-tight text-foreground truncate">
                       {current.project_name}
                     </h2>
+                    <button
+                      type="button"
+                      title="Rename project"
+                      onClick={() => {
+                        const name = window.prompt("Project name", current.project_name)?.trim();
+                        if (name && name !== current.project_name)
+                          update.mutate({ project_name: name });
+                      }}
+                      className="rounded-md p-1 text-muted-foreground transition hover:bg-secondary hover:text-foreground"
+                    >
+                      <Pencil className="size-3.5" />
+                    </button>
                     <Pill
                       tone={
                         current.build_stage === "Shipped"

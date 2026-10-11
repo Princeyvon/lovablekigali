@@ -325,7 +325,7 @@ export async function convertProspectToClient(prospect: ProspectItem): Promise<{
 }> {
   const clientId =
     prospect.client_id ||
-    `c-conv-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
+    crypto.randomUUID();
 
   const newClient: PipelineClient = {
     id: clientId,
