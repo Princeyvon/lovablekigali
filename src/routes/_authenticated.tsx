@@ -9,7 +9,7 @@ export const Route = createFileRoute("/_authenticated")({
     } = await supabase.auth.getUser();
 
     if (!user) {
-      throw redirect({ to: "/auth" });
+      throw redirect({ to: "/auth", search: { deactivated: false } });
     }
 
     // Deactivated accounts are signed out immediately
