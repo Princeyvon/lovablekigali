@@ -1300,6 +1300,7 @@ export type Database = {
       is_team_member: { Args: never; Returns: boolean }
       my_member_id: { Args: never; Returns: string }
       owns_client: { Args: { _client_id: string }; Returns: boolean }
+      resolve_login_email: { Args: { p_identifier: string }; Returns: string }
     }
     Enums: {
       app_role: "admin" | "sales" | "dev" | "support"
