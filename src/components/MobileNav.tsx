@@ -266,7 +266,11 @@ export function ProfileBadge({ variant = "fixed" }: { variant?: "fixed" | "inlin
           <div className="border-t border-border p-1">
             <button
               type="button"
-              onClick={() => void signOut()}
+              onClick={() => {
+                void signOut().then(() => {
+                  window.location.replace("/auth");
+                });
+              }}
               className="flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-left text-sm text-destructive hover:bg-destructive/10"
             >
               <LogOut className="size-4" /> Sign out

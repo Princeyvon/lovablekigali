@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { PRINCE_MEMBER_ID } from "@/lib/pipeline-store";
 
 export type UserRole = "admin" | "sales" | "dev" | "support";
 
@@ -17,56 +16,53 @@ export interface AuthState {
 
 export function useAuth(): AuthState {
   const [user, setUser] = useState<{ id: string; email: string } | null>(null);
-  const [role, setRole] = useState<UserRole>("admin");
-  const [memberId, setMemberId] = useState<string | null>(PRINCE_MEMBER_ID);
+  const [role, setRole] = useState<UserRole>("sales");
+  const [memberId, setMemberId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     let isMounted = true;
 
+    async function loadRoleFor(userId: string, email: string) {
+      const { data: member } = await supabase
+        .from("team_members")
+        .select("id, role")
+        .or(`user_id.eq.${userId},email.eq.${email}`)
+        .maybeSingle();
+
+      if (!isMounted) return;
+      if (member) {
+        setRole((member.role as UserRole) || "sales");
+        setMemberId(member.id);
+      } else {
+        setRole("sales");
+        setMemberId(null);
+      }
+    }
+
     async function loadUser() {
       try {
         const {
-          data: { session },
-        } = await supabase.auth.getSession();
+          data: { user: authUser },
+        } = await supabase.auth.getUser();
 
-        if (session?.user) {
-          if (isMounted) {
-            setUser({
-              id: session.user.id,
-              email: session.user.email ?? "admin@lovable.dev",
-            });
-          }
+        if (!isMounted) return;
 
-          // Check team_members
-          const { data: member } = await supabase
-            .from("team_members")
-            .select("id, role")
-            .or(`user_id.eq.${session.user.id},email.eq.${session.user.email}`)
-            .maybeSingle();
-
-          if (member && isMounted) {
-            setRole((member.role as UserRole) || "admin");
-            setMemberId(member.id);
-          } else if (isMounted) {
-            // Default to admin for full operational control
-            setRole("admin");
-            setMemberId(PRINCE_MEMBER_ID);
-          }
-        } else if (isMounted) {
-          // Dev default fallback user
-          setUser({
-            id: "u-admin-default",
-            email: "admin@lovable.dev",
-          });
-          setRole("admin");
-          setMemberId(PRINCE_MEMBER_ID);
+        if (authUser) {
+          const email = authUser.email ?? "";
+          setUser({ id: authUser.id, email });
+          await loadRoleFor(authUser.id, email);
+        } else {
+          setUser(null);
+          setRole("sales");
+          setMemberId(null);
         }
       } catch (e) {
         console.warn("useAuth error:", e);
         if (isMounted) {
-          setRole("admin");
-          setMemberId(PRINCE_MEMBER_ID);
+          setUser(null);
+          setRole("sales");
+          setMemberId(null);
         }
       } finally {
         if (isMounted) setIsLoading(false);
@@ -77,17 +73,19 @@ export function useAuth(): AuthState {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
+      if (!isMounted) return;
       if (session?.user) {
         setUser({
           id: session.user.id,
-          email: session.user.email ?? "admin@lovable.dev",
+          email: session.user.email ?? "",
         });
+        void loadRoleFor(session.user.id, session.user.email ?? "");
       } else {
-        setUser({
-          id: "u-admin-default",
-          email: "admin@lovable.dev",
-        });
+        setUser(null);
+        setRole("sales");
+        setMemberId(null);
       }
     });
 
@@ -104,6 +102,8 @@ export function useAuth(): AuthState {
       // Ignore
     }
     setUser(null);
+    setRole("sales");
+    setMemberId(null);
   };
 
   return {
