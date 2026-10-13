@@ -890,8 +890,10 @@ export type Database = {
           contact_name: string | null
           contact_phone: string | null
           created_at: string
+          estimated_value: number | null
           id: string
           industry: string | null
+          notes: string | null
           source: string | null
           stage: Database["public"]["Enums"]["prospect_stage"]
         }
@@ -903,8 +905,10 @@ export type Database = {
           contact_name?: string | null
           contact_phone?: string | null
           created_at?: string
+          estimated_value?: number | null
           id?: string
           industry?: string | null
+          notes?: string | null
           source?: string | null
           stage?: Database["public"]["Enums"]["prospect_stage"]
         }
@@ -916,8 +920,10 @@ export type Database = {
           contact_name?: string | null
           contact_phone?: string | null
           created_at?: string
+          estimated_value?: number | null
           id?: string
           industry?: string | null
+          notes?: string | null
           source?: string | null
           stage?: Database["public"]["Enums"]["prospect_stage"]
         }

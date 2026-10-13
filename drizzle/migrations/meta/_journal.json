@@ -15,6 +15,13 @@
       "when": 1791680278962,
       "tag": "0001_tighten_team_policies",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1791921916179,
+      "tag": "0002_prospect_notes_and_realtime",
+      "breakpoints": true
     }
   ]
 }
