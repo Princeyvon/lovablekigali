@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Toaster } from "sonner";
 import "@/styles.css";
 import { warmDatabaseCache, onDbSync } from "@/lib/database-interconnect";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createRootRoute({
   head: () => ({
@@ -45,7 +46,7 @@ function RootComponent() {
       new QueryClient({
         defaultOptions: {
           queries: {
-            staleTime: 1000 * 60 * 2,
+            staleTime: 1000 * 15,
             refetchOnWindowFocus: false,
           },
         },
@@ -83,7 +84,24 @@ function RootComponent() {
       }
     });
 
+    // 3. Live sync: any change saved from any device refreshes every open screen
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const channel = supabase
+      .channel("live-db-sync")
+      .on("postgres_changes", { event: "*", schema: "public" }, () => {
+        clearTimeout(timer);
+        timer = setTimeout(() => void queryClient.invalidateQueries(), 300);
+      })
+      .subscribe();
+    const onVisible = () => {
+      if (document.visibilityState === "visible") void queryClient.invalidateQueries();
+    };
+    document.addEventListener("visibilitychange", onVisible);
+
     return () => {
+      clearTimeout(timer);
+      document.removeEventListener("visibilitychange", onVisible);
+      void supabase.removeChannel(channel);
       unsubscribe();
     };
   }, [queryClient]);

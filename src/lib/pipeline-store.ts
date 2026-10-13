@@ -240,8 +240,14 @@ export function getSeedClients(): PipelineClient[] {
 /**
  * Load persisted projects from localStorage merged with seed projects
  */
+// Local copies are only trusted after a fresh database load in this session.
+let cacheReady = false;
+export function markCacheReady() {
+  cacheReady = true;
+}
+
 export function getLocalStoredProjects(): PipelineProject[] {
-  if (typeof window === "undefined") return [];
+  if (typeof window === "undefined" || !cacheReady) return [];
   try {
     const raw = window.localStorage?.getItem(STORAGE_KEY_PROJECTS);
     return raw ? (JSON.parse(raw) as PipelineProject[]) : [];
@@ -266,7 +272,7 @@ export function saveLocalProjects(projects: PipelineProject[]) {
  * Load persisted clients from localStorage merged with seed clients
  */
 export function getLocalStoredClients(): PipelineClient[] {
-  if (typeof window === "undefined") return [];
+  if (typeof window === "undefined" || !cacheReady) return [];
   try {
     const raw = window.localStorage?.getItem(STORAGE_KEY_CLIENTS);
     return raw ? (JSON.parse(raw) as PipelineClient[]) : [];
@@ -370,8 +376,9 @@ export async function fetchMergedProjects(): Promise<PipelineProject[]> {
       .select("*")
       .order("created_at", { ascending: false });
 
-    if (error || !dbProjects) {
-      return local;
+    if (error) throw new Error(error.message);
+    if (!dbProjects) {
+      return [];
     }
 
     // Merge: DB projects take precedence unless local has newer update,
@@ -401,10 +408,10 @@ export async function fetchMergedProjects(): Promise<PipelineProject[]> {
 
     // Update local cache with merged
     saveLocalProjects(merged);
+    markCacheReady();
     return merged;
   } catch (e) {
-    console.warn("fetchMergedProjects fallback to local:", e);
-    return local;
+    throw e;
   }
 }
 
@@ -419,8 +426,9 @@ export async function fetchMergedClients(): Promise<PipelineClient[]> {
       .select("*")
       .order("business_name");
 
-    if (error || !dbClients) {
-      return local;
+    if (error) throw new Error(error.message);
+    if (!dbClients) {
+      return [];
     }
 
     const dbMap = new Map(dbClients.map((c) => [c.id, c as PipelineClient]));
@@ -439,7 +447,6 @@ export async function fetchMergedClients(): Promise<PipelineClient[]> {
     saveLocalClients(merged);
     return merged;
   } catch (e) {
-    console.warn("fetchMergedClients fallback to local:", e);
-    return local;
+    throw e;
   }
 }
