@@ -73,7 +73,9 @@ export const DEFAULT_SEED_ACCOUNTS: LovableAccount[] = [
  * Get accounts from localStorage, falling back to initial seed accounts
  */
 export function getLocalStoredAccounts(): LovableAccount[] {
-  if (typeof window === "undefined") return DEFAULT_SEED_ACCOUNTS;
+  void DEFAULT_SEED_ACCOUNTS;
+  // Shared database is the only source of truth.
+  if (SHARED_DB_ONLY) return [];
   try {
     const raw = window.localStorage?.getItem(STORAGE_KEY_LOVABLE_ACCOUNTS);
     if (!raw) {
@@ -151,43 +153,9 @@ export function deleteLocalAccount(id: string) {
  * Fetch accounts merged with Supabase and localStorage fallback
  */
 export async function fetchMergedAccounts(): Promise<LovableAccount[]> {
-  const local = getLocalStoredAccounts();
-
-  try {
-    const { data, error } = await supabase.from("lovable_accounts").select("*").order("email");
-
-    if (error || !data || data.length === 0) {
-      return local;
-    }
-
-    // Merge Supabase accounts with local
-    const merged = [...local];
-    const localIdSet = new Set(local.map((a) => a.id));
-    const localEmailSet = new Set(local.map((a) => a.email.toLowerCase()));
-
-    for (const sbAcc of data) {
-      const idxById = merged.findIndex((a) => a.id === sbAcc.id);
-      const idxByEmail = merged.findIndex(
-        (a) => a.email.toLowerCase() === sbAcc.email.toLowerCase(),
-      );
-
-      const targetIdx = idxById >= 0 ? idxById : idxByEmail;
-      if (targetIdx >= 0) {
-        merged[targetIdx] = {
-          ...merged[targetIdx],
-          ...sbAcc,
-        };
-      } else {
-        merged.push(sbAcc);
-      }
-    }
-
-    saveLocalAccounts(merged);
-    return merged;
-  } catch (err) {
-    console.warn("fetchMergedAccounts network/auth warning, using local accounts:", err);
-    return local;
-  }
+  const { data, error } = await supabase.from("lovable_accounts").select("*").order("email");
+  if (error) throw new Error(error.message);
+  return (data ?? []) as LovableAccount[];
 }
 
 /**
@@ -204,3 +172,5 @@ export function findAccount(
     DEFAULT_SEED_ACCOUNTS.find((a) => a.id === idOrEmail || a.email.toLowerCase() === target)
   );
 }
+
+var SHARED_DB_ONLY: boolean = true;

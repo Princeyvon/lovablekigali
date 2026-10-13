@@ -221,8 +221,8 @@ function ProspectsPage() {
 
       upsertLocalProspect(newProspect);
 
-      try {
-        await supabase.from("prospects").insert({
+      {
+        const { error } = await supabase.from("prospects").insert({
           id: newProspect.id,
           business_name: newProspect.business_name,
           industry: newProspect.industry,
@@ -232,9 +232,9 @@ function ProspectsPage() {
           source: newProspect.source,
           stage: newProspect.stage,
           assigned_rep: newProspect.assigned_rep,
+          notes: newProspect.notes,
         });
-      } catch (e) {
-        console.warn("Supabase prospect insert warning (saved locally):", e);
+        if (error) throw new Error(error.message);
       }
     },
     onSuccess: () => {
@@ -260,11 +260,8 @@ function ProspectsPage() {
   const updateStageMutation = useMutation({
     mutationFn: async ({ id, stage }: { id: string; stage: ProspectStage }) => {
       updateLocalProspectStage(id, stage);
-      try {
-        await supabase.from("prospects").update({ stage }).eq("id", id);
-      } catch (e) {
-        console.warn("Supabase stage update warning:", e);
-      }
+      const { error } = await supabase.from("prospects").update({ stage }).eq("id", id);
+      if (error) throw new Error(error.message);
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["prospects"] });
@@ -276,8 +273,8 @@ function ProspectsPage() {
   const updateDetailsMutation = useMutation({
     mutationFn: async (updated: ProspectItem) => {
       upsertLocalProspect(updated);
-      try {
-        await supabase
+      {
+        const { error } = await supabase
           .from("prospects")
           .update({
             business_name: updated.business_name,
@@ -288,10 +285,11 @@ function ProspectsPage() {
             source: updated.source,
             stage: updated.stage,
             assigned_rep: updated.assigned_rep,
+            notes: updated.notes ?? null,
+            estimated_value: updated.estimated_value ?? null,
           })
           .eq("id", updated.id);
-      } catch (e) {
-        console.warn("Supabase details update warning:", e);
+        if (error) throw new Error(error.message);
       }
     },
     onSuccess: () => {
@@ -306,11 +304,8 @@ function ProspectsPage() {
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
       deleteLocalProspect(id);
-      try {
-        await supabase.from("prospects").delete().eq("id", id);
-      } catch (e) {
-        console.warn("Supabase delete warning:", e);
-      }
+      const { error } = await supabase.from("prospects").delete().eq("id", id);
+      if (error) throw new Error(error.message);
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["prospects"] });

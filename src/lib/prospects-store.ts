@@ -230,7 +230,9 @@ export const INITIAL_PROSPECTS: ProspectItem[] = [
 ];
 
 export function getLocalStoredProspects(): ProspectItem[] {
-  if (typeof window === "undefined") return INITIAL_PROSPECTS;
+  void INITIAL_PROSPECTS;
+  // Shared database is the only source of truth.
+  if (SHARED_DB_ONLY) return [];
   try {
     const raw = window.localStorage?.getItem(STORAGE_KEY_PROSPECTS);
     if (!raw) {
@@ -396,53 +398,27 @@ export async function convertProspectToClient(prospect: ProspectItem): Promise<{
  * Merged query for prospects: queries Supabase, merges with local prospects
  */
 export async function fetchMergedProspects(): Promise<ProspectItem[]> {
-  const local = getLocalStoredProspects();
-  try {
-    const { data: dbProspects, error } = await supabase
-      .from("prospects")
-      .select("*")
-      .order("created_at", { ascending: false });
-
-    if (error || !dbProspects || dbProspects.length === 0) {
-      return local;
-    }
-
-    const dbMap = new Map(dbProspects.map((p) => [p.id, p]));
-    const merged: ProspectItem[] = [];
-
-    for (const dbP of dbProspects) {
-      const locP = local.find((l) => l.id === dbP.id);
-      merged.push({
-        id: dbP.id,
-        business_name: dbP.business_name,
-        industry: dbP.industry,
-        contact_name: dbP.contact_name,
-        contact_email: dbP.contact_email,
-        contact_phone: dbP.contact_phone,
-        source: dbP.source,
-        stage: dbP.stage as ProspectStage,
-        assigned_rep: dbP.assigned_rep,
-        assigned_rep_name:
-          locP?.assigned_rep_name ??
-          (dbP.assigned_rep === PRINCE_MEMBER_ID ? PRINCE_MEMBER_NAME : undefined),
-        client_id: dbP.client_id,
-        estimated_value: locP?.estimated_value ?? 500000,
-        notes: locP?.notes ?? null,
-        created_at: dbP.created_at,
-        updated_at: locP?.updated_at,
-      });
-    }
-
-    for (const locP of local) {
-      if (!dbMap.has(locP.id)) {
-        merged.push(locP);
-      }
-    }
-
-    saveLocalProspects(merged);
-    return merged;
-  } catch (e) {
-    console.warn("fetchMergedProspects fallback to local:", e);
-    return local;
-  }
+  const { data: dbProspects, error } = await supabase
+    .from("prospects")
+    .select("*")
+    .order("created_at", { ascending: false });
+  if (error) throw new Error(error.message);
+  return (dbProspects ?? []).map((dbP) => ({
+    id: dbP.id,
+    business_name: dbP.business_name,
+    industry: dbP.industry,
+    contact_name: dbP.contact_name,
+    contact_email: dbP.contact_email,
+    contact_phone: dbP.contact_phone,
+    source: dbP.source,
+    stage: dbP.stage as ProspectStage,
+    assigned_rep: dbP.assigned_rep,
+    assigned_rep_name: dbP.assigned_rep === PRINCE_MEMBER_ID ? PRINCE_MEMBER_NAME : undefined,
+    client_id: dbP.client_id,
+    estimated_value: dbP.estimated_value != null ? Number(dbP.estimated_value) : 500000,
+    notes: dbP.notes ?? null,
+    created_at: dbP.created_at,
+  }));
 }
+
+var SHARED_DB_ONLY: boolean = true;
