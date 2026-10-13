@@ -231,7 +231,8 @@ export const INITIAL_PROSPECTS: ProspectItem[] = [
 
 export function getLocalStoredProspects(): ProspectItem[] {
   void INITIAL_PROSPECTS;
-  return [];
+  // Shared database is the only source of truth.
+  if (typeof window !== "undefined" || typeof window === "undefined") return [];
   try {
     const raw = window.localStorage?.getItem(STORAGE_KEY_PROSPECTS);
     if (!raw) {

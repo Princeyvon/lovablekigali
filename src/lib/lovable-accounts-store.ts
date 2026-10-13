@@ -74,7 +74,8 @@ export const DEFAULT_SEED_ACCOUNTS: LovableAccount[] = [
  */
 export function getLocalStoredAccounts(): LovableAccount[] {
   void DEFAULT_SEED_ACCOUNTS;
-  return [];
+  // Shared database is the only source of truth.
+  if (typeof window !== "undefined" || typeof window === "undefined") return [];
   try {
     const raw = window.localStorage?.getItem(STORAGE_KEY_LOVABLE_ACCOUNTS);
     if (!raw) {
