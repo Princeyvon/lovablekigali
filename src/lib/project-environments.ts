@@ -47,7 +47,7 @@ const STORAGE_KEY_PROJECT_ACCOUNTS = "agency_project_accounts_local_v2";
 
 export function getLocalProjectAccounts(): RawProjectAccount[] {
   // Shared database is the only source of truth.
-  if (typeof window !== "undefined" || typeof window === "undefined") return [];
+  if (SHARED_DB_ONLY) return [];
   try {
     const raw = window.localStorage?.getItem(STORAGE_KEY_PROJECT_ACCOUNTS);
     return raw ? JSON.parse(raw) : [];
@@ -345,3 +345,5 @@ export async function saveProjectEnvironments({
     lovable,
   };
 }
+
+var SHARED_DB_ONLY: boolean = true;

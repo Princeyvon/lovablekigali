@@ -232,7 +232,7 @@ export const INITIAL_PROSPECTS: ProspectItem[] = [
 export function getLocalStoredProspects(): ProspectItem[] {
   void INITIAL_PROSPECTS;
   // Shared database is the only source of truth.
-  if (typeof window !== "undefined" || typeof window === "undefined") return [];
+  if (SHARED_DB_ONLY) return [];
   try {
     const raw = window.localStorage?.getItem(STORAGE_KEY_PROSPECTS);
     if (!raw) {
@@ -420,3 +420,5 @@ export async function fetchMergedProspects(): Promise<ProspectItem[]> {
     created_at: dbP.created_at,
   }));
 }
+
+var SHARED_DB_ONLY: boolean = true;
