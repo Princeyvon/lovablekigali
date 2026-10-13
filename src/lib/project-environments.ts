@@ -46,7 +46,7 @@ export interface RawLovableAccount {
 const STORAGE_KEY_PROJECT_ACCOUNTS = "agency_project_accounts_local_v2";
 
 export function getLocalProjectAccounts(): RawProjectAccount[] {
-  if (typeof window === "undefined") return [];
+  return [];
   try {
     const raw = window.localStorage?.getItem(STORAGE_KEY_PROJECT_ACCOUNTS);
     return raw ? JSON.parse(raw) : [];
