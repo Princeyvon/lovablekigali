@@ -405,6 +405,42 @@ export type Database = {
           },
         ]
       }
+      library_items: {
+        Row: {
+          category: string | null
+          created_at: string
+          created_by: string | null
+          item_id: string
+          kind: string
+          payload: Json
+          sort_order: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          created_by?: string | null
+          item_id: string
+          kind: string
+          payload?: Json
+          sort_order?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          created_by?: string | null
+          item_id?: string
+          kind?: string
+          payload?: Json
+          sort_order?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       library_prompts: {
         Row: {
           body: string
