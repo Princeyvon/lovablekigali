@@ -112,6 +112,8 @@ export function TextPromptsPage() {
       .then((p) => setProjects(p))
       .catch(() => {});
 
+    void syncLibraryFromDb();
+    const cleanupRealtime = initLibraryRealtime();
     const unsub = onDbSync((e) => {
       if (e.type === "library_prompt_updated" || e.type === "library_synced") {
         refreshPrompts();
@@ -126,6 +128,7 @@ export function TextPromptsPage() {
     window.addEventListener("storage", handleStorage);
 
     return () => {
+      cleanupRealtime();
       unsub();
       window.removeEventListener("storage", handleStorage);
     };
