@@ -22,7 +22,14 @@ import { SubTabs } from "@/components/SubTabs";
 import { LIBRARY_TABS } from "@/routes/_authenticated.library";
 import { Pill } from "@/components/dash";
 import { SearchInput } from "@/components/search";
-import { DashboardInspo, getLocalInspo, upsertInspo, deleteInspo } from "@/lib/library-store";
+import {
+  DashboardInspo,
+  getLocalInspo,
+  upsertInspo,
+  deleteInspo,
+  syncLibraryFromDb,
+  initLibraryRealtime,
+} from "@/lib/library-store";
 import { LibraryToolbar } from "@/components/LibraryToolbar";
 import { onDbSync } from "@/lib/database-interconnect";
 import { CategoryDropdown } from "@/components/CategoryDropdown";
@@ -80,6 +87,8 @@ export function DashboardInspoPage() {
   };
 
   useEffect(() => {
+    void syncLibraryFromDb();
+    const cleanupRealtime = initLibraryRealtime();
     const unsub = onDbSync((e) => {
       if (e.type === "library_inspo_updated" || e.type === "library_synced") {
         refreshInspo();
@@ -94,6 +103,7 @@ export function DashboardInspoPage() {
     window.addEventListener("storage", handleStorage);
 
     return () => {
+      cleanupRealtime();
       unsub();
       window.removeEventListener("storage", handleStorage);
     };

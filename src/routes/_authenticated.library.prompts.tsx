@@ -31,6 +31,8 @@ import {
   getLocalPrompts,
   upsertPrompt,
   deletePrompt,
+  syncLibraryFromDb,
+  initLibraryRealtime,
 } from "@/lib/library-store";
 import { LibraryToolbar } from "@/components/LibraryToolbar";
 import { onDbSync } from "@/lib/database-interconnect";

@@ -24,7 +24,14 @@ import { SubTabs } from "@/components/SubTabs";
 import { LIBRARY_TABS } from "@/routes/_authenticated.library";
 import { Pill } from "@/components/dash";
 import { SearchInput } from "@/components/search";
-import { LibrarySkill, getLocalSkills, upsertSkill, deleteSkill } from "@/lib/library-store";
+import {
+  LibrarySkill,
+  getLocalSkills,
+  upsertSkill,
+  deleteSkill,
+  syncLibraryFromDb,
+  initLibraryRealtime,
+} from "@/lib/library-store";
 import { LibraryToolbar } from "@/components/LibraryToolbar";
 import { onDbSync } from "@/lib/database-interconnect";
 import { CategoryDropdown } from "@/components/CategoryDropdown";
@@ -84,6 +91,8 @@ export function SkillsPage() {
 
   // Subscribe to real-time interconnect and cross-tab storage sync
   useEffect(() => {
+    void syncLibraryFromDb();
+    const cleanupRealtime = initLibraryRealtime();
     const unsub = onDbSync((e) => {
       if (e.type === "library_skill_updated" || e.type === "library_synced") {
         refreshSkills();
@@ -98,6 +107,7 @@ export function SkillsPage() {
     window.addEventListener("storage", handleStorage);
 
     return () => {
+      cleanupRealtime();
       unsub();
       window.removeEventListener("storage", handleStorage);
     };
