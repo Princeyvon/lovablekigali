@@ -622,6 +622,7 @@ export function upsertSkill(skill: LibrarySkill): LibrarySkill[] {
     updated = [skill, ...current];
   }
   saveLocalSkills(updated);
+  void persistLibraryItem("skill", skill);
 
   broadcastDbSync({
     type: "library_skill_updated",
@@ -659,6 +660,7 @@ export function deleteSkill(id: string): LibrarySkill[] {
   const item = current.find((s) => s.id === id);
   const updated = current.filter((s) => s.id !== id);
   saveLocalSkills(updated);
+  void removeLibraryItem(id);
 
   broadcastDbSync({
     type: "library_skill_updated",
@@ -736,6 +738,7 @@ export function upsertInspo(item: DashboardInspo): DashboardInspo[] {
     updated = [item, ...current];
   }
   saveLocalInspo(updated);
+  void persistLibraryItem("inspo", item);
 
   broadcastDbSync({
     type: "library_inspo_updated",
@@ -772,6 +775,7 @@ export function deleteInspo(id: string): DashboardInspo[] {
   const item = current.find((i) => i.id === id);
   const updated = current.filter((i) => i.id !== id);
   saveLocalInspo(updated);
+  void removeLibraryItem(id);
 
   broadcastDbSync({
     type: "library_inspo_updated",
@@ -849,6 +853,7 @@ export function upsertPrompt(prompt: LibraryTextPrompt): LibraryTextPrompt[] {
     updated = [prompt, ...current];
   }
   saveLocalPrompts(updated);
+  void persistLibraryItem("prompt", prompt);
 
   broadcastDbSync({
     type: "library_prompt_updated",
@@ -885,6 +890,7 @@ export function deletePrompt(id: string): LibraryTextPrompt[] {
   const item = current.find((p) => p.id === id);
   const updated = current.filter((p) => p.id !== id);
   saveLocalPrompts(updated);
+  void removeLibraryItem(id);
 
   broadcastDbSync({
     type: "library_prompt_updated",
@@ -914,6 +920,134 @@ export function deletePrompt(id: string): LibraryTextPrompt[] {
   }
 
   return updated;
+}
+
+// ==========================================
+// 4.5 CLOUD DATABASE SYNC (library_items)
+// ==========================================
+
+type LibraryKind = "skill" | "inspo" | "prompt";
+
+function cacheFor(kind: LibraryKind, items: unknown[]) {
+  if (kind === "skill") saveLocalSkills(items as LibrarySkill[]);
+  else if (kind === "inspo") saveLocalInspo(items as DashboardInspo[]);
+  else saveLocalPrompts(items as LibraryTextPrompt[]);
+}
+
+function defaultsFor(kind: LibraryKind): (LibrarySkill | DashboardInspo | LibraryTextPrompt)[] {
+  if (kind === "skill") return DEFAULT_LIBRARY_SKILLS;
+  if (kind === "inspo") return DEFAULT_DASHBOARD_INSPO;
+  return DEFAULT_LIBRARY_PROMPTS;
+}
+
+let syncInFlight: Promise<void> | null = null;
+
+/** Pull the shared library from the cloud database into the local cache.
+ *  Seeds the standard presets into the database the first time it runs empty. */
+export function syncLibraryFromDb(): Promise<void> {
+  if (syncInFlight) return syncInFlight;
+  syncInFlight = (async () => {
+    try {
+      const { data, error } = await supabase
+        .from("library_items")
+        .select("item_id, kind, title, category, payload, sort_order")
+        .order("sort_order", { ascending: true });
+      if (error) throw error;
+      const rows = data || [];
+      const kinds: LibraryKind[] = ["skill", "inspo", "prompt"];
+      const seedRows: Record<string, unknown>[] = [];
+      for (const kind of kinds) {
+        const ofKind = rows.filter((r) => r.kind === kind);
+        if (ofKind.length === 0) {
+          for (const def of defaultsFor(kind)) {
+            seedRows.push({
+              item_id: def.id,
+              kind,
+              title: def.title,
+              category: def.category ?? null,
+              payload: def,
+            });
+          }
+          cacheFor(kind, defaultsFor(kind));
+        } else {
+          cacheFor(
+            kind,
+            ofKind.map((r) => ({ ...(r.payload as object), id: r.item_id })),
+          );
+        }
+      }
+      if (seedRows.length > 0) {
+        await supabase.from("library_items").upsert(seedRows, { onConflict: "item_id" });
+      }
+      broadcastDbSync({ type: "library_synced", payload: { source: "db" } });
+    } catch (err) {
+      console.warn("Library cloud sync failed (using local cache):", err);
+    }
+  })().finally(() => {
+    syncInFlight = null;
+  });
+  return syncInFlight;
+}
+
+export async function persistLibraryItem(
+  kind: LibraryKind,
+  item: { id: string; title: string; category?: string },
+  sortOrder = 0,
+): Promise<void> {
+  try {
+    const { error } = await supabase.from("library_items").upsert(
+      {
+        item_id: item.id,
+        kind,
+        title: item.title,
+        category: item.category ?? null,
+        payload: item,
+        sort_order: sortOrder,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "item_id" },
+    );
+    if (error) throw error;
+  } catch (err) {
+    console.warn("Could not save library item to cloud:", err);
+  }
+}
+
+export async function removeLibraryItem(id: string): Promise<void> {
+  try {
+    const { error } = await supabase.from("library_items").delete().eq("item_id", id);
+    if (error) throw error;
+  } catch (err) {
+    console.warn("Could not delete library item from cloud:", err);
+  }
+}
+
+let realtimeChannel: ReturnType<typeof supabase.channel> | null = null;
+let realtimeRefs = 0;
+
+/** Subscribe to live library changes so edits on other devices appear here. */
+export function initLibraryRealtime(): () => void {
+  realtimeRefs++;
+  if (!realtimeChannel) {
+    realtimeChannel = supabase
+      .channel("library_items_sync")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "library_items" },
+        () => {
+          void syncLibraryFromDb();
+        },
+      )
+      .subscribe();
+  }
+  return () => {
+    realtimeRefs--;
+    if (realtimeRefs <= 0 && realtimeChannel) {
+      supabase.removeChannel(realtimeChannel);
+      realtimeChannel = null;
+      realtimeRefs = 0;
+    }
+  };
 }
 
 // ==========================================
