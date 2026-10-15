@@ -1154,6 +1154,11 @@ export function importLibraryBundle(jsonStr: string): {
       saveLocalPrompts(merged);
     }
 
+    // Persist the merged library to the cloud database
+    for (const s of getLocalSkills()) void persistLibraryItem("skill", s);
+    for (const i of getLocalInspo()) void persistLibraryItem("inspo", i);
+    for (const p of getLocalPrompts()) void persistLibraryItem("prompt", p);
+
     broadcastDbSync({
       type: "library_synced",
       payload: { skillsCount, inspoCount, promptsCount },
@@ -1196,6 +1201,17 @@ export function resetLibraryToDefaults(): void {
   saveLocalSkills(DEFAULT_LIBRARY_SKILLS);
   saveLocalInspo(DEFAULT_DASHBOARD_INSPO);
   saveLocalPrompts(DEFAULT_LIBRARY_PROMPTS);
+
+  // Reset the cloud copy too so every device gets the defaults
+  void (async () => {
+    try {
+      await supabase.from("library_items").delete().neq("item_id", "");
+      syncInFlight = null;
+      await syncLibraryFromDb();
+    } catch (err) {
+      console.warn("Could not reset cloud library:", err);
+    }
+  })();
 
   broadcastDbSync({
     type: "library_synced",
